@@ -1,0 +1,15 @@
+{
+  "name": "imgtocnc",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "tsc index.ts --target es5 ; node index.js"
+  },
+  "author": "Marani Matias Ezequiel",
+  "license": "ISC",
+  "dependencies": {
+    "lwip": "0.0.9"
+  }
+}

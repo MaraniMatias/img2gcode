@@ -1,0 +1,14 @@
+G21 ; Set units to mm
+G90 ; Absolute positioning
+G01 X0 Y0 Z765 ; Initial line
+G01 X1 Y1
+G01 Z0
+G01 X2 Y1
+G01 Z765
+G01 X2 Y2
+G01 Z0
+G01 Z765
+G01 X2 Y3
+G01 Z0
+G01 X3 Y3
+G01 Z765
