@@ -12,9 +12,8 @@ interface axes {
 import Line from "./line";
 import * as fs from "fs";
 const lwip = require('lwip');
-const maxZ : number = 765;
 
-const dir : string = './img/130x130';
+const dir : string = './img/25x25';
 const dirImg : string = dir+'.png';
 const dirGCode : string = dir+'.gcode';
 
@@ -31,12 +30,12 @@ function intensity( pixel: pixel ):number {
  * @param  {pixel} p2 pixel actual
  */
 function pixelToG(gCode:Line[],pixelOld:pixelAxes, pixelNew:pixelAxes) {
-  let iOld = intensity(pixelOld.colour)
-    , iNew = intensity(pixelNew.colour)
-    , maxZ = 765 // distancia segura o para el color blanco
+  let iOld : number = intensity(pixelOld.colour)
+    , iNew : number = intensity(pixelNew.colour)
+    , maxZ : number = 765 // distancia segura o para el color blanco
   ;
-  let index :number = gCode.length!==0 ? gCode.length-1 : 0 ;
-  let gCodeLast :Line = gCode[index];
+  let index : number = gCode.length!==0 ? gCode.length-1 : 0 ;
+  let gCodeLast : Line = gCode[index];
   //console.log(index,"->",gCodeLast);
   // White to Black
   if ( iOld > iNew ) {
