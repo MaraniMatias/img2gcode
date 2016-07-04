@@ -3,7 +3,7 @@ var line_1 = require("./line");
 var fs = require("fs");
 var lwip = require('lwip');
 var maxZ = 765;
-var dir = './img/5x5';
+var dir = './img/130x130';
 var dirImg = dir + '.png';
 var dirGCode = dir + '.gcode';
 function intensity(pixel) {
@@ -14,10 +14,9 @@ function pixelToG(gCode, pixelOld, pixelNew) {
     var iOld = intensity(pixelOld.colour), iNew = intensity(pixelNew.colour), maxZ = 765;
     var index = gCode.length !== 0 ? gCode.length - 1 : 0;
     var gCodeLast = gCode[index];
-    console.log(index, "->", gCodeLast);
     if (iOld > iNew) {
         if (!(pixelNew.axes.x - gCodeLast.axes.x === 1 || pixelNew.axes.y - gCodeLast.axes.y === 1)) {
-            gCode.push(new line_1.default({ z: maxZ }, pixelNew.colour));
+            gCode.push(new line_1.default({ z: iOld }, pixelNew.colour));
         }
         var axes = { x: pixelNew.axes.x, y: pixelNew.axes.y };
         gCode.push(new line_1.default(axes, pixelNew.colour));
@@ -52,39 +51,21 @@ function pixelAnalysis(image) {
 }
 ;
 function main(dirImg, dirGCode) {
-    new Promise(function (resolve, reject) {
-        fs.unlink(dirGCode, function (err) {
-            if (err) {
-                fs.writeFile(dirGCode, "", function (err) {
-                    resolve({});
-                });
-            }
-            else {
-                resolve({});
-            }
+    fs.unlink(dirGCode, function (err) {
+    });
+    lwip.open(dirImg, function (err, image) {
+        pixelAnalysis(image).then(function (gCode) {
+            toFile(gCode, dirGCode);
+            console.log('->>', dirGCode);
         });
-    }).then(function (data) {
-        lwip.open(dirImg, function (err, image) {
-            pixelAnalysis(image).then(function (gCode) {
-                toFile(gCode, dirGCode);
-                console.log(__dirname + dirGCode);
-            });
-        });
-    }).catch(function (err) {
-        console.log(err);
     });
 }
 main(dirImg, dirGCode);
 function toFile(gCode, dirGCode) {
-    var data = concat(gCode);
-    for (var index = 0; index < data.length; index++) {
-        var lineG = data[index];
-        console.log(lineG);
-        fs.appendFile(dirGCode, lineG + '\n', { encoding: "utf8" }, function (err) {
-            if (err)
-                throw err;
-        });
-    }
+    fs.writeFile(dirGCode, concat(gCode).join('\n'), { encoding: "utf8" }, function (err) {
+        if (err)
+            throw err.message;
+    });
 }
 function concat(gCode) {
     var data = [

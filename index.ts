@@ -14,7 +14,7 @@ import * as fs from "fs";
 const lwip = require('lwip');
 const maxZ : number = 765;
 
-const dir : string = './img/5x5';
+const dir : string = './img/130x130';
 const dirImg : string = dir+'.png';
 const dirGCode : string = dir+'.gcode';
 
@@ -37,12 +37,12 @@ function pixelToG(gCode:Line[],pixelOld:pixelAxes, pixelNew:pixelAxes) {
   ;
   let index :number = gCode.length!==0 ? gCode.length-1 : 0 ;
   let gCodeLast :Line = gCode[index];
-  console.log(index,"->",gCodeLast);
+  //console.log(index,"->",gCodeLast);
   // White to Black
   if ( iOld > iNew ) {
     // Z en otro linea
     if ( !(pixelNew.axes.x - gCodeLast.axes.x === 1 || pixelNew.axes.y - gCodeLast.axes.y === 1) ){
-      gCode.push( new Line( {z:maxZ} ,pixelNew.colour ) ); // maxZ o capas i1
+      gCode.push( new Line( {z:iOld} ,pixelNew.colour ) ); // maxZ o capas i1
     }
     let axes :axes = { x : pixelNew.axes.x, y : pixelNew.axes.y }
     gCode.push( new Line( axes , pixelNew.colour ) );
@@ -85,38 +85,20 @@ function pixelAnalysis(image)  {
 
 
 function main(dirImg:string,dirGCode:string) {
-  new Promise( (resolve,reject) => {
-    fs.unlink(dirGCode,(err)=>{
-      if(err){
-        fs.writeFile(dirGCode,"",(err)=>{
-          resolve({});
-        });
-      }else{
-        resolve({});
-      }
-    });
-  }).then(( data )=>{
+    fs.unlink(dirGCode);
     lwip.open(dirImg, function(err, image){
       pixelAnalysis(image).then((gCode:Line[])=>{
         toFile(gCode,dirGCode);
-        console.log(__dirname+dirGCode);
+        console.log(dirImg,'=to=>',dirGCode);
       });
     });
-  }).catch( (err) => {
-    console.log(err);
-  })
 }
 main(dirImg,dirGCode);
 
 function toFile(gCode: Line[],dirGCode:string) {
-  let data : string[] = concat(gCode);
-  for (let index = 0; index < data.length; index++) {
-    let lineG = data[index];
-console.log(lineG);
-    fs.appendFile(dirGCode, lineG+'\n',{encoding:"utf8"} ,(err)=>{
-      if(err) throw err;
-    })
-  }
+  fs.writeFile(dirGCode, concat(gCode).join('\n'),{ encoding: "utf8" },(err)=>{
+    if(err) throw err.message;
+  });
 }
 function concat(gCode: Line[]):string[] {
   let data : string[]= [
