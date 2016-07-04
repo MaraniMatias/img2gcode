@@ -22,8 +22,8 @@ export default class line {
 
   
   /**
-   * @param  {any} axes  { x:number; y:number; z?:number;}
-   * @param  {pixel} colour?  {r:number; g:number; b:number; a:number;}
+   * @param  {x:number; y:number; z?:number;} axes 
+   * @param  {r:number; g:number; b:number; a:number;} colour?
    * @param  {string} comment? 
    */
   constructor(axes:any,colour?:pixel,comment?:string){

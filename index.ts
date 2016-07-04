@@ -12,8 +12,12 @@ interface axes {
 import Line from "./line";
 import * as fs from "fs";
 const lwip = require('lwip');
-const img : string = './img/5x5.png';
 const maxZ : number = 765;
+
+const dir : string = './img/5x5';
+const dirImg : string = dir+'.png';
+const dirGCode : string = dir+'.gcode';
+
 /**
  * @param  {pixel} pixel pixel
  * @returns number intencidad de 0-765
@@ -26,28 +30,33 @@ function intensity( pixel: pixel ):number {
  * @param  {pixel} p1 pixel anterior
  * @param  {pixel} p2 pixel actual
  */
-function pixelToG(gCode:Line[],p1:pixelAxes, p2:pixelAxes) {
-  // Z no esta bien calibrado
-  // intensity
-  let i1 = intensity(p1.colour)
-    , i2 = intensity(p2.colour)
-    , maxZ = 765 // distancia segura o para el blanco
+function pixelToG(gCode:Line[],pixelOld:pixelAxes, pixelNew:pixelAxes) {
+  let iOld = intensity(pixelOld.colour)
+    , iNew = intensity(pixelNew.colour)
+    , maxZ = 765 // distancia segura o para el color blanco
   ;
+  let index :number = gCode.length!==0 ? gCode.length-1 : 0 ;
+  let gCodeLast :Line = gCode[index];
+  console.log(index,"->",gCodeLast);
   // White to Black
-  if ( i1 > i2 ) {
-    // Z en otro linea 
-    let axes :axes = {x : p2.axes.x, y : p2.axes.y }
-    gCode.push( new Line(axes,p2.colour ) )
-    gCode.push( new Line( {z:i2} ,p2.colour ) )
+  if ( iOld > iNew ) {
+    // Z en otro linea
+    if ( !(pixelNew.axes.x - gCodeLast.axes.x === 1 || pixelNew.axes.y - gCodeLast.axes.y === 1) ){
+      gCode.push( new Line( {z:maxZ} ,pixelNew.colour ) ); // maxZ o capas i1
+    }
+    let axes :axes = { x : pixelNew.axes.x, y : pixelNew.axes.y }
+    gCode.push( new Line( axes , pixelNew.colour ) );
+    gCode.push( new Line( {x : pixelNew.axes.x, y : pixelNew.axes.y, z:iNew} ,pixelNew.colour ) );
   }
   // Black to White
-  if ( i1 < i2 ) {
-    gCode.push( new Line( {z:i2} ,p2.colour ) )
+  if ( iOld < iNew ) {
+    gCode.push( new Line( {z:iNew} ,pixelNew.colour ) );
   }
   // Black to Black
-  if ( i1 == 0 && i1 == i2 ) { // creo que no seria 0, verlo bien para otros colores y para analisis con mmMax mmMin
-    let axes :axes = {x : p2.axes.x, y : p2.axes.y }
-    gCode.push( new Line(axes,p2.colour ) )
+  if ( iNew == 0 && iOld == iNew ) {
+     // ver bien para otros colores y para analisis con mmMax mmMin
+    let axes :axes = {x : pixelNew.axes.x, y : pixelNew.axes.y,z:iNew }
+    gCode.push( new Line( axes , pixelNew.colour ) );
   }
 }
 
@@ -60,11 +69,13 @@ function pixelAnalysis(image)  {
   ;
   for (let y = 0; y < height; ++y) {
     for (let x = 0; x < width; ++x) {
+      let p = image.getPixel(x, y);
+      let pixelNew = {  axes:{ x , y } ,colour :{ r:p.r , g:p.g , b:p.b , a:p.a }};
       if( !(x==0 && y==0) ){
-        let p = image.getPixel(x, y);
-        let pixelNew = { colour :{ r:p.r , g:p.g , b:p.b , a:p.a }, axes:{ x , y } };
         pixelToG(gCode,pixelOld,pixelNew);
         pixelOld = pixelNew;
+      }else{
+        gCode.push( new Line({x:pixelNew.axes.x,y:pixelNew.axes.y,z:maxZ},pixelNew.colour, "Initial line") );
       }
     }
   }
@@ -73,25 +84,36 @@ function pixelAnalysis(image)  {
 };
 
 
-function main(img:string) {
-  fs.unlink("./img/myCodeG.gcode");
-  lwip.open(img, function(err, image){
-    pixelAnalysis(image).then((gCode:Line[])=>{
-      toFile(gCode);
-      console.log(__dirname+"/img/myCodeG.gcode");
+function main(dirImg:string,dirGCode:string) {
+  new Promise( (resolve,reject) => {
+    fs.unlink(dirGCode,(err)=>{
+      if(err){
+        fs.writeFile(dirGCode,"",(err)=>{
+          resolve({});
+        });
+      }else{
+        resolve({});
+      }
     });
-  });
-
+  }).then(( data )=>{
+    lwip.open(dirImg, function(err, image){
+      pixelAnalysis(image).then((gCode:Line[])=>{
+        toFile(gCode,dirGCode);
+        console.log(__dirname+dirGCode);
+      });
+    });
+  }).catch( (err) => {
+    console.log(err);
+  })
 }
-main(img);
+main(dirImg,dirGCode);
 
-
-function toFile(gCode: Line[]) {
+function toFile(gCode: Line[],dirGCode:string) {
   let data : string[] = concat(gCode);
   for (let index = 0; index < data.length; index++) {
     let lineG = data[index];
 console.log(lineG);
-    fs.appendFile("./img/myCodeG.gcode", lineG+'\n',{encoding:"utf8"} ,(err)=>{
+    fs.appendFile(dirGCode, lineG+'\n',{encoding:"utf8"} ,(err)=>{
       if(err) throw err;
     })
   }
@@ -99,8 +121,7 @@ console.log(lineG);
 function concat(gCode: Line[]):string[] {
   let data : string[]= [
     'G21 ; Set units to mm',
-    'G90 ; Absolute positioning',
-    `G01 X0 Y0 Z${maxZ} ; Initial line`
+    'G90 ; Absolute positioning'
   ]
   for (let index = 0; index < gCode.length; index++) {
     let element = gCode[index];
