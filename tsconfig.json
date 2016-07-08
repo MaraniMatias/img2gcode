@@ -1,7 +1,8 @@
 {
   "files": [
     "typings/index.d.ts",
-    "index.ts"
+    "index.ts",
+    "line.ts"
   ],
   "compilerOptions": {
     "allowJs": true,
