@@ -1,4 +1,5 @@
 /// <reference path="./typings/globals/lwip/index.d.ts" />
+type Pixel = { colour: ColorObject, intensity :number , axes:Axes };
 type ColorObject = {r: number, g: number, b: number, a?: number};
 type Axes = { x:number, y:number, z?:number};
 /**
@@ -10,29 +11,13 @@ export default class Line {
    * @param  {r:number; g:number; b:number; a:number;} colour?
    * @param  {string} comment? 
    */
-  constructor(show:boolean,axes:any,colour?:ColorObject,comment?:string){
-    this._axes = axes;
+  //constructor(show:boolean,axes:any,colour?:ColorObject,comment?:string){
+  constructor(show :boolean,pixel :Pixel,comment ?:string){
     this._show = show;
-    if(this._colour){ this._colour=colour; }
-    if(this._colour){ this._comment=comment; }
+    this._pixel = pixel;
+    if(comment){ this._comment = comment; }
   }
 
-  private _axes : Axes;
-  public get axes() : Axes {
-    return this._axes;
-  }
-  public set axes(v : Axes) {
-    this._axes = v;
-  }
-
-  private _colour : ColorObject;
-  public get colour() : ColorObject {
-    return this._colour;
-  }
-  public set colour(v : ColorObject) {
-    this._colour = v;
-  }
-  
   private _show : boolean;
   public get show() : boolean {
     return this._show;
@@ -40,7 +25,7 @@ export default class Line {
   public set show(v : boolean) {
     this._show = v;
   }
-    
+
   private _comment : string;
   public get comment() : string {
     return this._comment;
@@ -49,17 +34,27 @@ export default class Line {
     this._comment = v;
   }
   
+  private _pixel : Pixel;
+  public get axes() : Axes {
+    return this._pixel.axes;
+  }
+  public get colour() : ColorObject {
+    return this._pixel.colour;
+  }
+  public get intensity() :number{
+    return this._pixel.intensity;
+  }
+
   /**
    * code
    * Arma code for that line with data
    */
   public code() : string {
-    // si es solo un comentario G01 no estaria
-    let s = this._show ? '':';';
-    let x = this._axes.x!==undefined ? ` X${this._axes.x}`:'';
-    let y = this._axes.y!==undefined ? ` Y${this._axes.y}`:'';
-    let z = this._axes.z!==undefined ? ` Z${this._axes.z}`:'';
+    let show = this._show ? '':';';
+    let x = this._pixel.axes.x!==undefined ? ` X${this._pixel.axes.x}`:'';
+    let y = this._pixel.axes.y!==undefined ? ` Y${this._pixel.axes.y}`:'';
+    let z = this._pixel.axes.z!==undefined ? ` Z${this._pixel.axes.z}`:'';
     let comment = this._comment ? `; ${this._comment}`:'';
-    return s+"G01"+x+y+z+comment;
+    return show+"G01"+x+y+z+comment;
   }
 }

@@ -32,7 +32,7 @@ class File {
   }
   
   private _gCodeInit : string[];
-  private Concat(gCode: Line[]) :string[] {
+  private concat(gCode: Line[]) :string[] {
     for (let index = 0; index < gCode.length; index++) {
       let element = gCode[index];
       if(element.show){ this._gCodeInit.push( element.code() ); }
@@ -46,9 +46,9 @@ class File {
    * @param {string} dirGCode path the gCode file
    * @param {Line[]} gCode array de lineas para converti en gcode
    */
-  public Save(dirGCode :string, gCode: Line[] , cb?: () => void ) {
+  public save(dirGCode :string, gCode: Line[] , cb?: () => void ) {
     fs.unlink(dirGCode);
-    fs.writeFile(dirGCode, this.Concat(gCode).join('\n'),{ encoding: "utf8" },(err)=>{
+    fs.writeFile(dirGCode, this.concat(gCode).join('\n'),{ encoding: "utf8" },(err)=>{
       if(err) throw err.message;
       if(cb) cb();
     });
