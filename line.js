@@ -1,35 +1,12 @@
 "use strict";
 var Line = (function () {
-    function Line(show, axes, colour, comment) {
-        this._axes = axes;
+    function Line(show, pixel, comment) {
         this._show = show;
-        if (this._colour) {
-            this._colour = colour;
-        }
-        if (this._colour) {
+        this._pixel = pixel;
+        if (comment) {
             this._comment = comment;
         }
     }
-    Object.defineProperty(Line.prototype, "axes", {
-        get: function () {
-            return this._axes;
-        },
-        set: function (v) {
-            this._axes = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Line.prototype, "colour", {
-        get: function () {
-            return this._colour;
-        },
-        set: function (v) {
-            this._colour = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(Line.prototype, "show", {
         get: function () {
             return this._show;
@@ -50,13 +27,34 @@ var Line = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Line.prototype, "axes", {
+        get: function () {
+            return this._pixel.axes;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Line.prototype, "colour", {
+        get: function () {
+            return this._pixel.colour;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Line.prototype, "intensity", {
+        get: function () {
+            return this._pixel.intensity;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Line.prototype.code = function () {
-        var s = this._show ? '' : ';';
-        var x = this._axes.x !== undefined ? " X" + this._axes.x : '';
-        var y = this._axes.y !== undefined ? " Y" + this._axes.y : '';
-        var z = this._axes.z !== undefined ? " Z" + this._axes.z : '';
+        var show = this._show ? '' : ';';
+        var x = this._pixel.axes.x !== undefined ? " X" + this._pixel.axes.x : '';
+        var y = this._pixel.axes.y !== undefined ? " Y" + this._pixel.axes.y : '';
+        var z = this._pixel.axes.z !== undefined ? " Z" + this._pixel.axes.z : '';
         var comment = this._comment ? "; " + this._comment : '';
-        return s + "G01" + x + y + z + comment;
+        return show + "G01" + x + y + z + comment;
     };
     return Line;
 }());
