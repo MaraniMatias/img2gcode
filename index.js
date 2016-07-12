@@ -1,6 +1,5 @@
 "use strict";
 var line_1 = require("./line");
-var file_1 = require("./file");
 var lwip = require('lwip');
 var _log = true;
 var _dirGCode = 'myGcode.gcode';
@@ -55,27 +54,46 @@ function pixelToGCode(oldPixel, newPixel) {
     }
 }
 function nextBlackPixel(oldPixel) {
-    var axes = [1, -1], newPixel = {}, next = true;
-    for (var i = 0; i < axes.length && next; i++) {
-        for (var j = 0; j < axes.length && next; j++) {
-            var px = oldPixel.axes.x + axes[i], py = oldPixel.axes.y + axes[j];
-            if (px >= 0 && py >= 0 && py <= _width && px <= _height) {
-                var pixel = getPixel(px, py);
-                if (pixel.intensity < 765) {
-                    newPixel = { pixel: pixel, be: false };
-                    for (var index = 0; index < _gCode.length; index++) {
-                        var e = _gCode[index].axes;
-                        newPixel.be = (e.x === newPixel.pixel.axes.x && e.y === newPixel.pixel.axes.y);
-                    }
-                    next = newPixel.be;
-                }
-                else {
-                    addPixel(pixel, false);
-                }
+    var axesAround = [0, 1, -1], newPixel;
+    var pixelsA = pixelAround(axesAround);
+    for (var index = 0; index < pixelsA.length; index++) {
+        var pixel = pixelsA[index];
+        if (pixel.intensity < 765) {
+            if (!isPixelnGCode(pixel)) {
+                return pixel;
+            }
+        }
+        else {
+            addPixel(pixel, false);
+        }
+        if (index + 1 == pixelsA.length) {
+            return undefined;
+        }
+    }
+    function isPixelnGCode(pixel) {
+        for (var index = 0; index < _gCode.length; index++) {
+            var toBe = false;
+            if (index == _gCode.length || toBe) {
+                return toBe;
+            }
+            else {
+                toBe = (_gCode[index].axes.x === pixel.axes.x && _gCode[index].axes.y === pixel.axes.y);
             }
         }
     }
-    return newPixel.pixel;
+    function pixelAround(axes) {
+        var pixels = [];
+        for (var i = 0; i < axes.length; i++) {
+            for (var j = 0; j < axes.length; j++) {
+                var x = oldPixel.axes.x + axes[i], y = oldPixel.axes.y + axes[j];
+                if ((x >= 0 && y >= 0) && (y <= _width && x <= _height)) {
+                    pixels.push(getPixel(x, y));
+                }
+                if (i + 1 == axes.length && j + 1 == axes.length)
+                    return pixels;
+            }
+        }
+    }
 }
 function unprocessedPixel() {
     var next = true, pixel;
@@ -96,33 +114,17 @@ function unprocessedPixel() {
     return pixel;
 }
 function main(top, left) {
-    var oldPixel = getPixel(top != undefined ? top : 0, left != undefined ? left : 0);
-    var newPixel = nextBlackPixel(oldPixel);
-    if (newPixel === undefined || null) {
-        newPixel = unprocessedPixel();
-        if (newPixel === undefined || null) {
-            pixelToGCode(oldPixel, newPixel);
-            oldPixel = newPixel;
-        }
-        else {
-            new file_1.default().save(_dirGCode, _gCode, function () {
-                console.log("guardar :D");
-            });
-        }
-    }
-    else {
-        pixelToGCode(oldPixel, newPixel);
-        oldPixel = newPixel;
-    }
+    var oldPixel = getPixel(top, left);
+    console.log(nextBlackPixel(oldPixel));
 }
-function start(dirImg) {
+function start(dirImg, top, left) {
     _dirImg = dirImg;
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
         _height = image.height();
         _width = image.width();
         _img = image;
-        main();
+        main(top != undefined ? top : 0, left != undefined ? left : 0);
     });
 }
-start("./img/25x25.png");
+start("./img/25x25.png", 4, 2);
