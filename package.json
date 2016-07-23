@@ -1,7 +1,7 @@
 {
   "name": "imgtocnc",
   "version": "0.0.1",
-  "description": "",
+  "description": "Espero que alguien más le sirva  ([MIT](http://opensource.org/licenses/mit-license.php)). Autores: Marani Matias E.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,6 +10,11 @@
   "author": "Marani Matias Ezequiel",
   "license": "ISC",
   "dependencies": {
-    "lwip": "0.0.9"
+    "lwip": "^0.0.9"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node" : "6.3.1",
+    "npm" : "3.10.3"
   }
 }

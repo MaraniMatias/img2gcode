@@ -12,7 +12,7 @@ var _img      :lwip.Image;
 var _gCode    :Line[] = [];
 var _height   :number = 0;
 var _width    :number = 0;
-var self = this;
+//var self = this;
 /**
  * getPixel
  * 
@@ -47,7 +47,13 @@ function addPixel(pixel :Pixel, show ?:boolean, coment ?:string) :void {
 function pixelToGCode(oldPixel :Pixel, newPixel :Pixel) {
   let index : number = _gCode.length!==0 ? _gCode.length-1 : 0 ;
   let gCodeLast : Line = _gCode[index];
-  if(_log) console.log(index,"->",gCodeLast);
+
+  if(_log){
+    console.log("pixelToGCode\n");
+    console.log( index + "gCodeLast ->\n" , gCodeLast  );
+    console.log( "newPixel ->\n" , newPixel  );
+  }
+
   // White to Black
   if ( oldPixel.intensity > newPixel.intensity ) {
     // Z en otro linea
@@ -196,15 +202,15 @@ function unprocessedPixel() :Pixel {
 function main(top :number, left :number) {    
   // add pixel 0,0 o por el primero.
   let oldPixel :Pixel = getPixel( top, left);
+  // (3)
   // nuevo pixel blanco o siguiente
-  //let newPixel :Pixel = nextBlackPixel(oldPixel);
-console.log(nextBlackPixel(oldPixel));
-/*
-  if( newPixel === undefined || null ){  // este y (1) los anide por si separo los if capas que resuelve jutos
+  let newPixel :Pixel = nextBlackPixel(oldPixel);
+  if( newPixel === undefined ){  // este y (1) los anide por si separo los if capas que resuelve jutos
     newPixel = unprocessedPixel();
-    if( newPixel === undefined || null ){ // (1)
+    if( newPixel !== undefined ){ // (1)
       pixelToGCode(oldPixel,newPixel);
       oldPixel = newPixel;
+      // volver a (3)
     }else{
       new File().save(_dirGCode,_gCode, () => {
         console.log("guardar :D");
@@ -213,8 +219,8 @@ console.log(nextBlackPixel(oldPixel));
   }else{
     pixelToGCode(oldPixel,newPixel);
     oldPixel = newPixel;
+    // volver a (3)
   }
-*/
 }
 /**
  * start
@@ -232,4 +238,4 @@ function start(dirImg :string, top ?:number, left ?:number) {
   });
 }
 
-start("./img/25x25.png",4,2);
+start("./img/25x25.png"); //4,2

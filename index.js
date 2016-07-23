@@ -1,5 +1,6 @@
 "use strict";
 var line_1 = require("./line");
+var file_1 = require("./file");
 var lwip = require('lwip');
 var _log = true;
 var _dirGCode = 'myGcode.gcode';
@@ -9,6 +10,10 @@ var _gCode = [];
 var _height = 0;
 var _width = 0;
 var self = this;
+function log(f, s) {
+    if (_log)
+        console.log("->", f, ":\n", s);
+}
 function getPixel(left, top) {
     var pixel = _img.getPixel(left, top);
     var intensity = (pixel.r + pixel.g + pixel.b) * ((pixel.a > 1) ? pixel.a / 100 : 1);
@@ -20,8 +25,9 @@ function addPixel(pixel, show, coment) {
 function pixelToGCode(oldPixel, newPixel) {
     var index = _gCode.length !== 0 ? _gCode.length - 1 : 0;
     var gCodeLast = _gCode[index];
-    if (_log)
-        console.log(index, "->", gCodeLast);
+    console.log("pixelToGCode", index + "->", gCodeLast);
+    console.log("pixelToGCode", "newPixel ->", newPixel);
+    console.log(this);
     if (oldPixel.intensity > newPixel.intensity) {
         if (!(newPixel.axes.x - gCodeLast.axes.x === 1 || newPixel.axes.y - gCodeLast.axes.y === 1)) {
             newPixel.axes.z = oldPixel.intensity;
@@ -115,7 +121,23 @@ function unprocessedPixel() {
 }
 function main(top, left) {
     var oldPixel = getPixel(top, left);
-    console.log(nextBlackPixel(oldPixel));
+    var newPixel = nextBlackPixel(oldPixel);
+    if (newPixel === undefined) {
+        newPixel = unprocessedPixel();
+        if (newPixel !== undefined) {
+            pixelToGCode(oldPixel, newPixel);
+            oldPixel = newPixel;
+        }
+        else {
+            new file_1.default().save(_dirGCode, _gCode, function () {
+                console.log("guardar :D");
+            });
+        }
+    }
+    else {
+        pixelToGCode(oldPixel, newPixel);
+        oldPixel = newPixel;
+    }
 }
 function start(dirImg, top, left) {
     _dirImg = dirImg;
@@ -127,4 +149,4 @@ function start(dirImg, top, left) {
         main(top != undefined ? top : 0, left != undefined ? left : 0);
     });
 }
-start("./img/25x25.png", 4, 2);
+start("./img/25x25.png");
