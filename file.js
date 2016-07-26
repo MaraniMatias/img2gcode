@@ -23,7 +23,8 @@ var File = (function () {
         return this._gCodeInit;
     };
     File.prototype.save = function (dirGCode, gCode, cb) {
-        fs.unlink(dirGCode);
+        fs.unlink(dirGCode, function (err) {
+        });
         fs.writeFile(dirGCode, this.concat(gCode).join('\n'), { encoding: "utf8" }, function (err) {
             if (err)
                 throw err.message;

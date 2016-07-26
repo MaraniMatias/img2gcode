@@ -55,6 +55,6 @@ export default class Line {
     let y = this._pixel.axes.y!==undefined ? ` Y${this._pixel.axes.y}`:'';
     let z = this._pixel.axes.z!==undefined ? ` Z${this._pixel.axes.z}`:'';
     let comment = this._comment ? `; ${this._comment}`:'';
-    return show+"G01"+x+y+z+comment;
+    return show+"G01"+x+y+z+comment ;//+` ;intensity: ${this._pixel.intensity}`;
   }
 }
