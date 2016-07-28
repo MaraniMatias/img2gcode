@@ -5,34 +5,60 @@ import Line from "./line";
 import File from "./file";
 import * as lwip  from 'lwip';
 import * as path  from 'path';
-
-const _log    : any = {
+// 0 -- X
+// |
+// Y
+const _log = {
   nextBlackPixel:  false,
   pixelToGCode  :  false,
   pixelAround   :  false,
+  removePixel   :  false,
+  getAllPixel   :  false,
   addPixel      :  !false,
-  main          :  false
+  main          :  false,
+  size          :  false
 };
 var _dirGCode :string ='myGcode.gcode';
 var _dirImg   :string;
-var _img      :lwip.Image;
 var _gCode    :Line[] = [];
 var _height   :number = 0;
 var _width    :number = 0;
+var _img   :Pixel[][] = [];
 //var self = this;
+
+/**
+ * getAllPixel
+ * 
+ * @param {lwip.Image} image
+ * @returns {Pixel[][]}
+ */
+function getAllPixel(image:lwip.Image) :Pixel[][]{
+  if(_log.getAllPixel){console.log("_width:",_width,"_height:",_height)}
+  let newArray = [];
+  for (let x = 0; x < _width ; x++) {
+    let row = []
+    for (let y = 0; y < _height ; y++) {
+      let colour = image.getPixel(x,y);
+      let intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a/100 : 1);
+      row.push({  colour,axes:{x,y},intensity  });
+    }
+    newArray.push(row);
+  }
+  return newArray;
+}
+
 /**
  * getPixel
  * 
  * @function
- * @param {number} left
- * @param {number} top
+ * @param {number} left or X
+ * @param {number} top or Y
  * @returns {Pixel}
  */
 function getPixel(left :number, top :number) : Pixel {
-  let pixel = _img.getPixel(left,top);
-  let intensity = (pixel.r + pixel.g + pixel.b) * ((pixel.a > 1) ? pixel.a/100 : 1);
-  return { colour: pixel, intensity : intensity , axes : {x:left,y:top} }
+  return _img[left][top];
 }
+
 /**
  * addPixel
  * 
@@ -40,12 +66,48 @@ function getPixel(left :number, top :number) : Pixel {
  * @param {Pixel} pixel
  * @param {boolean} [show] default true
  * @param {string} [coment]
+ * @returns {Pixel}
 */
 function addPixel(pixel :Pixel, show ?:boolean, coment ?:string) :Pixel {
   let index = _gCode.push( new Line(show===undefined?true:show,pixel,coment) );
   if(_log.addPixel && (show===undefined)){  console.log( _gCode[index-1].code())  }
+  removePixel(pixel.axes.x,pixel.axes.y);
   return pixel;
 }
+
+/**
+ * removePixel
+ * 
+ * @function
+ * @param {number} left or X
+ * @param {number} top or Y
+ * @returns {Pixel[][]}
+ */
+function removePixel(left :number, top :number) : Pixel[][] {
+  if(_log.removePixel){console.log("removePixel:\n","left:",left,"top:",top,_img[left][top]);}
+  if(_img[left][top]){delete _img[left][top];}
+  else{if(_log.removePixel)console.log("It isn't:",left,top);}
+  return _img;
+}
+
+/**
+ * size
+ * 
+ * @param {Array} arr
+ * @returns {number} size of array
+ */
+function size(arr : any[][]) :number {
+  let size = 0;
+  if(_log.size){console.log(arr.length*arr[arr.length-1].length);}
+  for (let x = 0; x < arr.length; x++) {
+    let arrX = arr[x];
+    for (let y = 0; y < arrX.length; y++) {
+      if (arrX[y] ) size++;
+    }
+  }
+  return size
+}
+
 /**
  * pixelToGCode
  * 
@@ -139,14 +201,19 @@ function pixelAround(axes :number[],oldPixel:Pixel) :Pixel[] {
     let x : number = oldPixel.axes.x + axes[i]
       , y : number = oldPixel.axes.y + axes[j]
     ;
-    // pixel cercanos
-    if( (x>=0 && y>=0) && (y < _width && x < _height) ){
-      if(_log.pixelAround){console.log("pixelAround:","x:",x,"y:",y)}
-      pixels.push( getPixel(x,y) );
+    if( (x>=0 && y>=0) && (y < _width && x < _height) && !( oldPixel.axes.x == x && oldPixel.axes.y == y ) ){
+      let p = getPixel(x,y);
+      if(_log.pixelAround){console.log("pixelAround:","x:",x,"y:",y,"\npixel:",p)}
+      if( p != undefined ){
+        pixels.push( p );
+      }else{
+        if(_log.pixelAround){console.log(`(${x},${y}) -> ${getPixel(x,y)}`)}
+      }
     }
-    if(i+1 == axes.length && j+1 == axes.length) return pixels
+    //if(i+1 == axes.length && j+1 == axes.length) return pixels
   }
   }
+  return pixels
 }// pixelAround
 
 /**
@@ -156,24 +223,11 @@ function pixelAround(axes :number[],oldPixel:Pixel) :Pixel[] {
  * @returns {Pixel}
  */
 function unprocessedPixel() :Pixel {
-  let next   :boolean = true, pixel : Pixel;
-  for (let y = 0; y < _height && next; ++y) {
-    for (let x = 0; x < _width && next; ++x) {
-      pixel = getPixel(x,y);
-      next = false; // asumo que no esta
-      let toBe = false; // Is pixel in gCode ?
-      for (let i = 0; i < _gCode.length && !toBe ; i++) {
-        let e = _gCode[i].axes;
-        // true && true -> It is in gCode
-        if( e.x === x && e.y === y){
-          // pixel is in gCode then finsh for gCode
-          toBe = true; // pixel found
-          next = true; // next pixel in img
-        }
-      }
+  for (let x = 0; x < _img.length; x++) {
+    for (let y = 0; y < _img[x].length; y++) {
+      if( _img[x][y] ){  return getPixel(x,y);  } 
     }
   }
-  return pixel;
 }
 
 /**
@@ -184,19 +238,17 @@ function unprocessedPixel() :Pixel {
  */
 function mani(top? :number, left? :number) {
   let oldPixel :Pixel = addPixel(getPixel(0,0),true,"---> pixel start <---")
+  let s = size(_img);
 
-  let totalPixel = _height*_width;
-  for (let x = 0; x < _height; x++) {
-  for (let y = 0; y < _width; y++) {
-    //if(x<_height && y<_width){
-      let newPixel :Pixel = nextBlackPixel(oldPixel);
-      oldPixel = pixelToGCode(lasPixelGCode(),newPixel?newPixel:unprocessedPixel());
-    //}else{
-    //  x=_height,y=_width;
-    //  new File().save( _dirGCode, _gCode, () => {  console.log("guardar :D");  });
-    //}
+  for (let i = 0; i < s; i++) {
+    if(_log.size){  console.log("size",size(_img));  }
+    let newPixel :Pixel = nextBlackPixel(oldPixel);
+    //console.log("\nnextBlackPixel",nextBlackPixel(oldPixel),"\nunprocessedPixel",unprocessedPixel());
+    oldPixel = pixelToGCode(lasPixelGCode(),newPixel?newPixel:unprocessedPixel());
   }
-  }
+
+// antes de guardar subir Zmax
+  //  new File().save( _dirGCode, _gCode, () => {  console.log("guardar :D");  });
 }
 
 function lasPixelGCode() :Pixel {
@@ -218,23 +270,15 @@ function lasPixelGCode() :Pixel {
  * @param {Pixel} oldPixel
  */
 function nextBlackPixel(oldPixel :Pixel) :Pixel|any {
+  if(_log.nextBlackPixel){console.log("nextBlackPixel:\n\toldPixel:",oldPixel)}
   let axesAround :number[] = [0,1,-1] // unida sumadas para pixel cercanos
-    , newPixel :{ pixel :Pixel, be :boolean } //= <{pixel :Pixel, be :boolean}>{be:false}
-  ;
-  let pixelsA :Pixel[] = pixelAround( axesAround , oldPixel );
+    , pixelsA :Pixel[] = pixelAround( axesAround , oldPixel );
+  if(_log.nextBlackPixel){console.log("pixelsA:",pixelsA)}
   for (let index = 0; index < pixelsA.length; index++) {
-    let pixel :Pixel = pixelsA[index];
+    if(_log.nextBlackPixel){console.log(`pixelsA[${index}]:`,pixelsA[index].axes)}
+    if(_log.nextBlackPixel){console.log("nextBlackPixel:",pixelsA[index]);}
     // Is it a black pixel?
-    if( pixel.intensity < 765 ){
-      // Is the pixel in the GCode ?
-      if( !isPixelnGCode(pixel) ){
-        if(_log.nextBlackPixel){console.log("nextBlackPixel:",pixel);}
-        return pixel;
-      }
-    }else{
-      // guardar pixel seguientes y no negros ??
-      addPixel(pixel,false);
-    }
+    if( pixelsA[index].intensity < 765 ){  return pixelsA[index];  }
   }
 }
 
@@ -247,12 +291,13 @@ function start(dirImg :string) {
   //_dirImg = path.resolve(dirImg);
   _dirImg = dirImg;
   _dirGCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
-  lwip.open(_dirImg, function(err, image) {
+  lwip.open(_dirImg, function(err:Error, image) {
+    if(err)console.log(err.message);
     _height = image.height();
     _width = image.width();
-    _img = image;
+    _img = getAllPixel(image);
     mani();
   });
 }
 
-start("./img/130x130.png");
+start("./img/line-v.png");

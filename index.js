@@ -5,26 +5,71 @@ var _log = {
     nextBlackPixel: false,
     pixelToGCode: false,
     pixelAround: false,
+    removePixel: false,
+    getAllPixel: false,
     addPixel: !false,
-    main: false
+    main: false,
+    size: false
 };
 var _dirGCode = 'myGcode.gcode';
 var _dirImg;
-var _img;
 var _gCode = [];
 var _height = 0;
 var _width = 0;
+var _img = [];
+function getAllPixel(image) {
+    if (_log.getAllPixel) {
+        console.log("_width:", _width, "_height:", _height);
+    }
+    var newArray = [];
+    for (var x = 0; x < _width; x++) {
+        var row = [];
+        for (var y = 0; y < _height; y++) {
+            var colour = image.getPixel(x, y);
+            var intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
+            row.push({ colour: colour, axes: { x: x, y: y }, intensity: intensity });
+        }
+        newArray.push(row);
+    }
+    return newArray;
+}
 function getPixel(left, top) {
-    var pixel = _img.getPixel(left, top);
-    var intensity = (pixel.r + pixel.g + pixel.b) * ((pixel.a > 1) ? pixel.a / 100 : 1);
-    return { colour: pixel, intensity: intensity, axes: { x: left, y: top } };
+    return _img[left][top];
 }
 function addPixel(pixel, show, coment) {
     var index = _gCode.push(new line_1.default(show === undefined ? true : show, pixel, coment));
     if (_log.addPixel && (show === undefined)) {
         console.log(_gCode[index - 1].code());
     }
+    removePixel(pixel.axes.x, pixel.axes.y);
     return pixel;
+}
+function removePixel(left, top) {
+    if (_log.removePixel) {
+        console.log("removePixel:\n", "left:", left, "top:", top, _img[left][top]);
+    }
+    if (_img[left][top]) {
+        delete _img[left][top];
+    }
+    else {
+        if (_log.removePixel)
+            console.log("It isn't:", left, top);
+    }
+    return _img;
+}
+function size(arr) {
+    var size = 0;
+    if (_log.size) {
+        console.log(arr.length * arr[arr.length - 1].length);
+    }
+    for (var x = 0; x < arr.length; x++) {
+        var arrX = arr[x];
+        for (var y = 0; y < arrX.length; y++) {
+            if (arrX[y])
+                size++;
+        }
+    }
+    return size;
 }
 function pixelToGCode(oldPixel, newPixel) {
     if (_log.pixelToGCode) {
@@ -87,43 +132,42 @@ function pixelAround(axes, oldPixel) {
     for (var i = 0; i < axes.length; i++) {
         for (var j = 0; j < axes.length; j++) {
             var x = oldPixel.axes.x + axes[i], y = oldPixel.axes.y + axes[j];
-            if ((x >= 0 && y >= 0) && (y < _width && x < _height)) {
+            if ((x >= 0 && y >= 0) && (y < _width && x < _height) && !(oldPixel.axes.x == x && oldPixel.axes.y == y)) {
+                var p = getPixel(x, y);
                 if (_log.pixelAround) {
-                    console.log("pixelAround:", "x:", x, "y:", y);
+                    console.log("pixelAround:", "x:", x, "y:", y, "\npixel:", p);
                 }
-                pixels.push(getPixel(x, y));
+                if (p != undefined) {
+                    pixels.push(p);
+                }
+                else {
+                    if (_log.pixelAround) {
+                        console.log("(" + x + "," + y + ") -> " + getPixel(x, y));
+                    }
+                }
             }
-            if (i + 1 == axes.length && j + 1 == axes.length)
-                return pixels;
         }
     }
+    return pixels;
 }
 function unprocessedPixel() {
-    var next = true, pixel;
-    for (var y = 0; y < _height && next; ++y) {
-        for (var x = 0; x < _width && next; ++x) {
-            pixel = getPixel(x, y);
-            next = false;
-            var toBe = false;
-            for (var i = 0; i < _gCode.length && !toBe; i++) {
-                var e = _gCode[i].axes;
-                if (e.x === x && e.y === y) {
-                    toBe = true;
-                    next = true;
-                }
+    for (var x = 0; x < _img.length; x++) {
+        for (var y = 0; y < _img[x].length; y++) {
+            if (_img[x][y]) {
+                return getPixel(x, y);
             }
         }
     }
-    return pixel;
 }
 function mani(top, left) {
     var oldPixel = addPixel(getPixel(0, 0), true, "---> pixel start <---");
-    var totalPixel = _height * _width;
-    for (var x = 0; x < _height; x++) {
-        for (var y = 0; y < _width; y++) {
-            var newPixel = nextBlackPixel(oldPixel);
-            oldPixel = pixelToGCode(lasPixelGCode(), newPixel ? newPixel : unprocessedPixel());
+    var s = size(_img);
+    for (var i = 0; i < s; i++) {
+        if (_log.size) {
+            console.log("size", size(_img));
         }
+        var newPixel = nextBlackPixel(oldPixel);
+        oldPixel = pixelToGCode(lasPixelGCode(), newPixel ? newPixel : unprocessedPixel());
     }
 }
 function lasPixelGCode() {
@@ -138,20 +182,22 @@ function lasPixelGCode() {
     }
 }
 function nextBlackPixel(oldPixel) {
-    var axesAround = [0, 1, -1], newPixel;
-    var pixelsA = pixelAround(axesAround, oldPixel);
+    if (_log.nextBlackPixel) {
+        console.log("nextBlackPixel:\n\toldPixel:", oldPixel);
+    }
+    var axesAround = [0, 1, -1], pixelsA = pixelAround(axesAround, oldPixel);
+    if (_log.nextBlackPixel) {
+        console.log("pixelsA:", pixelsA);
+    }
     for (var index = 0; index < pixelsA.length; index++) {
-        var pixel = pixelsA[index];
-        if (pixel.intensity < 765) {
-            if (!isPixelnGCode(pixel)) {
-                if (_log.nextBlackPixel) {
-                    console.log("nextBlackPixel:", pixel);
-                }
-                return pixel;
-            }
+        if (_log.nextBlackPixel) {
+            console.log("pixelsA[" + index + "]:", pixelsA[index].axes);
         }
-        else {
-            addPixel(pixel, false);
+        if (_log.nextBlackPixel) {
+            console.log("nextBlackPixel:", pixelsA[index]);
+        }
+        if (pixelsA[index].intensity < 765) {
+            return pixelsA[index];
         }
     }
 }
@@ -159,10 +205,12 @@ function start(dirImg) {
     _dirImg = dirImg;
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
+        if (err)
+            console.log(err.message);
         _height = image.height();
         _width = image.width();
-        _img = image;
+        _img = getAllPixel(image);
         mani();
     });
 }
-start("./img/130x130.png");
+start("./img/line-v.png");
