@@ -76,7 +76,7 @@ function pixelToGCode(oldPixel, newPixel) {
         console.log("pixelToGCode\noldPixel ->\n", oldPixel.axes, "\nnewPixel ->\n", newPixel.axes);
     }
     if (oldPixel.intensity > newPixel.intensity) {
-        if (!(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1)) {
+        if (!distanceIsOne(newPixel, oldPixel)) {
             addPixel({
                 axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: oldPixel.intensity },
                 colour: newPixel.colour,
@@ -102,18 +102,13 @@ function pixelToGCode(oldPixel, newPixel) {
         }, false);
     }
     else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity) {
-        if ((newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1)) {
+        if (!distanceIsOne(newPixel, oldPixel)) {
             addPixel({
                 axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: 765 },
                 colour: oldPixel.colour,
                 intensity: 765
             });
         }
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: 765 },
-            colour: newPixel.colour,
-            intensity: 765
-        });
         addPixel({
             axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
             colour: newPixel.colour,
@@ -124,6 +119,11 @@ function pixelToGCode(oldPixel, newPixel) {
         addPixel(newPixel, false);
     }
     return newPixel;
+}
+function distanceIsOne(newPixel, oldPixel) {
+    var disX = newPixel.axes.x - oldPixel.axes.x;
+    var disY = newPixel.axes.y - oldPixel.axes.y;
+    return disX === 1 || disY === 1 || disX === -1 || disY === -1;
 }
 function isPixelnGCode(pixel) {
     for (var index = 0; index < _gCode.length; index++) {

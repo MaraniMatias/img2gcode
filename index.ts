@@ -122,7 +122,7 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   if ( oldPixel.intensity > newPixel.intensity ) {
     // primero mover al pixel negro , con Z anterior
     // Z en otro linea
-    if ( !(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1) ){
+    if ( ! distanceIsOne(newPixel,oldPixel) ){
       // solo mover 
       addPixel({
         axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : oldPixel.intensity },
@@ -154,7 +154,8 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   }
   // Black to Black
   else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
-    if ( (newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1) ){
+    // 1 o -1
+    if ( ! distanceIsOne(newPixel,oldPixel) ){
       // es cuando el pixel esta lejos de esta posision
       addPixel({
         axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
@@ -162,11 +163,6 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
         intensity : 765 // maxZ o capas oldPixel.intensity
       })
     }
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : 765 },
-      colour : newPixel.colour,
-      intensity : 765
-    });
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
       colour : newPixel.colour,
@@ -176,7 +172,11 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
 
   return newPixel;
 }
-
+function distanceIsOne(newPixel :Pixel, oldPixel :Pixel) :boolean{
+  let disX = newPixel.axes.x - oldPixel.axes.x ;
+  let disY = newPixel.axes.y - oldPixel.axes.y ;
+  return disX === 1 || disY === 1 || disX === -1 || disY === -1 ;
+}
 /**
  * Is the pixel in the GCode ?
  *
