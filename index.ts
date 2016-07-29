@@ -14,7 +14,7 @@ const _log = {
   pixelAround   :  false,
   removePixel   :  false,
   getAllPixel   :  false,
-  addPixel      :  !false,
+  addPixel      :  false,
   main          :  false,
   size          :  false
 };
@@ -242,7 +242,7 @@ function unprocessedPixel() :Pixel {
  */
 function mani(top? :number, left? :number) {
   let oldPixel :Pixel = addPixel(getPixel(0,0),true,"---> pixel start <---")
-  let s = size(_img);
+    , s = size(_img);
 
   for (let i = 0; i < s; i++) {
     if(_log.size){  console.log("size",size(_img));  }
@@ -251,8 +251,14 @@ function mani(top? :number, left? :number) {
     oldPixel = pixelToGCode(lasPixelGCode(),newPixel?newPixel:unprocessedPixel());
   }
 
-// antes de guardar subir Zmax
-  //  new File().save( _dirGCode, _gCode, () => {  console.log("guardar :D");  });
+
+  _gCode.push( new Line(true,{
+      axes : { x : undefined, y : undefined , z : 765 },
+      colour : oldPixel.colour,
+      intensity : 765
+    },"---> this code is for cnc-ino <---") );
+  new File().save( _dirGCode, _gCode, () => {  console.log("guardado :D\n",_dirGCode);  });
+
 }
 
 function lasPixelGCode() :Pixel {
@@ -304,4 +310,4 @@ function start(dirImg :string) {
   });
 }
 
-start("./img/4p.png");
+start("./img/x.png");

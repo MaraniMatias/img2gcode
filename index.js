@@ -1,5 +1,6 @@
 "use strict";
 var line_1 = require("./line");
+var file_1 = require("./file");
 var lwip = require('lwip');
 var _log = {
     nextBlackPixel: false,
@@ -7,7 +8,7 @@ var _log = {
     pixelAround: false,
     removePixel: false,
     getAllPixel: false,
-    addPixel: !false,
+    addPixel: false,
     main: false,
     size: false
 };
@@ -165,8 +166,7 @@ function unprocessedPixel() {
     }
 }
 function mani(top, left) {
-    var oldPixel = addPixel(getPixel(0, 0), true, "---> pixel start <---");
-    var s = size(_img);
+    var oldPixel = addPixel(getPixel(0, 0), true, "---> pixel start <---"), s = size(_img);
     for (var i = 0; i < s; i++) {
         if (_log.size) {
             console.log("size", size(_img));
@@ -174,6 +174,12 @@ function mani(top, left) {
         var newPixel = nextBlackPixel(oldPixel);
         oldPixel = pixelToGCode(lasPixelGCode(), newPixel ? newPixel : unprocessedPixel());
     }
+    _gCode.push(new line_1.default(true, {
+        axes: { x: undefined, y: undefined, z: 765 },
+        colour: oldPixel.colour,
+        intensity: 765
+    }, "---> this code is for cnc-ino <---"));
+    new file_1.default().save(_dirGCode, _gCode, function () { console.log("guardado :D\n", _dirGCode); });
 }
 function lasPixelGCode() {
     for (var index = _gCode.length - 1; index >= 0; index--) {
@@ -218,4 +224,4 @@ function start(dirImg) {
         mani();
     });
 }
-start("./img/4p.png");
+start("./img/x.png");

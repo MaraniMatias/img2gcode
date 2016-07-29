@@ -23,13 +23,14 @@ var File = (function () {
         return this._gCodeInit;
     };
     File.prototype.save = function (dirGCode, gCode, cb) {
+        var _this = this;
         fs.unlink(dirGCode, function (err) {
-        });
-        fs.writeFile(dirGCode, this.concat(gCode).join('\n'), { encoding: "utf8" }, function (err) {
-            if (err)
-                throw err.message;
-            if (cb)
-                cb();
+            fs.writeFile(dirGCode, _this.concat(gCode).join('\n'), { encoding: "utf8" }, function (err) {
+                if (err)
+                    throw err.message;
+                if (cb)
+                    cb();
+            });
         });
     };
     return File;

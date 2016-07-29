@@ -48,11 +48,10 @@ class File {
    */
   public save(dirGCode :string, gCode: Line[] , cb?: () => void ) {
     fs.unlink(dirGCode,(err)=>{
-      
-    });
-    fs.writeFile(dirGCode, this.concat(gCode).join('\n'),{ encoding: "utf8" },(err)=>{
-      if(err) throw err.message;
-      if(cb) cb();
+      fs.writeFile(dirGCode, this.concat(gCode).join('\n'),{ encoding: "utf8" },(err)=>{
+        if(err) throw err.message;
+        if(cb) cb();
+      });
     });
   }
 }
