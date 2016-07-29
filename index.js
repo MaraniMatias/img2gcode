@@ -75,21 +75,54 @@ function pixelToGCode(oldPixel, newPixel) {
     if (_log.pixelToGCode) {
         console.log("pixelToGCode\noldPixel ->\n", oldPixel.axes, "\nnewPixel ->\n", newPixel.axes);
     }
-    addPixel({
-        axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: 765 },
-        colour: oldPixel.colour,
-        intensity: oldPixel.intensity
-    });
-    addPixel({
-        axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: 765 },
-        colour: newPixel.colour,
-        intensity: newPixel.intensity
-    });
-    addPixel({
-        axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
-        colour: newPixel.colour,
-        intensity: newPixel.intensity
-    });
+    if (oldPixel.intensity > newPixel.intensity) {
+        if (!(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1)) {
+            addPixel({
+                axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: oldPixel.intensity },
+                colour: newPixel.colour,
+                intensity: oldPixel.intensity
+            });
+        }
+        addPixel({
+            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
+            colour: newPixel.colour,
+            intensity: newPixel.intensity
+        });
+    }
+    else if (oldPixel.intensity < newPixel.intensity) {
+        addPixel({
+            axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: newPixel.intensity },
+            colour: newPixel.colour,
+            intensity: newPixel.intensity
+        });
+        addPixel({
+            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
+            colour: newPixel.colour,
+            intensity: newPixel.intensity
+        }, false);
+    }
+    else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity) {
+        if ((newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1)) {
+            addPixel({
+                axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: 765 },
+                colour: oldPixel.colour,
+                intensity: 765
+            });
+        }
+        addPixel({
+            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: 765 },
+            colour: newPixel.colour,
+            intensity: 765
+        });
+        addPixel({
+            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
+            colour: newPixel.colour,
+            intensity: newPixel.intensity
+        });
+    }
+    else {
+        addPixel(newPixel, false);
+    }
     return newPixel;
 }
 function isPixelnGCode(pixel) {

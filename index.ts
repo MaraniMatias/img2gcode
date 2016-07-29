@@ -118,23 +118,61 @@ function size(arr : any[][]) :number {
 function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   if(_log.pixelToGCode){console.log( "pixelToGCode\noldPixel ->\n" , oldPixel.axes, "\nnewPixel ->\n" , newPixel.axes  );}
 
-  addPixel({
-    axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-    colour : oldPixel.colour,
-    intensity : oldPixel.intensity
-  })
-
-  addPixel({
-    axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-    colour : newPixel.colour, 
-    intensity : newPixel.intensity
-  })
-
-  addPixel({
-    axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-    colour : newPixel.colour,
-    intensity : newPixel.intensity
-  });
+  // White to Black
+  if ( oldPixel.intensity > newPixel.intensity ) {
+    // primero mover al pixel negro , con Z anterior
+    // Z en otro linea
+    if ( !(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1) ){
+      // solo mover 
+      addPixel({
+        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : oldPixel.intensity },
+        colour : newPixel.colour,
+        intensity : oldPixel.intensity
+      })
+    }
+    // depues bajar
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      colour : newPixel.colour,
+      intensity : newPixel.intensity
+    })
+  }
+  // Black to White
+  else if ( oldPixel.intensity < newPixel.intensity ) {
+    // solo subo
+    addPixel({
+      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y, z : newPixel.intensity },
+      colour : newPixel.colour,
+      intensity : newPixel.intensity
+    });
+    // solo para agregar que ya use este pixel
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      colour : newPixel.colour,
+      intensity : newPixel.intensity
+    },false);// porque estas son las corrdenadas nuevas
+  }
+  // Black to Black
+  else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
+    if ( (newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1) ){
+      // es cuando el pixel esta lejos de esta posision
+      addPixel({
+        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+        colour : oldPixel.colour, 
+        intensity : 765 // maxZ o capas oldPixel.intensity
+      })
+    }
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : 765 },
+      colour : newPixel.colour,
+      intensity : 765
+    });
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      colour : newPixel.colour,
+      intensity : newPixel.intensity
+    });
+  }else {  addPixel(newPixel,false);  }
 
   return newPixel;
 }
