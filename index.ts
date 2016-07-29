@@ -118,58 +118,24 @@ function size(arr : any[][]) :number {
 function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   if(_log.pixelToGCode){console.log( "pixelToGCode\noldPixel ->\n" , oldPixel.axes, "\nnewPixel ->\n" , newPixel.axes  );}
 
-  // White to Black
-  if ( oldPixel.intensity > newPixel.intensity ) {
-    // Z en otro linea
-    if ( !(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1) ){
-      // es cuando el pixel esta lejos de esta posision
-      // maxZ o capas oldPixel.intensity
-      newPixel.axes.z = oldPixel.intensity; // copas Zmas porque esta en otra liena
-      addPixel(newPixel);
-    }
-    // primero mover al pixel negro , con Z anterior
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y },
-      colour : newPixel.colour,
-      intensity : oldPixel.intensity
-    })
-    // depues bajar
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    })
-  }
-  // Black to White
-  else if ( oldPixel.intensity < newPixel.intensity ) {
-    // solo subo
-    addPixel({
-      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y, z : oldPixel.intensity },
-      colour : oldPixel.colour,
-      intensity : newPixel.intensity
-    });
-    // solo para agregar que ya use este pixel
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    },false);
-  }
-  // Black to Black
-  else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    });
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    });
-  }else {
-    addPixel(newPixel,false)
-  }
+  addPixel({
+    axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+    colour : oldPixel.colour,
+    intensity : oldPixel.intensity
+  })
+
+  addPixel({
+    axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+    colour : newPixel.colour, 
+    intensity : newPixel.intensity
+  })
+
+  addPixel({
+    axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+    colour : newPixel.colour,
+    intensity : newPixel.intensity
+  });
+
   return newPixel;
 }
 
@@ -300,4 +266,4 @@ function start(dirImg :string) {
   });
 }
 
-start("./img/line-v.png");
+start("./img/4p.png");

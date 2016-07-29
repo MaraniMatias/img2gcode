@@ -75,49 +75,21 @@ function pixelToGCode(oldPixel, newPixel) {
     if (_log.pixelToGCode) {
         console.log("pixelToGCode\noldPixel ->\n", oldPixel.axes, "\nnewPixel ->\n", newPixel.axes);
     }
-    if (oldPixel.intensity > newPixel.intensity) {
-        if (!(newPixel.axes.x - oldPixel.axes.x === 1 || newPixel.axes.y - oldPixel.axes.y === 1)) {
-            newPixel.axes.z = oldPixel.intensity;
-            addPixel(newPixel);
-        }
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y },
-            colour: newPixel.colour,
-            intensity: oldPixel.intensity
-        });
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
-            colour: newPixel.colour,
-            intensity: newPixel.intensity
-        });
-    }
-    else if (oldPixel.intensity < newPixel.intensity) {
-        addPixel({
-            axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: oldPixel.intensity },
-            colour: oldPixel.colour,
-            intensity: newPixel.intensity
-        });
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
-            colour: newPixel.colour,
-            intensity: newPixel.intensity
-        }, false);
-    }
-    else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity) {
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y },
-            colour: newPixel.colour,
-            intensity: newPixel.intensity
-        });
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
-            colour: newPixel.colour,
-            intensity: newPixel.intensity
-        });
-    }
-    else {
-        addPixel(newPixel, false);
-    }
+    addPixel({
+        axes: { x: oldPixel.axes.x, y: oldPixel.axes.y, z: 765 },
+        colour: oldPixel.colour,
+        intensity: oldPixel.intensity
+    });
+    addPixel({
+        axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: 765 },
+        colour: newPixel.colour,
+        intensity: newPixel.intensity
+    });
+    addPixel({
+        axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
+        colour: newPixel.colour,
+        intensity: newPixel.intensity
+    });
     return newPixel;
 }
 function isPixelnGCode(pixel) {
@@ -213,4 +185,4 @@ function start(dirImg) {
         mani();
     });
 }
-start("./img/line-v.png");
+start("./img/4p.png");
