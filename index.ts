@@ -118,7 +118,7 @@ function size(arr : any[][]) :number {
  */
 function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   if(_log.pixelToGCode){console.log( "pixelToGCode\noldPixel ->\n" , oldPixel.axes, "\nnewPixel ->\n" , newPixel.axes  );}
-//disX 1 disY 2 newPixel x:1, y:3 oldPixel x:0, y:1
+
   // White to Black
   if ( oldPixel.intensity > newPixel.intensity ) {
     if ( ! distanceIsOne(newPixel,oldPixel) ) {
@@ -147,28 +147,6 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
       colour : oldPixel.colour,
       intensity : 765
     })
-    /*BaddPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-      colour : oldPixel.colour,
-      intensity : 765
-    })*/
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    });
-    /*
-    addPixel({
-      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    });
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
-      intensity : newPixel.intensity
-    },false);// porque estas son las corrdenadas nuevas
-    */
   }
 
   // Black to Black

@@ -102,11 +102,6 @@ function pixelToGCode(oldPixel, newPixel) {
             colour: oldPixel.colour,
             intensity: 765
         });
-        addPixel({
-            axes: { x: newPixel.axes.x, y: newPixel.axes.y, z: newPixel.intensity },
-            colour: newPixel.colour,
-            intensity: newPixel.intensity
-        });
     }
     else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity) {
         if (!distanceIsOne(newPixel, oldPixel)) {
