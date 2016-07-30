@@ -10,6 +10,7 @@ import * as path  from 'path';
 // Y
 const _log = {
   nextBlackPixel:  false,
+  distanceIsOne :  false,
   pixelToGCode  :  false,
   pixelAround   :  false,
   removePixel   :  false,
@@ -117,65 +118,91 @@ function size(arr : any[][]) :number {
  */
 function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   if(_log.pixelToGCode){console.log( "pixelToGCode\noldPixel ->\n" , oldPixel.axes, "\nnewPixel ->\n" , newPixel.axes  );}
-
+//disX 1 disY 2 newPixel x:1, y:3 oldPixel x:0, y:1
   // White to Black
   if ( oldPixel.intensity > newPixel.intensity ) {
-    // primero mover al pixel negro , con Z anterior
-    // Z en otro linea
-    if ( ! distanceIsOne(newPixel,oldPixel) ){
-      // solo mover 
+    if ( ! distanceIsOne(newPixel,oldPixel) ) {
       addPixel({
-        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : oldPixel.intensity },
-        colour : newPixel.colour,
-        intensity : oldPixel.intensity
-      })
+        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+        colour : oldPixel.colour,
+        intensity : 765
+      });
+      addPixel({
+        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+        colour : oldPixel.colour,
+        intensity : 765
+      });
     }
-    // depues bajar
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
       colour : newPixel.colour,
       intensity : newPixel.intensity
-    })
+    });
   }
+
   // Black to White
   else if ( oldPixel.intensity < newPixel.intensity ) {
-    // solo subo
+    addPixel({
+      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+      colour : oldPixel.colour,
+      intensity : 765
+    })
+    /*BaddPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+      colour : oldPixel.colour,
+      intensity : 765
+    })*/
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      colour : newPixel.colour,
+      intensity : newPixel.intensity
+    });
+    /*
     addPixel({
       axes : { x : oldPixel.axes.x, y : oldPixel.axes.y, z : newPixel.intensity },
       colour : newPixel.colour,
       intensity : newPixel.intensity
     });
-    // solo para agregar que ya use este pixel
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
       colour : newPixel.colour,
       intensity : newPixel.intensity
     },false);// porque estas son las corrdenadas nuevas
+    */
   }
+
   // Black to Black
   else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
-    // 1 o -1
-    if ( ! distanceIsOne(newPixel,oldPixel) ){
-      // es cuando el pixel esta lejos de esta posision
+    if ( ! distanceIsOne(newPixel,oldPixel) ) {
       addPixel({
         axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-        colour : oldPixel.colour, 
-        intensity : 765 // maxZ o capas oldPixel.intensity
-      })
+        colour : oldPixel.colour,
+        intensity : 765
+      });
+      addPixel({
+        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+        colour : oldPixel.colour,
+        intensity : 765
+      });
     }
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
       colour : newPixel.colour,
       intensity : newPixel.intensity
     });
-  }else {  addPixel(newPixel,false);  }
+  } else {  addPixel(newPixel,false);  }
 
   return newPixel;
 }
 function distanceIsOne(newPixel :Pixel, oldPixel :Pixel) :boolean{
   let disX = newPixel.axes.x - oldPixel.axes.x ;
   let disY = newPixel.axes.y - oldPixel.axes.y ;
-  return disX === 1 || disY === 1 || disX === -1 || disY === -1 ;
+  if(_log.distanceIsOne)console.log("disX",disX,"disY",disY,"newPixel",newPixel.axes,"oldPixel",oldPixel.axes,disX === 1 || disY === 1 || disX === -1 || disY === -1);
+  // con medidas de fresa y escalas acomodar
+  let sigX = disX >0 ? 1 : -1;
+  let sigY = disY >0 ? 1 : -1;
+  return ( disX === sigX && ( disY === 0 || disY === sigY ) )||
+  ( disY === sigY && ( disX === 0 || disX === sigX ) )|| disY === 0 && disX === 0
 }
 /**
  * Is the pixel in the GCode ?
@@ -250,7 +277,6 @@ function mani(top? :number, left? :number) {
     //console.log("\nnextBlackPixel",nextBlackPixel(oldPixel),"\nunprocessedPixel",unprocessedPixel());
     oldPixel = pixelToGCode(lasPixelGCode(),newPixel?newPixel:unprocessedPixel());
   }
-
 
   _gCode.push( new Line(true,{
       axes : { x : undefined, y : undefined , z : 765 },
