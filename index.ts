@@ -8,6 +8,7 @@ import * as path  from 'path';
 // 0 -- X
 // |
 // Y
+// si la linea es > toolDiameter / 2 se hace
 const _log = {
   nextBlackPixel:  false,
   distanceIsOne :  false,
@@ -16,6 +17,7 @@ const _log = {
   removePixel   :  false,
   getAllPixel   :  false,
   addPixel      :  false,
+  start         :  false,
   main          :  false,
   size          :  false
 };
@@ -25,6 +27,13 @@ var _gCode    :Line[] = [];
 var _height   :number = 0;
 var _width    :number = 0;
 var _img   :Pixel[][] = [];
+var config = {  // It is mm
+  toolDiameter  : 2,
+  WhiteToZ      : 3,
+  sevaZ         : 7,
+  //step        : 0.027,
+  scaleAxes     : 5
+}
 //var self = this;
 
 /**
@@ -219,7 +228,6 @@ function pixelAround(axes :number[],oldPixel:Pixel) :Pixel[] {
         if(_log.pixelAround){console.log(`(${x},${y}) -> ${getPixel(x,y)}`)}
       }
     }
-    //if(i+1 == axes.length && j+1 == axes.length) return pixels
   }
   }
   return pixels
@@ -246,7 +254,8 @@ function unprocessedPixel() :Pixel {
  * @param {number} [left]
  */
 function mani(top? :number, left? :number) {
-  let oldPixel :Pixel = addPixel(getPixel(0,0),true,"---> pixel start <---")
+  let firstPixel :Pixel = unprocessedPixel()
+    , oldPixel :Pixel = addPixel({ axes : {x:firstPixel.axes.x,y:firstPixel.axes.y,z:firstPixel.intensity},colour : firstPixel.colour,intensity : firstPixel.intensity},true,"---> pixel start <---")
     , s = size(_img);
 
   for (let i = 0; i < s; i++) {
@@ -302,6 +311,7 @@ function nextBlackPixel(oldPixel :Pixel) :Pixel|any {
  * @param {string} dirImg image path
  */
 function start(dirImg :string) {
+  console.log("->",dirImg)
   //_dirImg = path.resolve(dirImg);
   _dirImg = dirImg;
   _dirGCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
@@ -310,8 +320,9 @@ function start(dirImg :string) {
     _height = image.height();
     _width = image.width();
     _img = getAllPixel(image);
+    if(_log.start){console.log("_height",_height,"_width",_width);}
     mani();
   });
 }
 
-start("./img/x.png");
+start("./img/test.png");

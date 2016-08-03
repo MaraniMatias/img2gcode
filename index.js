@@ -10,6 +10,7 @@ var _log = {
     removePixel: false,
     getAllPixel: false,
     addPixel: false,
+    start: false,
     main: false,
     size: false
 };
@@ -19,6 +20,12 @@ var _gCode = [];
 var _height = 0;
 var _width = 0;
 var _img = [];
+var config = {
+    toolDiameter: 2,
+    WhiteToZ: 3,
+    sevaZ: 7,
+    scaleAxes: 5
+};
 function getAllPixel(image) {
     if (_log.getAllPixel) {
         console.log("_width:", _width, "_height:", _height);
@@ -177,7 +184,7 @@ function unprocessedPixel() {
     }
 }
 function mani(top, left) {
-    var oldPixel = addPixel(getPixel(0, 0), true, "---> pixel start <---"), s = size(_img);
+    var firstPixel = unprocessedPixel(), oldPixel = addPixel({ axes: { x: firstPixel.axes.x, y: firstPixel.axes.y, z: firstPixel.intensity }, colour: firstPixel.colour, intensity: firstPixel.intensity }, true, "---> pixel start <---"), s = size(_img);
     for (var i = 0; i < s; i++) {
         if (_log.size) {
             console.log("size", size(_img));
@@ -224,6 +231,7 @@ function nextBlackPixel(oldPixel) {
     }
 }
 function start(dirImg) {
+    console.log("->", dirImg);
     _dirImg = dirImg;
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
@@ -232,7 +240,10 @@ function start(dirImg) {
         _height = image.height();
         _width = image.width();
         _img = getAllPixel(image);
+        if (_log.start) {
+            console.log("_height", _height, "_width", _width);
+        }
         mani();
     });
 }
-start("./img/x.png");
+start("./img/test.png");
