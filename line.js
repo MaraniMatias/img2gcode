@@ -34,13 +34,6 @@ var Line = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Line.prototype, "colour", {
-        get: function () {
-            return this._pixel.colour;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(Line.prototype, "intensity", {
         get: function () {
             return this._pixel.intensity;

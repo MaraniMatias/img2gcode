@@ -1,8 +1,6 @@
-type ColorObject = {r: number, g: number, b: number, a?: number};
 type Axes = { x:number, y:number, z?:number};
 interface Line {
   comment  :string;
-  colour   :ColorObject;
   axes     :Axes;
   show     :boolean;
   code()   :string;

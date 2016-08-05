@@ -1,5 +1,5 @@
 /// <reference path="./typings/globals/lwip/index.d.ts" />
-type Pixel = { colour: ColorObject, intensity :number , axes:Axes };
+type Pixel = { /*colour: ColorObject,*/ intensity :number , axes:Axes };
 type ColorObject = {r: number, g: number, b: number, a?: number};
 type Axes = { x:number, y:number, z?:number};
 /**
@@ -38,9 +38,11 @@ export default class Line {
   public get axes() : Axes {
     return this._pixel.axes;
   }
+  /*
   public get colour() : ColorObject {
     return this._pixel.colour;
   }
+  */
   public get intensity() :number{
     return this._pixel.intensity;
   }

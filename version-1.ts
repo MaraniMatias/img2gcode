@@ -1,4 +1,4 @@
-type Pixel = { colour:lwip.ColorObject, intensity :number , axes:Axes };
+type Pixel = { intensity :number , axes:Axes };
 type Axes = { x:number, y:number, z?:number };
 
 import Line from "./line";
@@ -26,12 +26,6 @@ var _gCode    :Line[] = [];
 var _height   :number = 0;
 var _width    :number = 0;
 var _img   :Pixel[][] = [];
-var config = {
-  toolDiameter  : 2,
-  maxZ          : 3,
-  //step        : 0.023,
-  scaleX        : 5
-}
 //var self = this;
 
 /**
@@ -131,18 +125,15 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
     if ( ! distanceIsOne(newPixel,oldPixel) ) {
       addPixel({
         axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-        colour : oldPixel.colour,
         intensity : 765
       });
       addPixel({
         axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-        colour : oldPixel.colour,
         intensity : 765
       });
     }
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
       intensity : newPixel.intensity
     });
   }
@@ -151,7 +142,6 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
   else if ( oldPixel.intensity < newPixel.intensity ) {
     addPixel({
       axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-      colour : oldPixel.colour,
       intensity : 765
     })
   }
@@ -161,18 +151,15 @@ function pixelToGCode(oldPixel :Pixel,newPixel :Pixel){
     if ( ! distanceIsOne(newPixel,oldPixel) ) {
       addPixel({
         axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-        colour : oldPixel.colour,
         intensity : 765
       });
       addPixel({
         axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-        colour : oldPixel.colour,
         intensity : 765
       });
     }
     addPixel({
       axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      colour : newPixel.colour,
       intensity : newPixel.intensity
     });
   } else {  addPixel(newPixel,false);  }
@@ -264,7 +251,6 @@ function mani(top? :number, left? :number) {
 
   _gCode.push( new Line(true,{
       axes : { x : undefined, y : undefined , z : 765 },
-      colour : oldPixel.colour,
       intensity : 765
     },"---> this code is for cnc-ino <---") );
   new File().save( _dirGCode, _gCode, () => {  console.log("guardado :D\n",_dirGCode);  });
@@ -276,7 +262,6 @@ function lasPixelGCode() :Pixel {
     if(_gCode[index].show){ 
       return {
         axes  :  _gCode[index].axes,
-        colour  :  _gCode[index].colour,
         intensity  :  _gCode[index].intensity
       };
     }
