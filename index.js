@@ -1,13 +1,8 @@
 "use strict";
 var lwip = require('lwip');
 var _log = {
-    nextBlackPixel: false,
-    distanceIsOne: false,
-    pixelToGCode: false,
-    pixelAround: false,
-    removePixel: false,
+    getFirstPixel: false,
     getAllPixel: false,
-    addPixel: false,
     start: false,
     main: false,
     size: false
@@ -38,7 +33,7 @@ function start(dirImg) {
         if (_log.getAllPixel) {
             console.log("_img:", _img);
         }
-        mani();
+        main();
     });
 }
 function getAllPixel(image) {
@@ -68,16 +63,44 @@ function size(arr) {
     }
     return size;
 }
-function mani() {
+function getFirstPixel() {
     for (var x = 0; x < _img.length; x++) {
         for (var y = 0; y < _img[x].length; y++) {
-            if (!_log.main) {
+            if (_log.main) {
                 console.log("for " + x + "," + y + " -> " + _img[x][y].axes.x + "," + _img[x][y].axes.y + " -> " + _img[x][y].intensity);
             }
-            if (_img[x][y]) {
+            var pixels = [];
+            if (x + config.toolDiameter < _width && y + config.toolDiameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
+                for (var x2 = 0; x2 < config.toolDiameter; x2++) {
+                    var row = [];
+                    for (var y2 = 0; y2 < config.toolDiameter; y2++) {
+                        var p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
+                        if (p.intensity < 765) {
+                            row.push(p);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    pixels.push(row);
+                }
+                if (size(pixels) === config.toolDiameter * 2) {
+                    return pixels;
+                }
+            }
+            else {
+                if (_log.getFirstPixel)
+                    console.log((x + config.toolDiameter) + "< " + _width + " && " + (y + config.toolDiameter) + "<" + _height + " && " + _img[x][y].intensity + " < 765");
             }
         }
     }
+}
+function main() {
+    var firstPixel = getFirstPixel();
+    console.log(firstPixel[0][0].axes);
+    console.log(firstPixel[0][1].axes);
+    console.log(firstPixel[1][0].axes);
+    console.log(firstPixel[1][1].axes);
 }
 function pixelAround(oldPixel) {
     var pixelAround = [];
