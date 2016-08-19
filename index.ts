@@ -92,6 +92,11 @@ function size(arr : any[][]) :number {
   return size
 }
 
+/**
+ * pixel negros debajo la her para bajar directamente
+ * 
+ * @returns {Pixel[][]}
+ */
 function getFirstPixel() :Pixel[][] {
 
   for (let x = 0; x < _img.length; x++) {
@@ -114,49 +119,20 @@ function getFirstPixel() :Pixel[][] {
     }else {
       if(_log.getFirstPixel)console.log(`${x+config.toolDiameter}< ${_width} && ${y+config.toolDiameter}<${_height} && ${_img[x][y].intensity} < 765`);
     }
+  }// for
+  }// for
 
-  }
-  }
 }
 
 function main() {
-  let firstPixel = getFirstPixel();
-  console.log(firstPixel[0][0].axes);
-  console.log(firstPixel[0][1].axes);
-  console.log(firstPixel[1][0].axes);
-  console.log(firstPixel[1][1].axes);
-}
+  let firstPixel :Pixel[][] = getFirstPixel();
 
+  nextBlackToMove(firstPixel);
 
+}getFirstPixel
 
+function toGCode( pixels:Pixel[][] ){
 
-
-/**
- * cordenadas de los pixel cercanos
- * @param {number[]} axes
- * @returns {Pixel[]}
-*/
-function pixelAround(oldPixel:Pixel[][]) {
-  // 1 2 3
-  // 4 5 6
-  // 7 8 9
-  // devolver 9 elemntos con pixel debajo de la heramienta
-  let pixelAround :Pixel[][] = [];
-
-  let pixelTool :Pixel[][] = [];
-
-  let row0 = [];
-  // 0,0
-  // 0,1  ->
-  // 0,2
-  let row1 = [];
-  // 1,0 ->
-  // 1,1 -> oldPixel
-  // 1,2 ->
-  let row2 = [];
-  // 2,0
-  // 2,1 ->
-  // 2,2
 }
 
 /**
@@ -187,5 +163,51 @@ function unprocessedPixelBelowTool() :Pixel[][]{
     }
     return pixelBelowTool
   }
+  }
+}
+
+
+function nextBlackToMove(oldPixelBlack:Pixel[][]) {
+  // devolver los pixel negros que puedan correr la her
+  //let numberOfPixelToLook = config.toolDiameter/2; // no es necesario
+
+  console.log(0,oldPixelBlack[0][0].axes);
+  console.log(0,oldPixelBlack[0][1].axes);
+  console.log(1,oldPixelBlack[1][0].axes);
+  console.log(1,oldPixelBlack[1][1].axes);
+  // 1 2 3
+  // 4 5 6
+  // 7 8 9
+
+// look at "1 2 3" up
+  for (var iX = 0; iX < oldPixelBlack.length; iX++) {
+    var element = oldPixelBlack[iX][0];
+    // 2,1 3,1
+    console.log("axes",element.axes,"x,y-1 (",element.axes.x,element.axes.y-1,")");
+    // 2,0 3,0
+  }
+
+// look at "1 4 7" left (<-o)
+  for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
+    var element = oldPixelBlack[0][iColumn];
+    // 2,1 2,2
+    console.log("axes",element.axes,"x-1,y (",element.axes.x-1,element.axes.y,")");
+    // 1,1 1,2
+  }
+
+// look at "3 6 9" right (o->)
+  for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
+    var element = oldPixelBlack[oldPixelBlack.length-1][iRow];
+    // 3,1 3,2
+    console.log("axes",element.axes,"x+1,y (",element.axes.x+1,element.axes.y,")");
+    // 4,1 4,2
+  }
+
+// look at "7 8 9" down
+  for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
+    var element = oldPixelBlack[iY][oldPixelBlack[0].length-1];
+    // 2,2 3,2
+    console.log("axes",element.axes,"x,y+1 (",element.axes.x,element.axes.y+1,")");
+    // 2,3 3,3
   }
 }

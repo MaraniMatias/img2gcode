@@ -97,17 +97,10 @@ function getFirstPixel() {
 }
 function main() {
     var firstPixel = getFirstPixel();
-    console.log(firstPixel[0][0].axes);
-    console.log(firstPixel[0][1].axes);
-    console.log(firstPixel[1][0].axes);
-    console.log(firstPixel[1][1].axes);
+    nextBlackToMove(firstPixel);
 }
-function pixelAround(oldPixel) {
-    var pixelAround = [];
-    var pixelTool = [];
-    var row0 = [];
-    var row1 = [];
-    var row2 = [];
+getFirstPixel;
+function toGCode(pixels) {
 }
 function unprocessedPixelBelowTool() {
     var pixelBelowTool = [];
@@ -132,5 +125,27 @@ function unprocessedPixelBelowTool() {
             }
             return pixelBelowTool;
         }
+    }
+}
+function nextBlackToMove(oldPixelBlack) {
+    console.log(0, oldPixelBlack[0][0].axes);
+    console.log(0, oldPixelBlack[0][1].axes);
+    console.log(1, oldPixelBlack[1][0].axes);
+    console.log(1, oldPixelBlack[1][1].axes);
+    for (var iX = 0; iX < oldPixelBlack.length; iX++) {
+        var element = oldPixelBlack[iX][0];
+        console.log("axes", element.axes, "x,y-1 (", element.axes.x, element.axes.y - 1, ")");
+    }
+    for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
+        var element = oldPixelBlack[0][iColumn];
+        console.log("axes", element.axes, "x-1,y (", element.axes.x - 1, element.axes.y, ")");
+    }
+    for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
+        var element = oldPixelBlack[oldPixelBlack.length - 1][iRow];
+        console.log("axes", element.axes, "x+1,y (", element.axes.x + 1, element.axes.y, ")");
+    }
+    for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
+        var element = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
+        console.log("axes", element.axes, "x,y+1 (", element.axes.x, element.axes.y + 1, ")");
     }
 }
