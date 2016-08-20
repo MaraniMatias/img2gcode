@@ -1,8 +1,10 @@
 "use strict";
 var lwip = require('lwip');
 var _log = {
+    nextBlackToMove: !false,
     getFirstPixel: false,
     getAllPixel: false,
+    lookAt: false,
     start: false,
     main: false,
     size: false
@@ -97,9 +99,10 @@ function getFirstPixel() {
 }
 function main() {
     var firstPixel = getFirstPixel();
+    console.log(firstPixel[0][0].axes, firstPixel[0][1].axes);
+    console.log(firstPixel[1][0].axes, firstPixel[1][1].axes);
     nextBlackToMove(firstPixel);
 }
-getFirstPixel;
 function toGCode(pixels) {
 }
 function unprocessedPixelBelowTool() {
@@ -127,25 +130,92 @@ function unprocessedPixelBelowTool() {
         }
     }
 }
-function nextBlackToMove(oldPixelBlack) {
-    console.log(0, oldPixelBlack[0][0].axes);
-    console.log(0, oldPixelBlack[0][1].axes);
-    console.log(1, oldPixelBlack[1][0].axes);
-    console.log(1, oldPixelBlack[1][1].axes);
+function lootAtUp(oldPixelBlack) {
+    var pixels = [];
     for (var iX = 0; iX < oldPixelBlack.length; iX++) {
-        var element = oldPixelBlack[iX][0];
-        console.log("axes", element.axes, "x,y-1 (", element.axes.x, element.axes.y - 1, ")");
+        var e = oldPixelBlack[iX][0];
+        var pixel = _img[e.axes.x][e.axes.y - 1];
+        if (pixel)
+            pixels.push(pixel);
+        if (_log.lookAt) {
+            console.log("axes", e.axes, "x,y-1", pixel.axes);
+        }
     }
+    return pixels;
+}
+function lootAtLeft(oldPixelBlack) {
+    var pixels = [];
     for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
-        var element = oldPixelBlack[0][iColumn];
-        console.log("axes", element.axes, "x-1,y (", element.axes.x - 1, element.axes.y, ")");
+        var e = oldPixelBlack[0][iColumn];
+        var pixel = _img[e.axes.x - 1][e.axes.y];
+        if (pixel)
+            pixels.push(pixel);
+        if (_log.lookAt) {
+            console.log("axes", e.axes, "x-1,y", pixel.axes);
+        }
     }
-    for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
-        var element = oldPixelBlack[oldPixelBlack.length - 1][iRow];
-        console.log("axes", element.axes, "x+1,y (", element.axes.x + 1, element.axes.y, ")");
-    }
+    return pixels;
+}
+function lootAtDown(oldPixelBlack) {
+    var pixels = [];
     for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
-        var element = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
-        console.log("axes", element.axes, "x,y+1 (", element.axes.x, element.axes.y + 1, ")");
+        var e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
+        var pixel = _img[e.axes.x][e.axes.y + 1];
+        if (pixel)
+            pixels.push(pixel);
+        if (_log.lookAt) {
+            console.log("axes", e.axes, "x,y+1", pixel.axes);
+        }
+    }
+    return pixels;
+}
+function lootAtRight(oldPixelBlack) {
+    var pixels = [];
+    for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
+        var e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
+        var pixel = _img[e.axes.x + 1][e.axes.y];
+        if (pixel)
+            pixels.push(pixel);
+        if (_log.lookAt) {
+            console.log("axes", e.axes, "x+1,y", pixel.axes);
+        }
+    }
+    return pixels;
+}
+function AllBlack(oldPixelBlack) {
+    var answer = true;
+    for (var x = 0; x < oldPixelBlack.length; x++) {
+        if (oldPixelBlack[x].intensity !== 0) {
+            answer = false;
+        }
+        ;
+    }
+    return answer;
+}
+function nextBlackToMove(oldPixelBlack) {
+    var plootAtUp = lootAtUp(oldPixelBlack);
+    var plootAtLeft = lootAtLeft(oldPixelBlack);
+    var plootAtRight = lootAtRight(oldPixelBlack);
+    var plootAtDown = lootAtDown(oldPixelBlack);
+    var arrPixel = [];
+    if (!AllBlack(plootAtUp)) {
+        if (_log.nextBlackToMove)
+            console.log("plootAtUp\n", plootAtUp);
+        for (var iRow = 0; iRow < oldPixelBlack.length; iRow++) {
+            var row = [];
+            row.push(plootAtUp[iRow]);
+            for (var iColumn = 0; iColumn < oldPixelBlack[iRow].length - 1; iColumn++) {
+                row.push(oldPixelBlack[iRow][iColumn]);
+            }
+            arrPixel.push(row);
+        }
+    }
+    if (_log.nextBlackToMove) {
+        for (var ix = 0; ix < arrPixel.length; ix++) {
+            for (var iy = 0; iy < arrPixel[ix].length; iy++) {
+                var e = arrPixel[ix][iy];
+                console.log(ix, iy, "e", e.axes, "inte", e.intensity);
+            }
+        }
     }
 }

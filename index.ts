@@ -15,8 +15,10 @@ const _log = {
 //  pixelToGCode  :  false,
 //  pixelAround   :  false,
 //  removePixel   :  false,
+  nextBlackToMove : !false,
   getFirstPixel :  false,
   getAllPixel   :  false,
+  lookAt        :  false,
 //  addPixel      :  false,
   start         :  false,
   main          :  false,
@@ -126,10 +128,12 @@ function getFirstPixel() :Pixel[][] {
 
 function main() {
   let firstPixel :Pixel[][] = getFirstPixel();
-
+  
+  console.log(firstPixel[0][0].axes, firstPixel[0][1].axes);
+  console.log(firstPixel[1][0].axes, firstPixel[1][1].axes);
+  
   nextBlackToMove(firstPixel);
-
-}getFirstPixel
+}
 
 function toGCode( pixels:Pixel[][] ){
 
@@ -166,48 +170,143 @@ function unprocessedPixelBelowTool() :Pixel[][]{
   }
 }
 
+function lootAtUp(oldPixelBlack:Pixel[][]) :Pixel[] {
+  let pixels :Pixel[] = [];
+  for (let iX = 0; iX < oldPixelBlack.length; iX++) {
+    let e = oldPixelBlack[iX][0];
+    let pixel = _img[e.axes.x][e.axes.y-1]
+    if(pixel) pixels.push(pixel);
+    if(_log.lookAt){
+      // 2,1 3,1
+      console.log("axes",e.axes,"x,y-1",pixel.axes);
+      // 2,0 3,0
+    }
+  }
+  return pixels;
+}
+function lootAtLeft(oldPixelBlack:Pixel[][]) :Pixel[] {
+  let pixels :Pixel[] = [];
+  for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
+    let e = oldPixelBlack[0][iColumn];
+    let pixel = _img[e.axes.x-1][e.axes.y]
+    if(pixel) pixels.push(pixel);
+    if(_log.lookAt){
+      // 2,1 2,2
+      console.log("axes",e.axes,"x-1,y",pixel.axes);
+      // 1,1 1,2
+    }
+  }
+  return pixels;
+}
+function lootAtDown(oldPixelBlack:Pixel[][]) :Pixel[] {
+  let pixels :Pixel[] = [];
+  for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
+    let e = oldPixelBlack[iY][oldPixelBlack[0].length-1];
+    let pixel = _img[e.axes.x][e.axes.y+1]
+    if(pixel) pixels.push(pixel);
+    if(_log.lookAt){
+      // 2,2 3,2
+      console.log("axes",e.axes,"x,y+1",pixel.axes);
+      // 2,3 3,3
+    }
+  }
+  return pixels;
+}
+function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
+  let pixels :Pixel[] = [];
+  for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
+    let e = oldPixelBlack[oldPixelBlack.length-1][iRow];
+    let pixel = _img[e.axes.x+1][e.axes.y]
+    if(pixel) pixels.push(pixel);
+    if(_log.lookAt){
+      // 3,1 3,2
+      console.log("axes",e.axes,"x+1,y",pixel.axes);
+      // 4,1 4,2
+    }
+  }
+  return pixels;
+}
 
+function AllBlack(oldPixelBlack:Pixel[]) :boolean{
+  let answer = true;
+  for (let x = 0; x < oldPixelBlack.length; x++) {
+    if(oldPixelBlack[x].intensity !== 0){ answer = false };
+  }
+  return answer;
+}
+/**
+ * determinar los pixel negro a corre segun la herr.
+ * 
+ * @param {Pixel[][]} oldPixelBlack
+ */
 function nextBlackToMove(oldPixelBlack:Pixel[][]) {
-  // devolver los pixel negros que puedan correr la her
-  //let numberOfPixelToLook = config.toolDiameter/2; // no es necesario
+  // look at "1 2 3" up
+  let plootAtUp = lootAtUp(oldPixelBlack);
+  // look at "1 4 7" left (<-o)
+  let plootAtLeft = lootAtLeft(oldPixelBlack);
+  // look at "3 6 9" right (o->)
+  let plootAtRight = lootAtRight(oldPixelBlack);
+  // look at "7 8 9" down
+  let plootAtDown = lootAtDown(oldPixelBlack);
 
-  console.log(0,oldPixelBlack[0][0].axes);
-  console.log(0,oldPixelBlack[0][1].axes);
-  console.log(1,oldPixelBlack[1][0].axes);
-  console.log(1,oldPixelBlack[1][1].axes);
-  // 1 2 3
-  // 4 5 6
-  // 7 8 9
+  let arrPixel :Pixel[][] = [];
 
-// look at "1 2 3" up
-  for (var iX = 0; iX < oldPixelBlack.length; iX++) {
-    var element = oldPixelBlack[iX][0];
-    // 2,1 3,1
-    console.log("axes",element.axes,"x,y-1 (",element.axes.x,element.axes.y-1,")");
-    // 2,0 3,0
+  // sortear por donde empezar ?¿?¿?¿
+  if( !AllBlack(plootAtUp) ){
+    if(_log.nextBlackToMove) console.log("plootAtUp\n",plootAtUp);
+
+    for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
+      let row :Pixel[] = [];
+      row.push( plootAtUp[iRow] );
+      for (let iColumn = 0; iColumn < oldPixelBlack[iRow].length-1; iColumn++) {
+        row.push( oldPixelBlack[iRow][iColumn] );
+      }
+      arrPixel.push(row);
+    }
+
+  }else if( AllBlack(plootAtLeft) ){
+    if(_log.nextBlackToMove)console.log("plootAtLeft\n",plootAtLeft);
+
+    arrPixel.push(plootAtLeft);
+    for (let iRow = oldPixelBlack.length-1; iRow >0 ; iRow--) {
+      let e = oldPixelBlack[iRow];
+      arrPixel.push(e);
+    }
+
+  }else if( AllBlack(plootAtRight) ){
+    if(_log.nextBlackToMove)console.log("plootAtRight\n",plootAtRight);
+
+    for (let iRow = 1; iRow < oldPixelBlack.length; iRow++) {
+      let e = oldPixelBlack[iRow];
+      arrPixel.push(e);
+    }
+    arrPixel.push(plootAtRight);
+
+  }else if( AllBlack(plootAtDown) ){
+    if(_log.nextBlackToMove)console.log("plootAtDown\n",plootAtDown);
+
+    for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
+      let row :Pixel[] = [];
+      for (let iColumn = 1; iColumn < oldPixelBlack[iRow].length; iColumn++) {
+        row.push( oldPixelBlack[iRow][iColumn] );
+      }
+      row.push(plootAtDown[iRow]);
+      arrPixel.push(row);
+    }
+
+  }else{
+    console.log("buscar por otro lado");
+    // buscar otros pixel
   }
 
-// look at "1 4 7" left (<-o)
-  for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
-    var element = oldPixelBlack[0][iColumn];
-    // 2,1 2,2
-    console.log("axes",element.axes,"x-1,y (",element.axes.x-1,element.axes.y,")");
-    // 1,1 1,2
+//####################################################
+if(_log.nextBlackToMove){
+  for (var ix = 0; ix < arrPixel.length; ix++) {
+    for (var iy = 0; iy < arrPixel[ix].length; iy++) {
+      var e = arrPixel[ix][iy];
+      console.log(ix,iy,"e",e.axes,"inte",e.intensity);
+    }
   }
-
-// look at "3 6 9" right (o->)
-  for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
-    var element = oldPixelBlack[oldPixelBlack.length-1][iRow];
-    // 3,1 3,2
-    console.log("axes",element.axes,"x+1,y (",element.axes.x+1,element.axes.y,")");
-    // 4,1 4,2
-  }
-
-// look at "7 8 9" down
-  for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
-    var element = oldPixelBlack[iY][oldPixelBlack[0].length-1];
-    // 2,2 3,2
-    console.log("axes",element.axes,"x,y+1 (",element.axes.x,element.axes.y+1,")");
-    // 2,3 3,3
-  }
+}
+//####################################################
 }
