@@ -15,7 +15,7 @@ const _log = {
 //  pixelToGCode  :  false,
 //  pixelAround   :  false,
 //  removePixel   :  false,
-  nextBlackToMove : !false,
+  nextBlackToMove: false,
   getFirstPixel :  false,
   getAllPixel   :  false,
   lookAt        :  false,
@@ -127,12 +127,15 @@ function getFirstPixel() :Pixel[][] {
 }
 
 function main() {
-  let firstPixel :Pixel[][] = getFirstPixel();
-  
+  let firstPixel: Pixel[][] = getFirstPixel();
+  console.log("firstPixel");
   console.log(firstPixel[0][0].axes, firstPixel[0][1].axes);
   console.log(firstPixel[1][0].axes, firstPixel[1][1].axes);
-  
-  nextBlackToMove(firstPixel);
+
+  let nexPixels = nextBlackToMove(firstPixel);
+  console.log("nexPixels");
+  console.log(nexPixels[0][0].axes, nexPixels[0][1].axes);
+  console.log(nexPixels[1][0].axes, nexPixels[1][1].axes);
 }
 
 function toGCode( pixels:Pixel[][] ){
@@ -230,7 +233,7 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
 function AllBlack(oldPixelBlack:Pixel[]) :boolean{
   let answer = true;
   for (let x = 0; x < oldPixelBlack.length; x++) {
-    if(oldPixelBlack[x].intensity !== 0){ answer = false };
+    if(oldPixelBlack[x].intensity === 765){ answer = false };
   }
   return answer;
 }
@@ -239,7 +242,7 @@ function AllBlack(oldPixelBlack:Pixel[]) :boolean{
  * 
  * @param {Pixel[][]} oldPixelBlack
  */
-function nextBlackToMove(oldPixelBlack:Pixel[][]) {
+function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
   // look at "1 2 3" up
   let plootAtUp = lootAtUp(oldPixelBlack);
   // look at "1 4 7" left (<-o)
@@ -252,7 +255,7 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) {
   let arrPixel :Pixel[][] = [];
 
   // sortear por donde empezar ?¿?¿?¿
-  if( !AllBlack(plootAtUp) ){
+  if( AllBlack(plootAtUp) ){
     if(_log.nextBlackToMove) console.log("plootAtUp\n",plootAtUp);
 
     for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
@@ -299,14 +302,14 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) {
     // buscar otros pixel
   }
 
-//####################################################
-if(_log.nextBlackToMove){
-  for (var ix = 0; ix < arrPixel.length; ix++) {
-    for (var iy = 0; iy < arrPixel[ix].length; iy++) {
-      var e = arrPixel[ix][iy];
-      console.log(ix,iy,"e",e.axes,"inte",e.intensity);
+  if(_log.nextBlackToMove){
+    for (var ix = 0; ix < arrPixel.length; ix++) {
+      for (var iy = 0; iy < arrPixel[ix].length; iy++) {
+        var e = arrPixel[ix][iy];
+        console.log(ix,iy,"e",e.axes,"inte",e.intensity);
+      }
     }
   }
-}
-//####################################################
+
+  return arrPixel;
 }
