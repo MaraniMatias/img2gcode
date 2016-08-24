@@ -45,7 +45,7 @@ function getAllPixel(image) {
         for (var y = 0; y < _height; y++) {
             var colour = image.getPixel(x, y);
             var intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
-            row.push({ axes: { x: x, y: y }, intensity: intensity });
+            row.push({ axes: { x: x, y: y }, intensity: intensity, be: false });
         }
         newArray.push(row);
     }
@@ -103,14 +103,23 @@ function main() {
     console.log('G01 X0 Y0 Z765; con Z max');
     var firstPixel = getFirstPixel();
     addPixel(firstPixel[0][0].axes);
-    var nexPixels = nextBlackToMove(firstPixel);
-    toGCode(firstPixel, nexPixels);
+    var i = 0;
+    while (i < 5) {
+        var nexPixels = nextBlackToMove(firstPixel);
+        toGCode(firstPixel, nexPixels);
+        firstPixel = nexPixels;
+        i++;
+    }
 }
 function toGCode(oldPixel, newPixel) {
     var pixelToMm = 1;
     var pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
     var pixelLast = oldPixel[0][0];
-    addPixel({ x: pixelFist.axes.x - pixelLast.axes.x, y: pixelFist.axes.y - pixelLast.axes.y });
+    addPixel({
+        x: pixelFist.axes.x - pixelLast.axes.x,
+        y: pixelFist.axes.y - pixelLast.axes.y
+    });
+    appliedAllPixel(oldPixel, function (p) { p.be = true; });
 }
 function addPixel(axes) {
     var pixelToMm = 1;
@@ -118,12 +127,19 @@ function addPixel(axes) {
     var Y = axes.y + config.toolDiameter / 2;
     console.log("G01 X" + X + " Y" + Y, axes.z ? "Z" + axes.z : '');
 }
+function appliedAllPixel(p, cb) {
+    for (var iRow = 0; iRow < p.length; iRow++) {
+        for (var iColumn = 0; iColumn < p[iRow].length - 1; iColumn++) {
+            cb(_img[iRow][iColumn], iRow, iColumn);
+        }
+    }
+}
 function unprocessedPixelBelowTool() {
     var pixelBelowTool = [];
     var pixelWhite = 0;
     for (var x = 0; x < _img.length; x++) {
         for (var y = 0; y < _img[x].length; y++) {
-            if (_img[x][y]) {
+            if (_img[x][y].be) {
                 for (var x2 = 0; x2 < config.toolDiameter; x2++) {
                     var row = [];
                     for (var y2 = 0; y2 < config.toolDiameter; y2++) {
@@ -148,7 +164,7 @@ function lootAtUp(oldPixelBlack) {
     for (var iX = 0; iX < oldPixelBlack.length; iX++) {
         var e = oldPixelBlack[iX][0];
         var pixel = _img[e.axes.x][e.axes.y - 1];
-        if (pixel)
+        if (pixel.be)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x,y-1", pixel.axes);
@@ -161,7 +177,7 @@ function lootAtLeft(oldPixelBlack) {
     for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
         var e = oldPixelBlack[0][iColumn];
         var pixel = _img[e.axes.x - 1][e.axes.y];
-        if (pixel)
+        if (pixel.be)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x-1,y", pixel.axes);
@@ -174,7 +190,7 @@ function lootAtDown(oldPixelBlack) {
     for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
         var e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
         var pixel = _img[e.axes.x][e.axes.y + 1];
-        if (pixel)
+        if (pixel.be)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x,y+1", pixel.axes);
@@ -187,7 +203,7 @@ function lootAtRight(oldPixelBlack) {
     for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
         var e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
         var pixel = _img[e.axes.x + 1][e.axes.y];
-        if (pixel)
+        if (pixel.be)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x+1,y", pixel.axes);
@@ -206,50 +222,50 @@ function AllBlack(oldPixelBlack) {
     return answer;
 }
 function nextBlackToMove(oldPixelBlack) {
-    var plootAtUp = lootAtUp(oldPixelBlack);
-    var plootAtLeft = lootAtLeft(oldPixelBlack);
-    var plootAtRight = lootAtRight(oldPixelBlack);
-    var plootAtDown = lootAtDown(oldPixelBlack);
+    var PLootAtUp = lootAtUp(oldPixelBlack);
+    var PLootAtLeft = lootAtLeft(oldPixelBlack);
+    var PLootAtRight = lootAtRight(oldPixelBlack);
+    var PLootAtDown = lootAtDown(oldPixelBlack);
     var arrPixel = [];
-    if (AllBlack(plootAtUp)) {
+    if (AllBlack(PLootAtUp)) {
         if (_log.nextBlackToMove)
-            console.log("plootAtUp\n", plootAtUp);
+            console.log("PLootAtUp\n", PLootAtUp);
         for (var iRow = 0; iRow < oldPixelBlack.length; iRow++) {
             var row = [];
-            row.push(plootAtUp[iRow]);
+            row.push(PLootAtUp[iRow]);
             for (var iColumn = 0; iColumn < oldPixelBlack[iRow].length - 1; iColumn++) {
                 row.push(oldPixelBlack[iRow][iColumn]);
             }
             arrPixel.push(row);
         }
     }
-    else if (AllBlack(plootAtLeft)) {
+    else if (AllBlack(PLootAtLeft)) {
         if (_log.nextBlackToMove)
-            console.log("plootAtLeft\n", plootAtLeft);
-        arrPixel.push(plootAtLeft);
+            console.log("PLootAtLeft\n", PLootAtLeft);
+        arrPixel.push(PLootAtLeft);
         for (var iRow = oldPixelBlack.length - 1; iRow > 0; iRow--) {
-            var e_1 = oldPixelBlack[iRow];
-            arrPixel.push(e_1);
+            var e = oldPixelBlack[iRow];
+            arrPixel.push(e);
         }
     }
-    else if (AllBlack(plootAtRight)) {
+    else if (AllBlack(PLootAtRight)) {
         if (_log.nextBlackToMove)
-            console.log("plootAtRight\n", plootAtRight);
+            console.log("PLootAtRight\n", PLootAtRight);
         for (var iRow = 1; iRow < oldPixelBlack.length; iRow++) {
-            var e_2 = oldPixelBlack[iRow];
-            arrPixel.push(e_2);
+            var e = oldPixelBlack[iRow];
+            arrPixel.push(e);
         }
-        arrPixel.push(plootAtRight);
+        arrPixel.push(PLootAtRight);
     }
-    else if (AllBlack(plootAtDown)) {
+    else if (AllBlack(PLootAtDown)) {
         if (_log.nextBlackToMove)
-            console.log("plootAtDown\n", plootAtDown);
+            console.log("PLootAtDown\n", PLootAtDown);
         for (var iRow = 0; iRow < oldPixelBlack.length; iRow++) {
             var row = [];
             for (var iColumn = 1; iColumn < oldPixelBlack[iRow].length; iColumn++) {
                 row.push(oldPixelBlack[iRow][iColumn]);
             }
-            row.push(plootAtDown[iRow]);
+            row.push(PLootAtDown[iRow]);
             arrPixel.push(row);
         }
     }
@@ -257,12 +273,9 @@ function nextBlackToMove(oldPixelBlack) {
         console.log("buscar por otro lado");
     }
     if (_log.nextBlackToMove) {
-        for (var ix = 0; ix < arrPixel.length; ix++) {
-            for (var iy = 0; iy < arrPixel[ix].length; iy++) {
-                var e = arrPixel[ix][iy];
-                console.log(ix, iy, "e", e.axes, "inte", e.intensity);
-            }
-        }
+        appliedAllPixel(arrPixel, function (e, iRow, iColumn) {
+            console.log(iRow, iColumn, "e", e.axes, "intensity", e.intensity);
+        });
     }
     return arrPixel;
 }

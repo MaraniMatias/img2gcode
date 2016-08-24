@@ -1,5 +1,5 @@
 type Axes = { x:number, y:number, z?:number };
-type Pixel = {  intensity :number , axes:Axes };
+type Pixel = {  intensity :number , axes:Axes ,be :boolean};
 
 import Line from "./line";
 import File from "./file";
@@ -71,7 +71,7 @@ function getAllPixel(image:lwip.Image) :Pixel[][]{
       let colour = image.getPixel(x,y);
       let intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a/100 : 1);
       // si intensity == 765 no ponerlo ¿?
-      row.push({ axes:{x,y}, intensity  });
+      row.push({ axes:{x,y}, intensity , be : false });
     }
     newArray.push(row);
   }
@@ -133,10 +133,17 @@ function main() {
 
   let firstPixel: Pixel[][] = getFirstPixel();
   addPixel(firstPixel[0][0].axes);
-  //console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
-  let nexPixels = nextBlackToMove(firstPixel);
-  //console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
-  toGCode(firstPixel,nexPixels);
+
+let i = 0;  
+  while ( i<3) {
+    //console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
+    let nexPixels = nextBlackToMove(firstPixel);
+    //console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
+    toGCode(firstPixel, nexPixels);
+    firstPixel = nexPixels;
+i++;
+  }
+
 }
 
 function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
@@ -147,15 +154,26 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
     x: pixelFist.axes.x - pixelLast.axes.x,
     y: pixelFist.axes.y - pixelLast.axes.y
   });
+
+  // a  oldPixel y newPixel indicar que a esos pixeles ya lo use
+  appliedAllPixel(oldPixel , (p :Pixel)=>{ p.be = true; });
 }
 
 function addPixel( axes :Axes){
   let pixelToMm = 1; // 1 pixel es X mm
   let X = axes.x + config.toolDiameter / 2;
   let Y = axes.y + config.toolDiameter / 2;
-  console.log(`G01 X${X} Y${Y}` , axes.z ? `Z${axes.z}` : '');
+  console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z}` : '');
   //console.log( pixels[0][0].axes , pixels[0][pixels[0].length-1].axes );
   //console.log( pixels[pixels.length-1][0].axes , pixels[pixels.length-1][pixels[pixels.length-1].length-1].axes );
+}
+
+function appliedAllPixel(p :Pixel[][], cb ){
+  for (let iRow = 0; iRow < p.length; iRow++) {
+    for (let iColumn = 0; iColumn < p[iRow].length-1; iColumn++) {
+      cb( _img[iRow][iColumn] ,iRow,iColumn);
+    }
+  }
 }
 
 /**
@@ -163,12 +181,12 @@ function addPixel( axes :Axes){
  * @returns {Pixel[][]}
  */
 function unprocessedPixelBelowTool() :Pixel[][]{
-  // no blanco debajjo de la tool
+  // no blanco debajo de la tool
   let pixelBelowTool :Pixel[][] = [];
   let pixelWhite = 0; 
   for (let x = 0; x < _img.length; x++) {
   for (let y = 0; y < _img[x].length; y++) {
-    if( _img[x][y] ){
+    if( _img[x][y].be ){
       for (let x2 = 0; x2 < config.toolDiameter; x2++) {
         let row :Pixel[] = [];
         for (let y2 = 0; y2 < config.toolDiameter; y2++) {
@@ -260,56 +278,56 @@ function AllBlack(oldPixelBlack:Pixel[]) :boolean{
  */
 function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
   // look at "1 2 3" up
-  let plootAtUp = lootAtUp(oldPixelBlack);
+  let PLootAtUp = lootAtUp(oldPixelBlack);
   // look at "1 4 7" left (<-o)
-  let plootAtLeft = lootAtLeft(oldPixelBlack);
+  let PLootAtLeft = lootAtLeft(oldPixelBlack);
   // look at "3 6 9" right (o->)
-  let plootAtRight = lootAtRight(oldPixelBlack);
+  let PLootAtRight = lootAtRight(oldPixelBlack);
   // look at "7 8 9" down
-  let plootAtDown = lootAtDown(oldPixelBlack);
+  let PLootAtDown = lootAtDown(oldPixelBlack);
 
   let arrPixel :Pixel[][] = [];
 
   // sortear por donde empezar ?¿?¿?¿
-  if( AllBlack(plootAtUp) ){
-    if(_log.nextBlackToMove) console.log("plootAtUp\n",plootAtUp);
+  if( AllBlack(PLootAtUp) ){
+    if(_log.nextBlackToMove) console.log("PLootAtUp\n",PLootAtUp);
 
     for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
       let row :Pixel[] = [];
-      row.push( plootAtUp[iRow] );
+      row.push( PLootAtUp[iRow] );
       for (let iColumn = 0; iColumn < oldPixelBlack[iRow].length-1; iColumn++) {
         row.push( oldPixelBlack[iRow][iColumn] );
       }
       arrPixel.push(row);
     }
 
-  }else if( AllBlack(plootAtLeft) ){
-    if(_log.nextBlackToMove)console.log("plootAtLeft\n",plootAtLeft);
+  }else if( AllBlack(PLootAtLeft) ){
+    if(_log.nextBlackToMove)console.log("PLootAtLeft\n",PLootAtLeft);
 
-    arrPixel.push(plootAtLeft);
+    arrPixel.push(PLootAtLeft);
     for (let iRow = oldPixelBlack.length-1; iRow >0 ; iRow--) {
       let e = oldPixelBlack[iRow];
       arrPixel.push(e);
     }
 
-  }else if( AllBlack(plootAtRight) ){
-    if(_log.nextBlackToMove)console.log("plootAtRight\n",plootAtRight);
+  }else if( AllBlack(PLootAtRight) ){
+    if(_log.nextBlackToMove)console.log("PLootAtRight\n",PLootAtRight);
 
     for (let iRow = 1; iRow < oldPixelBlack.length; iRow++) {
       let e = oldPixelBlack[iRow];
       arrPixel.push(e);
     }
-    arrPixel.push(plootAtRight);
+    arrPixel.push(PLootAtRight);
 
-  }else if( AllBlack(plootAtDown) ){
-    if(_log.nextBlackToMove)console.log("plootAtDown\n",plootAtDown);
+  }else if( AllBlack(PLootAtDown) ){
+    if(_log.nextBlackToMove)console.log("PLootAtDown\n",PLootAtDown);
 
     for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
       let row :Pixel[] = [];
       for (let iColumn = 1; iColumn < oldPixelBlack[iRow].length; iColumn++) {
         row.push( oldPixelBlack[iRow][iColumn] );
       }
-      row.push(plootAtDown[iRow]);
+      row.push(PLootAtDown[iRow]);
       arrPixel.push(row);
     }
 
@@ -318,13 +336,10 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
     // buscar otros pixel
   }
 
-  if(_log.nextBlackToMove){
-    for (var ix = 0; ix < arrPixel.length; ix++) {
-      for (var iy = 0; iy < arrPixel[ix].length; iy++) {
-        var e = arrPixel[ix][iy];
-        console.log(ix,iy,"e",e.axes,"inte",e.intensity);
-      }
-    }
+  if (_log.nextBlackToMove) {
+    appliedAllPixel(arrPixel, (e,iRow,iColumn) => {
+      console.log(iRow,iColumn,"e",e.axes,"intensity",e.intensity);
+    })
   }
 
   return arrPixel;
