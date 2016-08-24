@@ -104,7 +104,7 @@ function main() {
     var firstPixel = getFirstPixel();
     addPixel(firstPixel[0][0].axes);
     var i = 0;
-    while (i < 5) {
+    while (i < 3) {
         var nexPixels = nextBlackToMove(firstPixel);
         toGCode(firstPixel, nexPixels);
         firstPixel = nexPixels;
@@ -164,7 +164,7 @@ function lootAtUp(oldPixelBlack) {
     for (var iX = 0; iX < oldPixelBlack.length; iX++) {
         var e = oldPixelBlack[iX][0];
         var pixel = _img[e.axes.x][e.axes.y - 1];
-        if (pixel.be)
+        if (pixel)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x,y-1", pixel.axes);
@@ -177,7 +177,7 @@ function lootAtLeft(oldPixelBlack) {
     for (var iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
         var e = oldPixelBlack[0][iColumn];
         var pixel = _img[e.axes.x - 1][e.axes.y];
-        if (pixel.be)
+        if (pixel)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x-1,y", pixel.axes);
@@ -190,7 +190,7 @@ function lootAtDown(oldPixelBlack) {
     for (var iY = 0; iY < oldPixelBlack[0].length; iY++) {
         var e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
         var pixel = _img[e.axes.x][e.axes.y + 1];
-        if (pixel.be)
+        if (pixel)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x,y+1", pixel.axes);
@@ -203,7 +203,7 @@ function lootAtRight(oldPixelBlack) {
     for (var iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
         var e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
         var pixel = _img[e.axes.x + 1][e.axes.y];
-        if (pixel.be)
+        if (pixel)
             pixels.push(pixel);
         if (_log.lookAt) {
             console.log("axes", e.axes, "x+1,y", pixel.axes);
@@ -214,8 +214,11 @@ function lootAtRight(oldPixelBlack) {
 function AllBlack(oldPixelBlack) {
     var answer = true;
     for (var x = 0; x < oldPixelBlack.length; x++) {
-        if (oldPixelBlack[x].intensity === 765) {
+        if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
             answer = false;
+        }
+        else {
+            console.log("esta procesado o es blanco");
         }
         ;
     }

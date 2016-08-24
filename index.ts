@@ -263,11 +263,16 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
   }
   return pixels;
 }
-
+/**
+ * Pensar con los paso y capas que si es negro pero deveser procesado
+ * 
+ * @param {Pixel[]} oldPixelBlack
+ * @returns {boolean}
+ */
 function AllBlack(oldPixelBlack:Pixel[]) :boolean{
   let answer = true;
   for (let x = 0; x < oldPixelBlack.length; x++) {
-    if(oldPixelBlack[x].intensity === 765){ answer = false };
+    if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) { answer = false } else { console.log("esta procesado o es blanco") };
   }
   return answer;
 }
