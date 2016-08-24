@@ -132,6 +132,7 @@ function main() {
   console.log('G01 X0 Y0 Z765; con Z max');
 
   let firstPixel: Pixel[][] = getFirstPixel();
+  addPixel(firstPixel[0][0].axes);
   //console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
   let nexPixels = nextBlackToMove(firstPixel);
   //console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
@@ -142,14 +143,17 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
   let pixelToMm = 1; // 1 pixel es X mm
   let pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
   let pixelLast = oldPixel[0][0];
-  addPixel(pixelFist.axes.x - pixelLast.axes.x,pixelFist.axes.y - pixelLast.axes.y);
+  addPixel({
+    x: pixelFist.axes.x - pixelLast.axes.x,
+    y: pixelFist.axes.y - pixelLast.axes.y
+  });
 }
 
-function addPixel( x:number,y:number,z?:number ){
+function addPixel( axes :Axes){
   let pixelToMm = 1; // 1 pixel es X mm
-  let X = x + config.toolDiameter / 2;
-  let Y = y + config.toolDiameter / 2;
-  console.log(`G01 X${X} Y${Y}` , z ? `Z${z}` : '');
+  let X = axes.x + config.toolDiameter / 2;
+  let Y = axes.y + config.toolDiameter / 2;
+  console.log(`G01 X${X} Y${Y}` , axes.z ? `Z${axes.z}` : '');
   //console.log( pixels[0][0].axes , pixels[0][pixels[0].length-1].axes );
   //console.log( pixels[pixels.length-1][0].axes , pixels[pixels.length-1][pixels[pixels.length-1].length-1].axes );
 }
