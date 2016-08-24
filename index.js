@@ -98,16 +98,24 @@ function getFirstPixel() {
     }
 }
 function main() {
+    console.log('G21 ; Set units to mm');
+    console.log('G90 ; Absolute positioning');
+    console.log('G01 X0 Y0 Z765; con Z max');
     var firstPixel = getFirstPixel();
-    console.log("firstPixel");
-    console.log(firstPixel[0][0].axes, firstPixel[0][1].axes);
-    console.log(firstPixel[1][0].axes, firstPixel[1][1].axes);
     var nexPixels = nextBlackToMove(firstPixel);
-    console.log("nexPixels");
-    console.log(nexPixels[0][0].axes, nexPixels[0][1].axes);
-    console.log(nexPixels[1][0].axes, nexPixels[1][1].axes);
+    toGCode(firstPixel, nexPixels);
 }
-function toGCode(pixels) {
+function toGCode(oldPixel, newPixel) {
+    var pixelToMm = 1;
+    var pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+    var pixelLast = oldPixel[0][0];
+    addPixel(pixelFist.axes.x - pixelLast.axes.x, pixelFist.axes.y - pixelLast.axes.y);
+}
+function addPixel(x, y, z) {
+    var pixelToMm = 1;
+    var X = x + config.toolDiameter / 2;
+    var Y = y + config.toolDiameter / 2;
+    console.log("G01 X" + X + " Y" + Y, z ? "Z" + z : '');
 }
 function unprocessedPixelBelowTool() {
     var pixelBelowTool = [];

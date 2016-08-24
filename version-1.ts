@@ -70,8 +70,8 @@ function getPixel(left :number, top :number) : Pixel {
  * @param {string} [coment]
  * @returns {Pixel}
 */
-function addPixel(pixel :Pixel, show ?:boolean, coment ?:string) :Pixel {
-  let index = _gCode.push( new Line(show===undefined?true:show,pixel,coment) );
+function addPixel(pixel :Pixel, show ?:boolean, comment ?:string) :Pixel {
+  let index = _gCode.push( new Line(show===undefined?true:show,pixel,comment) );
   if(_log.addPixel && (show===undefined)){  console.log( _gCode[index-1].code())  }
   removePixel(pixel.axes.x,pixel.axes.y);
   return pixel;
@@ -238,7 +238,7 @@ function unprocessedPixel() :Pixel {
  * @param {number} [top]
  * @param {number} [left]
  */
-function mani(top? :number, left? :number) {
+function main(top? :number, left? :number) {
   let oldPixel :Pixel = addPixel(getPixel(0,0),true,"---> pixel start <---")
     , s = size(_img);
 
@@ -303,7 +303,7 @@ function start(dirImg :string) {
     _width = image.width();
     _img = getAllPixel(image);
     if(_log.start){console.log("_height",_height,"_width",_width);}
-    mani();
+    main();
   });
 }
 
