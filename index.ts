@@ -156,7 +156,7 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
   });
 
   // a  oldPixel y newPixel indicar que a esos pixeles ya lo use
-  appliedAllPixel(oldPixel , (p :Pixel)=>{ p.be = true; });
+  forEachPixel(oldPixel , (p :Pixel)=>{ p.be = true; });
 }
 
 function addPixel( axes :Axes){
@@ -168,7 +168,7 @@ function addPixel( axes :Axes){
   //console.log( pixels[pixels.length-1][0].axes , pixels[pixels.length-1][pixels[pixels.length-1].length-1].axes );
 }
 
-function appliedAllPixel(p :Pixel[][], cb ){
+function forEachPixel(p :Pixel[][], cb ){
   for (let iRow = 0; iRow < p.length; iRow++) {
     for (let iColumn = 0; iColumn < p[iRow].length-1; iColumn++) {
       cb( _img[iRow][iColumn] ,iRow,iColumn);
@@ -342,7 +342,7 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
   }
 
   if (_log.nextBlackToMove) {
-    appliedAllPixel(arrPixel, (e,iRow,iColumn) => {
+    forEachPixel(arrPixel, (e,iRow,iColumn) => {
       console.log(iRow,iColumn,"e",e.axes,"intensity",e.intensity);
     })
   }
