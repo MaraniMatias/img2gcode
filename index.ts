@@ -181,7 +181,7 @@ function appliedAllPixel(p :Pixel[][], cb ){
  * @returns {Pixel[][]}
  */
 function unprocessedPixelBelowTool() :Pixel[][]{
-  // no blanco debajo de la tool
+  // no blanco debajo de la herramienta.
   let pixelBelowTool :Pixel[][] = [];
   let pixelWhite = 0; 
   for (let x = 0; x < _img.length; x++) {
