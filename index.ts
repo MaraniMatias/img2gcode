@@ -19,6 +19,7 @@ const _log = {
   getFirstPixel :  false,
   getAllPixel   :  false,
   lookAt        :  false,
+  AllBlack      :  false,
 //  addPixel      :  false,
   start         :  false,
   main          :  false,
@@ -82,7 +83,7 @@ function getAllPixel(image:lwip.Image) :Pixel[][]{
  * @param {Array} arr
  * @returns {number} size of array
  */
-function size(arr : any[][]) :number {
+function size(arr : any[]) :number {
   let size = 0;
   if(_log.size){console.log(arr.length*arr[arr.length-1].length);}
   for (let x = 0; x < arr.length; x++) {
@@ -110,7 +111,7 @@ function getFirstPixel() :Pixel[][] {
         let row :Pixel[] = [];
         for (let y2 = 0; y2 < config.toolDiameter; y2++) {
           let p = _img[ x+x2<_width?x+x2:_width ][ y+y2<_height?y+y2:_height ];
-          if(p.intensity < 765){ row.push(p); }
+          if(p.intensity < 765 && !p.be ){ row.push(p); }
           else{ break; }
         }
         pixels.push(row);
@@ -179,8 +180,8 @@ function appliedAllPixel(p :Pixel[][], cb ){
 /**
  * array [n][m] n = m = toolDiameter
  * @returns {Pixel[][]}
- */
-function unprocessedPixelBelowTool() :Pixel[][]{
+ *//*
+function unprocessedPixelBelowTool( ) :Pixel[][]{
   // no blanco debajo de la herramienta.
   let pixelBelowTool :Pixel[][] = [];
   let pixelWhite = 0; 
@@ -205,7 +206,7 @@ function unprocessedPixelBelowTool() :Pixel[][]{
     return pixelBelowTool
   }
   }
-}
+}*/
 
 function lootAtUp(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
@@ -272,7 +273,11 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
 function AllBlack(oldPixelBlack:Pixel[]) :boolean{
   let answer = true;
   for (let x = 0; x < oldPixelBlack.length; x++) {
-    if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) { answer = false } else { console.log("esta procesado o es blanco") };
+    if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
+      answer = false;
+    } else {
+      if(_log.AllBlack){console.log("esta procesado o es blanco");}
+    };
   }
   return answer;
 }
@@ -337,8 +342,8 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
     }
 
   }else{
-    console.log("buscar por otro lado");
-    // buscar otros pixel
+    console.log("buscar por otro lado -> avanzar y buscar otro");
+    arrPixel = getFirstPixel();
   }
 
   if (_log.nextBlackToMove) {

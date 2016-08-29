@@ -2,11 +2,12 @@
   "files": [
     "typings/index.d.ts",
     "index.ts",
+    "file.ts",
     "line.ts"
   ],
   "compilerOptions": {
     "allowJs": true,
-    "target": "es5",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": false,
