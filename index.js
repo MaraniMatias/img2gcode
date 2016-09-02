@@ -102,14 +102,14 @@ function main() {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
     console.log('G01 X0 Y0 Z765; con Z max');
+    let w = size(_img) / config.toolDiameter * 2;
     let firstPixel = getFirstPixel();
     addPixel(firstPixel[0][0].axes);
-    let i = 0;
-    while (i < 3) {
+    while (w >= 0) {
         let nexPixels = nextBlackToMove(firstPixel);
         toGCode(firstPixel, nexPixels);
         firstPixel = nexPixels;
-        i++;
+        w--;
     }
 }
 function toGCode(oldPixel, newPixel) {
@@ -190,13 +190,12 @@ function lootAtRight(oldPixelBlack) {
 function AllBlack(oldPixelBlack) {
     let answer = true;
     for (let x = 0; x < oldPixelBlack.length; x++) {
-        if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
+        if (oldPixelBlack[x].intensity === 765 || !oldPixelBlack[x].be) {
             answer = false;
         }
         else {
-            if (_log.AllBlack) {
-                console.log("esta procesado o es blanco");
-            }
+            if (_log.AllBlack)
+                console.log("AllBlack:\tintensidad:", oldPixelBlack[x].intensity, "be", oldPixelBlack[x].be);
         }
         ;
     }

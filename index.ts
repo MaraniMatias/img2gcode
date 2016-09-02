@@ -132,17 +132,17 @@ function main() {
   console.log('G90 ; Absolute positioning');
   console.log('G01 X0 Y0 Z765; con Z max');
 
+  let w = size(_img) / config.toolDiameter * 2;
   let firstPixel: Pixel[][] = getFirstPixel();
   addPixel(firstPixel[0][0].axes);
 
-let i = 0;  
-  while ( i<3) {
+  while ( w >= 0) {
     //console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
     let nexPixels = nextBlackToMove(firstPixel);
     //console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
     toGCode(firstPixel, nexPixels);
     firstPixel = nexPixels;
-i++;
+w--;
   }
 
 }
@@ -273,10 +273,10 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
 function AllBlack(oldPixelBlack:Pixel[]) :boolean{
   let answer = true;
   for (let x = 0; x < oldPixelBlack.length; x++) {
-    if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
+    if (oldPixelBlack[x].intensity === 765 || !oldPixelBlack[x].be) {
       answer = false;
     } else {
-      if(_log.AllBlack){console.log("esta procesado o es blanco");}
+      if(_log.AllBlack)console.log("AllBlack:\tintensidad:",oldPixelBlack[x].intensity,"be",oldPixelBlack[x].be)
     };
   }
   return answer;
