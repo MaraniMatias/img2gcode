@@ -10,18 +10,13 @@ import * as path  from 'path';
 // Y
 // si la linea es > toolDiameter / 2 se hace
 const _log = {
-//  nextBlackPixel:  false,
-//  distanceIsOne :  false,
-//  pixelToGCode  :  false,
-//  pixelAround   :  false,
-//  removePixel   :  false,
+  appliedAllPixel: false,
   nextBlackToMove: false,
   getFirstPixel: false,
   getAllPixel: false,
   AllBlack: false,
   toGCode: false,
   lookAt: false,
-//  addPixel      :  false,  
   start: false,
   main: false,
   size: false
@@ -139,7 +134,11 @@ function main() {
 
   let w = size(_img) / config.toolDiameter * 2;
   let firstPixel: Pixel[][] = getFirstPixel();
-  addPixel(firstPixel[0][0].axes);
+
+  let sum = config.toolDiameter / 2;
+  let X = firstPixel[0][0].axes.x + sum;
+  let Y = firstPixel[0][0].axes.y + sum;
+  console.log(`G01 X${X} Y${Y};`);
 
   while ( w >= 0) {
     if(_log.main)console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
@@ -156,34 +155,23 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
     console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
     console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
   }
-
   let pixelToMm = 1; // 1 pixel es X mm
-  let pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
-  let pixelLast = oldPixel[0][0];
 
-  addPixel({
-    x: pixelLast.axes.x + (pixelFist.axes.x - pixelLast.axes.x),
-    y: pixelLast.axes.y + (pixelFist.axes.y - pixelLast.axes.y)
-  });
+  let pixelLast = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+  let pixelFist = oldPixel[0][0];
+
+  let X = pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x);
+  let Y = pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y);
+  console.log(`G01 X${X} Y${Y};`);
 
   appliedAllPixel(oldPixel, (p: Pixel) => { p.be = true; });
   return newPixel;
 }
 
-function addPixel( axes :Axes){
-  let pixelToMm = 1; // 1 pixel es X mm
-  let sum = config.toolDiameter / 2,
-    X = axes.x + sum,
-    Y = axes.y + sum
-  console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z}` : '');
-  //console.log( pixels[0][0].axes , pixels[0][pixels[0].length-1].axes );
-  //console.log( pixels[pixels.length-1][0].axes , pixels[pixels.length-1][pixels[pixels.length-1].length-1].axes );
-}
-
 function appliedAllPixel(arr :Pixel[][], cb ){
   for (let iRow = 0; iRow < arr.length; iRow++) {
     for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
-      //console.log( _img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y] )
+      if(_log.appliedAllPixel)console.log( _img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y] )
       //cb( _img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y] ,iRow,iColumn);
       cb( arr[iRow][iColumn] ,iRow,iColumn);
     }
@@ -327,7 +315,7 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
     }
 
   }else{
-    console.log("buscar por otro lado -> avanzar y buscar otro");
+    if (_log.nextBlackToMove) { console.log("buscar por otro lado -> avanzar y buscar otro"); }
     arrPixel = getFirstPixel();
   }
 
