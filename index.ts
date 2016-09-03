@@ -106,21 +106,25 @@ function getFirstPixel() :Pixel[][] {
   for (let y = 0; y < _img[x].length; y++) {
     if(_log.main){console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`);}
     let pixels :Pixel[][] = [];
-    if( x+config.toolDiameter< _width && y+config.toolDiameter<_height && _img[x][y] && _img[x][y].intensity < 765 ){
+    if (x + config.toolDiameter < _width && y + config.toolDiameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
       for (let x2 = 0; x2 < config.toolDiameter; x2++) {
-        let row :Pixel[] = [];
+        let row: Pixel[] = [];
         for (let y2 = 0; y2 < config.toolDiameter; y2++) {
-          let p = _img[ x+x2<_width?x+x2:_width ][ y+y2<_height?y+y2:_height ];
-          if(p.intensity < 765 && !p.be ){ row.push(p); }
-          else{ break; }
+          let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
+          if (p.intensity < 765 && !p.be) { row.push(p); }
+          else { break; }
         }
         pixels.push(row);
       }
-      if( size(pixels) === config.toolDiameter*2 ){
+      if (size(pixels) === config.toolDiameter * 2) {
         return pixels;
       }
-    }else {
-      if(_log.getFirstPixel)console.log(`${x+config.toolDiameter}< ${_width} && ${y+config.toolDiameter}<${_height} && ${_img[x][y].intensity} < 765`);
+    } else {
+      if (_log.getFirstPixel) {
+        console.log(`${x + config.toolDiameter}< ${_width} && 
+        ${y + config.toolDiameter}<${_height} && 
+        ${_img[x][y].intensity} < 765`);
+      }
     }
   }// for
   }// for
@@ -132,7 +136,7 @@ function main() {
   console.log('G90 ; Absolute positioning');
   console.log('G01 X0 Y0 Z765; con Z max');
 
-  let w = size(_img) / config.toolDiameter * 2;
+  let w = 4;// size(_img) / config.toolDiameter * 2;
   let firstPixel: Pixel[][] = getFirstPixel();
   addPixel(firstPixel[0][0].axes);
 
@@ -140,14 +144,13 @@ function main() {
     //console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
     let nexPixels = nextBlackToMove(firstPixel);
     //console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
-    toGCode(firstPixel, nexPixels);
-    firstPixel = nexPixels;
-w--;
+    firstPixel = toGCode(firstPixel, nexPixels);
+    w--;
   }
 
 }
 
-function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
+function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
   let pixelToMm = 1; // 1 pixel es X mm
   let pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
   let pixelLast = oldPixel[0][0];
@@ -157,56 +160,25 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]) {
   });
 
   // a  oldPixel y newPixel indicar que a esos pixeles ya lo use
-  appliedAllPixel(oldPixel , (p :Pixel)=>{ p.be = true; });
+  appliedAllPixel(oldPixel, (p: Pixel) => { p.be = true; });
+  return newPixel;
 }
 
 function addPixel( axes :Axes){
   let pixelToMm = 1; // 1 pixel es X mm
-  let X = axes.x + config.toolDiameter / 2;
-  let Y = axes.y + config.toolDiameter / 2;
+  let sum = config.toolDiameter / 2, X = axes.x + sum, Y = axes.y + sum;
   console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z}` : '');
   //console.log( pixels[0][0].axes , pixels[0][pixels[0].length-1].axes );
   //console.log( pixels[pixels.length-1][0].axes , pixels[pixels.length-1][pixels[pixels.length-1].length-1].axes );
 }
 
-function appliedAllPixel(p :Pixel[][], cb ){
-  for (let iRow = 0; iRow < p.length; iRow++) {
-    for (let iColumn = 0; iColumn < p[iRow].length-1; iColumn++) {
-      cb( _img[iRow][iColumn] ,iRow,iColumn);
+function appliedAllPixel(arr :Pixel[][], cb ){
+  for (let iRow = 0; iRow < arr.length; iRow++) {
+    for (let iColumn = 0; iColumn < arr[iRow].length-1; iColumn++) {
+      cb( arr[iRow][iColumn] ,iRow,iColumn);
     }
   }
 }
-
-/**
- * array [n][m] n = m = toolDiameter
- * @returns {Pixel[][]}
- *//*
-function unprocessedPixelBelowTool( ) :Pixel[][]{
-  // no blanco debajo de la herramienta.
-  let pixelBelowTool :Pixel[][] = [];
-  let pixelWhite = 0; 
-  for (let x = 0; x < _img.length; x++) {
-  for (let y = 0; y < _img[x].length; y++) {
-    if( _img[x][y].be ){
-      for (let x2 = 0; x2 < config.toolDiameter; x2++) {
-        let row :Pixel[] = [];
-        for (let y2 = 0; y2 < config.toolDiameter; y2++) {
-          let p = _img[ x+x2<_width?x+x2:_width ][ y+y2<_height?y+y2:_height ];
-          if(p.intensity === 765){ 
-            pixelWhite++;
-            if(pixelWhite > config.toolDiameter*2){
-              console.log("muchos blancos");
-            }
-          }
-          row.push(p);
-        }
-        pixelBelowTool.push(row);
-      }
-    }
-    return pixelBelowTool
-  }
-  }
-}*/
 
 function lootAtUp(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
@@ -273,10 +245,13 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
 function AllBlack(oldPixelBlack:Pixel[]) :boolean{
   let answer = true;
   for (let x = 0; x < oldPixelBlack.length; x++) {
-    if (oldPixelBlack[x].intensity === 765 || !oldPixelBlack[x].be) {
+    if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
       answer = false;
     } else {
-      if(_log.AllBlack)console.log("AllBlack:\tintensidad:",oldPixelBlack[x].intensity,"be",oldPixelBlack[x].be)
+      if (_log.AllBlack) console.log("AllBlack:\n\taxes:",
+        oldPixelBlack[x].axes, "intensidad:",
+        oldPixelBlack[x].intensity, "be",
+        oldPixelBlack[x].be)
     };
   }
   return answer;
@@ -348,7 +323,7 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
 
   if (_log.nextBlackToMove) {
     appliedAllPixel(arrPixel, (e,iRow,iColumn) => {
-      console.log(iRow,iColumn,"e",e.axes,"intensity",e.intensity);
+      console.log(iRow,iColumn,"e",e.axes,"intensity",e.intensity,"be",e.be);
     })
   }
 

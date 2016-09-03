@@ -92,8 +92,11 @@ function getFirstPixel() {
                 }
             }
             else {
-                if (_log.getFirstPixel)
-                    console.log(`${x + config.toolDiameter}< ${_width} && ${y + config.toolDiameter}<${_height} && ${_img[x][y].intensity} < 765`);
+                if (_log.getFirstPixel) {
+                    console.log(`${x + config.toolDiameter}< ${_width} && 
+        ${y + config.toolDiameter}<${_height} && 
+        ${_img[x][y].intensity} < 765`);
+                }
             }
         }
     }
@@ -102,13 +105,12 @@ function main() {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
     console.log('G01 X0 Y0 Z765; con Z max');
-    let w = size(_img) / config.toolDiameter * 2;
+    let w = 4;
     let firstPixel = getFirstPixel();
     addPixel(firstPixel[0][0].axes);
     while (w >= 0) {
         let nexPixels = nextBlackToMove(firstPixel);
-        toGCode(firstPixel, nexPixels);
-        firstPixel = nexPixels;
+        firstPixel = toGCode(firstPixel, nexPixels);
         w--;
     }
 }
@@ -121,17 +123,19 @@ function toGCode(oldPixel, newPixel) {
         y: pixelFist.axes.y - pixelLast.axes.y
     });
     appliedAllPixel(oldPixel, (p) => { p.be = true; });
+    return newPixel;
 }
 function addPixel(axes) {
     let pixelToMm = 1;
-    let X = axes.x + config.toolDiameter / 2;
-    let Y = axes.y + config.toolDiameter / 2;
+    let sum = config.toolDiameter / 2;
+    let X = axes.x + sum;
+    let Y = axes.y + sum;
     console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z}` : '');
 }
-function appliedAllPixel(p, cb) {
-    for (let iRow = 0; iRow < p.length; iRow++) {
-        for (let iColumn = 0; iColumn < p[iRow].length - 1; iColumn++) {
-            cb(_img[iRow][iColumn], iRow, iColumn);
+function appliedAllPixel(arr, cb) {
+    for (let iRow = 0; iRow < arr.length; iRow++) {
+        for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
+            cb(arr[iRow][iColumn], iRow, iColumn);
         }
     }
 }
@@ -190,12 +194,12 @@ function lootAtRight(oldPixelBlack) {
 function AllBlack(oldPixelBlack) {
     let answer = true;
     for (let x = 0; x < oldPixelBlack.length; x++) {
-        if (oldPixelBlack[x].intensity === 765 || !oldPixelBlack[x].be) {
+        if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
             answer = false;
         }
         else {
             if (_log.AllBlack)
-                console.log("AllBlack:\tintensidad:", oldPixelBlack[x].intensity, "be", oldPixelBlack[x].be);
+                console.log("AllBlack:\n\taxes:", oldPixelBlack[x].axes, "intensidad:", oldPixelBlack[x].intensity, "be", oldPixelBlack[x].be);
         }
         ;
     }
@@ -255,7 +259,7 @@ function nextBlackToMove(oldPixelBlack) {
     }
     if (_log.nextBlackToMove) {
         appliedAllPixel(arrPixel, (e, iRow, iColumn) => {
-            console.log(iRow, iColumn, "e", e.axes, "intensity", e.intensity);
+            console.log(iRow, iColumn, "e", e.axes, "intensity", e.intensity, "be", e.be);
         });
     }
     return arrPixel;
