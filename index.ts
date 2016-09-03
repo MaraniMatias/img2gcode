@@ -122,8 +122,8 @@ function getFirstPixel() :Pixel[][] {
     } else {
       if (_log.getFirstPixel) {
         console.log(`${x + config.toolDiameter}< ${_width} && 
-        ${y + config.toolDiameter}<${_height} && 
-        ${_img[x][y].intensity} < 765`);
+          ${y + config.toolDiameter}<${_height} && 
+          ${_img[x][y].intensity} < 765`);
       }
     }
   }// for
@@ -174,7 +174,9 @@ function addPixel( axes :Axes){
 
 function appliedAllPixel(arr :Pixel[][], cb ){
   for (let iRow = 0; iRow < arr.length; iRow++) {
-    for (let iColumn = 0; iColumn < arr[iRow].length-1; iColumn++) {
+    for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
+      //console.log( _img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y] )
+      //cb( _img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y] ,iRow,iColumn);
       cb( arr[iRow][iColumn] ,iRow,iColumn);
     }
   }

@@ -94,8 +94,8 @@ function getFirstPixel() {
             else {
                 if (_log.getFirstPixel) {
                     console.log(`${x + config.toolDiameter}< ${_width} && 
-        ${y + config.toolDiameter}<${_height} && 
-        ${_img[x][y].intensity} < 765`);
+          ${y + config.toolDiameter}<${_height} && 
+          ${_img[x][y].intensity} < 765`);
                 }
             }
         }
@@ -127,9 +127,7 @@ function toGCode(oldPixel, newPixel) {
 }
 function addPixel(axes) {
     let pixelToMm = 1;
-    let sum = config.toolDiameter / 2;
-    let X = axes.x + sum;
-    let Y = axes.y + sum;
+    let sum = config.toolDiameter / 2, X = axes.x + sum, Y = axes.y + sum;
     console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z}` : '');
 }
 function appliedAllPixel(arr, cb) {
@@ -264,3 +262,4 @@ function nextBlackToMove(oldPixelBlack) {
     }
     return arrPixel;
 }
+//# sourceMappingURL=index.js.map

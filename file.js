@@ -35,3 +35,4 @@ class File {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = File;
+//# sourceMappingURL=file.js.map
