@@ -1,7 +1,7 @@
 "use strict";
-var fs = require("fs");
-var File = (function () {
-    function File(gCodeInit) {
+const fs = require("fs");
+class File {
+    constructor(gCodeInit) {
         if (gCodeInit) {
             this._gCodeInit = gCodeInit;
         }
@@ -13,27 +13,26 @@ var File = (function () {
             ];
         }
     }
-    File.prototype.concat = function (gCode) {
-        for (var index = 0; index < gCode.length; index++) {
-            var element = gCode[index];
+    concat(gCode) {
+        for (let index = 0; index < gCode.length; index++) {
+            let element = gCode[index];
             if (element.show) {
                 this._gCodeInit.push(element.code());
             }
         }
         return this._gCodeInit;
-    };
-    File.prototype.save = function (dirGCode, gCode, cb) {
-        var _this = this;
-        fs.unlink(dirGCode, function (err) {
-            fs.writeFile(dirGCode, _this.concat(gCode).join('\n'), { encoding: "utf8" }, function (err) {
+    }
+    save(dirGCode, gCode, cb) {
+        fs.unlink(dirGCode, (err) => {
+            fs.writeFile(dirGCode, this.concat(gCode).join('\n'), { encoding: "utf8" }, (err) => {
                 if (err)
                     throw err.message;
                 if (cb)
                     cb();
             });
         });
-    };
-    return File;
-}());
+    }
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = File;
+//# sourceMappingURL=file.js.map
