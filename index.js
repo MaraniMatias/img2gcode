@@ -4,8 +4,9 @@ const _log = {
     nextBlackToMove: false,
     getFirstPixel: false,
     getAllPixel: false,
-    lookAt: false,
     AllBlack: false,
+    toGCode: false,
+    lookAt: false,
     start: false,
     main: false,
     size: false
@@ -105,22 +106,30 @@ function main() {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
     console.log('G01 X0 Y0 Z765; con Z max');
-    let w = 4;
+    let w = size(_img) / config.toolDiameter * 2;
     let firstPixel = getFirstPixel();
     addPixel(firstPixel[0][0].axes);
     while (w >= 0) {
+        if (_log.main)
+            console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
         let nexPixels = nextBlackToMove(firstPixel);
+        if (_log.main)
+            console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
         firstPixel = toGCode(firstPixel, nexPixels);
         w--;
     }
 }
 function toGCode(oldPixel, newPixel) {
+    if (_log.toGCode) {
+        console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
+        console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
+    }
     let pixelToMm = 1;
     let pixelFist = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
     let pixelLast = oldPixel[0][0];
     addPixel({
-        x: pixelFist.axes.x - pixelLast.axes.x,
-        y: pixelFist.axes.y - pixelLast.axes.y
+        x: pixelLast.axes.x + (pixelFist.axes.x - pixelLast.axes.x),
+        y: pixelLast.axes.y + (pixelFist.axes.y - pixelLast.axes.y)
     });
     appliedAllPixel(oldPixel, (p) => { p.be = true; });
     return newPixel;

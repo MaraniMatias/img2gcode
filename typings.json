@@ -3,11 +3,9 @@
   "dependencies": {},
   "globalDependencies": {
     "async": "registry:dt/async#2.0.1+20160804113311",
-    "colors": "registry:dt/colors#0.6.0-1+20160501135139",
-    "debug": "registry:dt/debug#0.0.0+20160317120654",
     "lwip": "registry:dt/lwip#0.0.8+20151229195328",
-    "node": "registry:dt/node#6.0.0+20160826120425",
-    "promise": "registry:dt/promise#7.1.1+20160602154553",
-    "request": "registry:dt/request#0.0.0+20160726020908"
+    "node": "registry:dt/node#6.0.0+20160831021119",
+    "npm": "registry:dt/npm#0.0.0+20160317120654",
+    "promise": "registry:dt/promise#7.1.1+20160602154553"
   }
 }
