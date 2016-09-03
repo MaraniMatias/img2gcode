@@ -109,10 +109,10 @@ function main() {
     console.log('G01 X0 Y0 Z765; con Z max');
     let w = size(_img) / config.toolDiameter * 2;
     let firstPixel = getFirstPixel();
-    let sum = config.toolDiameter / 2;
-    let X = firstPixel[0][0].axes.x + sum;
-    let Y = firstPixel[0][0].axes.y + sum;
-    console.log(`G01 X${X} Y${Y};`);
+    addPixel({
+        x: firstPixel[0][0].axes.x,
+        y: firstPixel[0][0].axes.y
+    });
     while (w >= 0) {
         if (_log.main)
             console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
@@ -129,13 +129,20 @@ function toGCode(oldPixel, newPixel) {
         console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
     }
     let pixelToMm = 1;
-    let pixelLast = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+    let pixelLast = newPixel[0][0];
     let pixelFist = oldPixel[0][0];
-    let X = pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x);
-    let Y = pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y);
-    console.log(`G01 X${X} Y${Y};`);
+    addPixel({
+        x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+    });
     appliedAllPixel(oldPixel, (p) => { p.be = true; });
     return newPixel;
+}
+function addPixel(axes) {
+    let sum = config.toolDiameter / 2;
+    let X = axes.x + sum;
+    let Y = axes.y + sum;
+    console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z};` : ';');
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {

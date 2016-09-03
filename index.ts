@@ -132,14 +132,13 @@ function main() {
   console.log('G90 ; Absolute positioning');
   console.log('G01 X0 Y0 Z765; con Z max');
 
-  let w = size(_img) / config.toolDiameter * 2;
   let firstPixel: Pixel[][] = getFirstPixel();
+  addPixel({
+    x: firstPixel[0][0].axes.x,
+    y: firstPixel[0][0].axes.y
+  });
 
-  let sum = config.toolDiameter / 2;
-  let X = firstPixel[0][0].axes.x + sum;
-  let Y = firstPixel[0][0].axes.y + sum;
-  console.log(`G01 X${X} Y${Y};`);
-
+  let w = size(_img) / config.toolDiameter * 2;
   while ( w >= 0) {
     if(_log.main)console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
     let nexPixels = nextBlackToMove(firstPixel);
@@ -155,19 +154,27 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
     console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
     console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
   }
+
   let pixelToMm = 1; // 1 pixel es X mm
-
-  let pixelLast = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+//  let pixelLast = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+//  let pixelFist = oldPixel[0][0];
+  let pixelLast = newPixel[0][0];
   let pixelFist = oldPixel[0][0];
-
-  let X = pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x);
-  let Y = pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y);
-  console.log(`G01 X${X} Y${Y};`);
-
+  addPixel({
+    x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+    y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+  })
 
   appliedAllPixel(oldPixel, (p: Pixel) => { p.be = true; });
   return newPixel;
 
+}
+
+function addPixel(axes:Axes) {
+  let sum = config.toolDiameter / 2;
+  let X = axes.x + sum;
+  let Y = axes.y + sum;
+  console.log(`G01 X${X} Y${Y}`,axes.z?` Z${axes.z};`:';');
 }
 
 function appliedAllPixel(arr :Pixel[][], cb ){
