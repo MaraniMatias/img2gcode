@@ -18,8 +18,14 @@ var _gCode = [];
 var _height = 0;
 var _width = 0;
 var _img = [];
+var _pixel = {
+    toMm: 1,
+    diameter: 1
+};
 var config = {
     toolDiameter: 2,
+    sevaZ: 7,
+    scaleAxes: 10
 };
 start("./img/test.png");
 function start(dirImg) {
@@ -32,6 +38,8 @@ function start(dirImg) {
         _height = image.height();
         _width = image.width();
         _img = getAllPixel(image);
+        _pixel.toMm = config.scaleAxes / _height;
+        _pixel.diameter = config.toolDiameter / _pixel.toMm;
         if (_log.start) {
             console.log("_height", _height, "_width", _width);
         }
@@ -75,10 +83,10 @@ function getFirstPixel() {
                 console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`);
             }
             let pixels = [];
-            if (x + config.toolDiameter < _width && y + config.toolDiameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
-                for (let x2 = 0; x2 < config.toolDiameter; x2++) {
+            if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
+                for (let x2 = 0; x2 < _pixel.diameter; x2++) {
                     let row = [];
-                    for (let y2 = 0; y2 < config.toolDiameter; y2++) {
+                    for (let y2 = 0; y2 < _pixel.diameter; y2++) {
                         let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
                         if (p.intensity < 765 && !p.be) {
                             row.push(p);
@@ -89,14 +97,14 @@ function getFirstPixel() {
                     }
                     pixels.push(row);
                 }
-                if (size(pixels) === config.toolDiameter * 2) {
+                if (size(pixels) === _pixel.diameter * 2) {
                     return pixels;
                 }
             }
             else {
                 if (_log.getFirstPixel) {
-                    console.log(`${x + config.toolDiameter}< ${_width} && 
-          ${y + config.toolDiameter}<${_height} && 
+                    console.log(`${x + _pixel.diameter}< ${_width} && 
+          ${y + _pixel.diameter}<${_height} && 
           ${_img[x][y].intensity} < 765`);
                 }
             }
@@ -106,13 +114,13 @@ function getFirstPixel() {
 function main() {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
-    console.log('G01 X0 Y0 Z765; con Z max');
-    let w = size(_img) / config.toolDiameter * 2;
+    console.log(`G01 X0 Y0 Z${config.sevaZ}; con Z max`);
     let firstPixel = getFirstPixel();
     addPixel({
         x: firstPixel[0][0].axes.x,
         y: firstPixel[0][0].axes.y
     });
+    let w = size(_img) / _pixel.diameter * 2;
     while (w >= 0) {
         if (_log.main)
             console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
@@ -128,7 +136,6 @@ function toGCode(oldPixel, newPixel) {
         console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
         console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
     }
-    let pixelToMm = 1;
     let pixelLast = newPixel[0][0];
     let pixelFist = oldPixel[0][0];
     addPixel({
@@ -139,10 +146,10 @@ function toGCode(oldPixel, newPixel) {
     return newPixel;
 }
 function addPixel(axes) {
-    let sum = config.toolDiameter / 2;
+    let sum = _pixel.diameter / 2;
     let X = axes.x + sum;
     let Y = axes.y + sum;
-    console.log(`G01 X${X} Y${Y}`, axes.z ? `Z${axes.z};` : ';');
+    console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {
