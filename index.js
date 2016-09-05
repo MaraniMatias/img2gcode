@@ -1,5 +1,6 @@
 "use strict";
 const lwip = require('lwip');
+const path = require('path');
 const _log = {
     appliedAllPixel: false,
     nextBlackToMove: false,
@@ -24,13 +25,14 @@ var _pixel = {
 };
 var config = {
     toolDiameter: 2,
+    WhiteToZ: 3,
     sevaZ: 7,
     scaleAxes: 10
 };
 start("./img/test.png");
 function start(dirImg) {
     console.log("->", dirImg);
-    _dirImg = dirImg;
+    _dirImg = path.resolve(dirImg);
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
         if (err)
@@ -125,6 +127,8 @@ function main() {
         if (_log.main)
             console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
         let nexPixels = nextBlackToMove(firstPixel);
+        if (!nexPixels)
+            break;
         if (_log.main)
             console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
         firstPixel = toGCode(firstPixel, nexPixels);
@@ -147,8 +151,8 @@ function toGCode(oldPixel, newPixel) {
 }
 function addPixel(axes) {
     let sum = _pixel.diameter / 2;
-    let X = axes.x + sum;
-    let Y = axes.y + sum;
+    let X = (axes.x + sum) * _pixel.toMm;
+    let Y = (axes.y + sum) * _pixel.toMm;
     console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
 }
 function appliedAllPixel(arr, cb) {

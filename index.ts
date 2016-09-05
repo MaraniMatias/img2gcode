@@ -34,7 +34,7 @@ var _pixel = {
 
 var config = {  // It is mm
   toolDiameter  : 2,
-  //WhiteToZ      : 3,
+  WhiteToZ      : 3,
   sevaZ         : 7,
   scaleAxes     : 10
 }
@@ -47,8 +47,7 @@ start("./img/test.png");
  */
 function start(dirImg :string) {
   console.log("->",dirImg)
-  //_dirImg = path.resolve(dirImg);
-  _dirImg = dirImg;
+  _dirImg = path.resolve(dirImg);
   _dirGCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
   lwip.open(_dirImg, function(err:Error, image) {
     if(err)console.log(err.message);
@@ -76,7 +75,7 @@ function getAllPixel(image:lwip.Image) :Pixel[][]{
     for (let y = 0; y < _height ; y++) {
       let colour = image.getPixel(x,y);
       let intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a/100 : 1);
-      // si intensity == 765 no ponerlo ¿?
+      // si intensity == 765 ponerlo ¿?
       row.push({ axes:{x,y}, intensity , be : false });
     }
     newArray.push(row);
@@ -130,6 +129,7 @@ function getFirstPixel() :Pixel[][] {
           ${y + _pixel.diameter}<${_height} && 
           ${_img[x][y].intensity} < 765`);
       }
+//      throw new Error('No hay lugar para trabajar.')
     }
   }// for
   }// for
@@ -137,25 +137,29 @@ function getFirstPixel() :Pixel[][] {
 }
 
 function main() {
-  console.log('G21 ; Set units to mm');
-  console.log('G90 ; Absolute positioning');
-  console.log(`G01 X0 Y0 Z${config.sevaZ}; con Z max`);
+//  try {
+    console.log('G21 ; Set units to mm');
+    console.log('G90 ; Absolute positioning');
+    console.log(`G01 X0 Y0 Z${config.sevaZ}; con Z max`);
 
-  let firstPixel: Pixel[][] = getFirstPixel();
-  addPixel({
-    x: firstPixel[0][0].axes.x,
-    y: firstPixel[0][0].axes.y
-  });
+    let firstPixel: Pixel[][] = getFirstPixel();
+    addPixel({
+      x: firstPixel[0][0].axes.x,
+      y: firstPixel[0][0].axes.y
+    });
 
-  let w = size(_img) / _pixel.diameter * 2;
-  while ( w >= 0) {
-    if(_log.main)console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
-    let nexPixels = nextBlackToMove(firstPixel);
-    if(_log.main)console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
-    firstPixel = toGCode(firstPixel, nexPixels);
-    w--;
-  }
-
+    let w = size(_img) / _pixel.diameter * 2;
+    while (w >= 0) {
+      if(_log.main)console.log("firstPixel",'\n',firstPixel[0][0].axes, firstPixel[0][1].axes,'\n',firstPixel[1][0].axes, firstPixel[1][1].axes);
+      let nexPixels = nextBlackToMove(firstPixel);
+      if (!nexPixels )break;
+      if(_log.main)console.log("nexPixels",'\n',nexPixels[0][0].axes, nexPixels[0][1].axes,'\n',nexPixels[1][0].axes, nexPixels[1][1].axes);
+      firstPixel = toGCode(firstPixel, nexPixels);
+      w--;
+    }
+//  } catch (error) {
+//    console.log(error);
+//  }
 }
 
 function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
@@ -180,8 +184,8 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
 
 function addPixel(axes:Axes) {
   let sum = _pixel.diameter / 2;
-  let X = axes.x + sum;
-  let Y = axes.y + sum;
+  let X = (axes.x + sum)*_pixel.toMm;
+  let Y = (axes.y + sum)*_pixel.toMm;
   console.log(`G01 X${X} Y${Y}`,axes.z?` Z${axes.z};`:';');
 }
 
