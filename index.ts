@@ -116,16 +116,15 @@ function getFirstPixel() :Pixel[][] {
         let row: Pixel[] = [];
         for (let y2 = 0; y2 < _pixel.diameter; y2++) {
           let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
-          let countBe = 0;
+
+          let countBlack = 0;
           if (p.intensity < 765) {
-            if (!p.be) { countBe++; }
-            if (countBe === _pixel.diameter*2 ){
-              // si alrededor es negro y hay uno sin procesar
+            countBlack++;
+            if (countBlack > _pixel.diameter || !p.be){
               row.push(p);
             }
-            else { break; }
           }
-          else { break; }
+
         }
         pixels.push(row);
       }
@@ -172,6 +171,7 @@ function main() {
 }
 
 function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
+  //console.log(distanceIsOne(oldPixel,newPixel));
   if(_log.toGCode){
     console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
     console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);

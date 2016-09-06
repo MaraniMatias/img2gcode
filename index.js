@@ -91,20 +91,12 @@ function getFirstPixel() {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
                         let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
-                        let countBe = 0;
+                        let countBlack = 0;
                         if (p.intensity < 765) {
-                            if (!p.be) {
-                                countBe++;
-                            }
-                            if (countBe === _pixel.diameter * 2) {
+                            countBlack++;
+                            if (countBlack > _pixel.diameter || !p.be) {
                                 row.push(p);
                             }
-                            else {
-                                break;
-                            }
-                        }
-                        else {
-                            break;
                         }
                     }
                     pixels.push(row);
@@ -166,14 +158,32 @@ function addPixel(axes) {
     console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
 }
 function distanceIsOne(oldPixel, newPixel) {
-    let newPixel_11 = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
-    let newPixel_00 = newPixel[0][0];
-    let newPixel_01 = newPixel[0][newPixel[newPixel.length - 1].length - 1];
-    let newPixel_10 = newPixel[newPixel.length - 1][0];
-    let oldPixel_11 = oldPixel[oldPixel.length - 1][oldPixel[oldPixel.length - 1].length - 1];
-    let oldPixel_00 = oldPixel[0][0];
-    let oldPixel_01 = oldPixel[0][oldPixel[oldPixel.length - 1].length - 1];
-    let oldPixel_10 = oldPixel[oldPixel.length - 1][0];
+    let arrNewPixel = Array();
+    arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
+    arrNewPixel.push(newPixel[0][0]);
+    arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
+    arrNewPixel.push(newPixel[newPixel.length - 1][0]);
+    let arrOldPixel = Array();
+    arrOldPixel.push(oldPixel[oldPixel.length - 1][oldPixel[oldPixel.length - 1].length - 1]);
+    arrOldPixel.push(oldPixel[0][0]);
+    arrOldPixel.push(oldPixel[0][oldPixel[oldPixel.length - 1].length - 1]);
+    arrOldPixel.push(oldPixel[oldPixel.length - 1][0]);
+    for (let ix = 0; ix < arrNewPixel.length; ix++) {
+        let nPixel = arrNewPixel[ix];
+        for (let iy = 0; iy < arrOldPixel.length; iy++) {
+            let oPixel = arrOldPixel[iy];
+            let disX = nPixel.axes.x - oPixel.axes.x;
+            let disY = nPixel.axes.y - oPixel.axes.y;
+            if (_log.distanceIsOne) {
+                console.log("disX", disX, "disY", disY, "newPixel", nPixel.axes, "oldPixel", oPixel.axes, disX === 1 || disY === 1 || disX === -1 || disY === -1);
+            }
+            let sigX = disX > 0 ? 1 : -1;
+            let sigY = disY > 0 ? 1 : -1;
+            return (disX === sigX && (disY === 0 || disY === sigY)) ||
+                (disY === sigY && (disX === 0 || disX === sigX)) ||
+                disY === 0 && disX === 0;
+        }
+    }
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {
