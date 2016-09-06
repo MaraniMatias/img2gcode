@@ -5,6 +5,7 @@ const _log = {
     appliedAllPixel: false,
     nextBlackToMove: false,
     getFirstPixel: false,
+    distanceIsOne: false,
     getAllPixel: false,
     AllBlack: false,
     toGCode: false,
@@ -90,8 +91,17 @@ function getFirstPixel() {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
                         let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
-                        if (p.intensity < 765 && !p.be) {
-                            row.push(p);
+                        let countBe = 0;
+                        if (p.intensity < 765) {
+                            if (!p.be) {
+                                countBe++;
+                            }
+                            if (countBe === _pixel.diameter * 2) {
+                                row.push(p);
+                            }
+                            else {
+                                break;
+                            }
                         }
                         else {
                             break;
@@ -154,6 +164,8 @@ function addPixel(axes) {
     let X = (axes.x + sum) * _pixel.toMm;
     let Y = (axes.y + sum) * _pixel.toMm;
     console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
+}
+function distanceIsOne(newPixel, oldPixel) {
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {

@@ -13,6 +13,7 @@ const _log = {
   appliedAllPixel: false,
   nextBlackToMove: false,
   getFirstPixel: false,
+  distanceIsOne: false,
   getAllPixel: false,
   AllBlack: false,
   toGCode: false,
@@ -115,7 +116,15 @@ function getFirstPixel() :Pixel[][] {
         let row: Pixel[] = [];
         for (let y2 = 0; y2 < _pixel.diameter; y2++) {
           let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
-          if (p.intensity < 765 && !p.be) { row.push(p); }
+          let countBe = 0;
+          if (p.intensity < 765) {
+            if (!p.be) { countBe++; }
+            if (countBe === _pixel.diameter*2 ){
+              // si alrededor es negro y hay uno sin procesar
+              row.push(p);
+            }
+            else { break; }
+          }
           else { break; }
         }
         pixels.push(row);
@@ -187,6 +196,20 @@ function addPixel(axes:Axes) {
   let X = (axes.x + sum)*_pixel.toMm;
   let Y = (axes.y + sum)*_pixel.toMm;
   console.log(`G01 X${X} Y${Y}`,axes.z?` Z${axes.z};`:';');
+}
+
+function distanceIsOne(newPixel: Pixel[][], oldPixel: Pixel[][]): boolean{
+  // tener ecuenta el paso ??
+/*
+  let disX = newPixel.axes.x - oldPixel.axes.x ;
+  let disY = newPixel.axes.y - oldPixel.axes.y ;
+  if (_log.distanceIsOne)console.log("disX", disX, "disY", disY, "newPixel", newPixel.axes, "oldPixel", oldPixel.axes, disX === 1 || disY === 1 || disX === -1 || disY === -1);
+
+  let sigX = disX >0 ? 1 : -1;
+  let sigY = disY >0 ? 1 : -1;
+  return ( disX === sigX && ( disY === 0 || disY === sigY ) )||
+  ( disY === sigY && ( disX === 0 || disX === sigX ) )|| disY === 0 && disX === 0
+*/  
 }
 
 function appliedAllPixel(arr :Pixel[][], cb ){
@@ -348,3 +371,51 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
 
   return arrPixel;
 }
+
+/*
+
+  // White to Black
+  if ( oldPixel.intensity > newPixel.intensity ) {
+    if ( ! distanceIsOne(newPixel,oldPixel) ) {
+      addPixel({
+        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+        intensity : 765
+      });
+      addPixel({
+        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+        intensity : 765
+      });
+    }
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      intensity : newPixel.intensity
+    });
+  }
+
+  // Black to White
+  else if ( oldPixel.intensity < newPixel.intensity ) {
+    addPixel({
+      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+      intensity : 765
+    })
+  }
+
+  // Black to Black
+  else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
+    if ( ! distanceIsOne(newPixel,oldPixel) ) {
+      addPixel({
+        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
+        intensity : 765
+      });
+      addPixel({
+        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
+        intensity : 765
+      });
+    }
+    addPixel({
+      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
+      intensity : newPixel.intensity
+    });
+  } else {  addPixel(newPixel,false);  }
+
+*/
