@@ -198,18 +198,37 @@ function addPixel(axes:Axes) {
   console.log(`G01 X${X} Y${Y}`,axes.z?` Z${axes.z};`:';');
 }
 
-function distanceIsOne(newPixel: Pixel[][], oldPixel: Pixel[][]): boolean{
+function distanceIsOne(oldPixel: Pixel[][], newPixel: Pixel[][]): boolean{
   // tener ecuenta el paso ??
-/*
-  let disX = newPixel.axes.x - oldPixel.axes.x ;
-  let disY = newPixel.axes.y - oldPixel.axes.y ;
-  if (_log.distanceIsOne)console.log("disX", disX, "disY", disY, "newPixel", newPixel.axes, "oldPixel", oldPixel.axes, disX === 1 || disY === 1 || disX === -1 || disY === -1);
+  let arrNewPixel: Array<Pixel> = Array();
+  arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
+  arrNewPixel.push(newPixel[0][0]);
+  arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
+  arrNewPixel.push(newPixel[newPixel.length - 1][0]);
 
-  let sigX = disX >0 ? 1 : -1;
-  let sigY = disY >0 ? 1 : -1;
-  return ( disX === sigX && ( disY === 0 || disY === sigY ) )||
-  ( disY === sigY && ( disX === 0 || disX === sigX ) )|| disY === 0 && disX === 0
-*/  
+  let arrOldPixel: Array<Pixel> = Array();
+  arrOldPixel.push(oldPixel[oldPixel.length - 1][oldPixel[oldPixel.length - 1].length - 1]);
+  arrOldPixel.push(oldPixel[0][0]);
+  arrOldPixel.push(oldPixel[0][oldPixel[oldPixel.length - 1].length - 1]);
+  arrOldPixel.push(oldPixel[oldPixel.length - 1][0]);
+
+  for (let ix = 0; ix < arrNewPixel.length; ix++) { let nPixel = arrNewPixel[ix];
+    for (let iy = 0; iy < arrOldPixel.length; iy++) { let oPixel = arrOldPixel[iy];
+      let disX = nPixel.axes.x - oPixel.axes.x;
+      let disY = nPixel.axes.y - oPixel.axes.y;
+      if (_log.distanceIsOne) {
+        console.log("disX", disX, "disY", disY,
+          "newPixel", nPixel.axes, "oldPixel", oPixel.axes,
+          disX === 1 || disY === 1 || disX === -1 || disY === -1);
+      }
+      let sigX = disX > 0 ? 1 : -1;
+      let sigY = disY >0 ? 1 : -1;
+      return ( disX === sigX && ( disY === 0 || disY === sigY ) ) ||
+      ( disY === sigY && ( disX === 0 || disX === sigX ) ) ||
+      disY === 0 && disX === 0
+    }
+  }
+
 }
 
 function appliedAllPixel(arr :Pixel[][], cb ){

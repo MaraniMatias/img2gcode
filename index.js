@@ -165,7 +165,15 @@ function addPixel(axes) {
     let Y = (axes.y + sum) * _pixel.toMm;
     console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
 }
-function distanceIsOne(newPixel, oldPixel) {
+function distanceIsOne(oldPixel, newPixel) {
+    let newPixel_11 = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
+    let newPixel_00 = newPixel[0][0];
+    let newPixel_01 = newPixel[0][newPixel[newPixel.length - 1].length - 1];
+    let newPixel_10 = newPixel[newPixel.length - 1][0];
+    let oldPixel_11 = oldPixel[oldPixel.length - 1][oldPixel[oldPixel.length - 1].length - 1];
+    let oldPixel_00 = oldPixel[0][0];
+    let oldPixel_01 = oldPixel[0][oldPixel[oldPixel.length - 1].length - 1];
+    let oldPixel_10 = oldPixel[oldPixel.length - 1][0];
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {
