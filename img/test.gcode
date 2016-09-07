@@ -1,3 +1,4 @@
+;---> this code is for cnc-ino <---
 G21 ; Set units to mm
 G90 ; Absolute positioning
 G01 X0 Y0 Z7; With Z max

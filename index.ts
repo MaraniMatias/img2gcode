@@ -50,7 +50,7 @@ start("./img/test.png");
  * @param {string} dirImg image path
  */
 function start(dirImg :string) {
-  console.log("->",dirImg)
+  console.log("-> Imagen: ",dirImg)
   _dirImg = path.resolve(dirImg);
   _dirGCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
   lwip.open(_dirImg, function(err:Error, image) {
@@ -159,7 +159,7 @@ function main() {
       let nexPixels = nextBlackToMove(firstPixel);
       if (!nexPixels) {
         new File().save(_dirGCode, _gCode, () => {
-          console.log("-> Sava As\n", _dirGCode);
+          console.log("-> Sava As:", _dirGCode);
         });
         break;
       }

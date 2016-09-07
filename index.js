@@ -30,7 +30,7 @@ var config = {
 };
 start("./img/test.png");
 function start(dirImg) {
-    console.log("->", dirImg);
+    console.log("-> Imagen: ", dirImg);
     _dirImg = path.resolve(dirImg);
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
@@ -126,7 +126,7 @@ function main() {
             let nexPixels = nextBlackToMove(firstPixel);
             if (!nexPixels) {
                 new file_1.default().save(_dirGCode, _gCode, () => {
-                    console.log("-> Sava As\n", _dirGCode);
+                    console.log("-> Sava As:", _dirGCode);
                 });
                 break;
             }
