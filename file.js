@@ -8,17 +8,14 @@ class File {
         else {
             this._gCodeInit = [
                 'G21 ; Set units to mm',
-                'G90 ; Absolute positioning',
-                'G01 X0 Y0 Z765; con Z max',
+                'G90 ; Absolute positioning'
             ];
         }
     }
     concat(gCode) {
         for (let index = 0; index < gCode.length; index++) {
             let element = gCode[index];
-            if (element.show) {
-                this._gCodeInit.push(element.code());
-            }
+            this._gCodeInit.push(element.code());
         }
         return this._gCodeInit;
     }

@@ -1,5 +1,6 @@
 "use strict";
 const line_1 = require("./line");
+const file_1 = require("./file");
 const lwip = require('lwip');
 const path = require('path');
 const _log = {
@@ -9,6 +10,7 @@ const _log = {
     distanceIsOne: false,
     getAllPixel: false,
     AllBlack: false,
+    addPixel: false,
     toGCode: false,
     lookAt: false,
     start: false,
@@ -111,25 +113,31 @@ function getFirstPixel() {
     }
 }
 function main() {
-    console.log('G21 ; Set units to mm');
-    console.log('G90 ; Absolute positioning');
-    console.log(`G01 X0 Y0 Z${config.sevaZ} ; con Z max`);
-    let firstPixel = getFirstPixel();
-    addPixel({
-        x: firstPixel[0][0].axes.x,
-        y: firstPixel[0][0].axes.y
-    });
-    let w = size(_img) / _pixel.diameter * 2;
-    while (w >= 0) {
-        if (_log.main)
-            console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
-        let nexPixels = nextBlackToMove(firstPixel);
-        if (!nexPixels)
-            break;
-        if (_log.main)
-            console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
-        firstPixel = toGCode(firstPixel, nexPixels);
-        w--;
+    try {
+        let firstPixel = getFirstPixel();
+        addPixel({
+            x: firstPixel[0][0].axes.x,
+            y: firstPixel[0][0].axes.y
+        });
+        let w = size(_img) / _pixel.diameter * 2;
+        while (w >= 0) {
+            if (_log.main)
+                console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
+            let nexPixels = nextBlackToMove(firstPixel);
+            if (!nexPixels) {
+                new file_1.default().save(_dirGCode, _gCode, () => {
+                    console.log("-> Sava As\n", _dirGCode);
+                });
+                break;
+            }
+            if (_log.main)
+                console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
+            firstPixel = toGCode(firstPixel, nexPixels);
+            w--;
+        }
+    }
+    catch (error) {
+        console.log(error);
     }
 }
 function toGCode(oldPixel, newPixel) {
@@ -162,13 +170,17 @@ function toGCode(oldPixel, newPixel) {
 }
 function addPixel(axes) {
     let sum = _pixel.diameter / 2;
-    let X = axes.x ? (axes.x + sum) * _pixel.toMm : false;
-    let Y = axes.y ? (axes.y + sum) * _pixel.toMm : false;
+    let X = axes.x ? (axes.x + sum) * _pixel.toMm : undefined;
+    let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
     if (_gCode.length == 0) {
-        console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-        _gCode.push(new line_1.default(false, { intensity: 765, axes: { x: 5, y: 5 } }));
+        if (_log.addPixel)
+            console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
+        _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, 'With Z max'));
+        _gCode.push(new line_1.default({ x: X, y: Y, z: config.sevaZ }));
     }
-    console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');
+    if (_log.addPixel)
+        console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');
+    _gCode.push(new line_1.default({ x: X, y: Y, z: axes.z }));
 }
 function distanceIsOne(oldPixel, newPixel) {
     let arrNewPixel = Array();

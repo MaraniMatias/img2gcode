@@ -1,17 +1,10 @@
 "use strict";
 class Line {
-    constructor(show, pixel, comment) {
-        this._show = show;
-        this._pixel = pixel;
+    constructor(axes, comment) {
+        this._axes = axes;
         if (comment) {
             this._comment = comment;
         }
-    }
-    get show() {
-        return this._show;
-    }
-    set show(v) {
-        this._show = v;
     }
     get comment() {
         return this._comment;
@@ -20,18 +13,14 @@ class Line {
         this._comment = v;
     }
     get axes() {
-        return this._pixel.axes;
-    }
-    get intensity() {
-        return this._pixel.intensity;
+        return this._axes;
     }
     code() {
-        let show = this._show ? '' : ';';
-        let x = this._pixel.axes.x !== undefined ? ` X${this._pixel.axes.x}` : '';
-        let y = this._pixel.axes.y !== undefined ? ` Y${this._pixel.axes.y}` : '';
-        let z = this._pixel.axes.z !== undefined ? ` Z${this._pixel.axes.z}` : '';
+        let x = this._axes.x !== undefined ? ` X${this._axes.x}` : '';
+        let y = this._axes.y !== undefined ? ` Y${this._axes.y}` : '';
+        let z = this._axes.z !== undefined ? ` Z${this._axes.z}` : '';
         let comment = this._comment ? `; ${this._comment}` : '';
-        return show + "G01" + x + y + z + comment;
+        return "G01" + x + y + z + comment;
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
