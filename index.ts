@@ -209,8 +209,9 @@ function addPixel(axes: Axes) {
   let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
   if ( _gCode.length==0){
     if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-    _gCode.push(new Line({ x:0, y:0, z:config.sevaZ },'With Z max') );
+    _gCode.push(new Line({ x: 0, y: 0, z:config.sevaZ },'With Z max') );
     _gCode.push(new Line({ x: X, y: Y, z: config.sevaZ }));
+    _gCode.push(new Line({ x: X, y: Y, z: config.blackZ }));
   }
   if(_log.addPixel) console.log('G01',axes.x?`X${X}`:'',axes.y? `Y${Y}`:'',axes.z!==undefined?`Z${axes.z};`:';');
   _gCode.push(new Line({ x:X, y:Y, z:axes.z }) );

@@ -3,6 +3,7 @@ G21 ; Set units to mm
 G90 ; Absolute positioning
 G01 X0 Y0 Z7; With Z max
 G01 X2 Y5 Z7
+G01 X2 Y5 Z0
 G01 X2 Y5
 G01 X3 Y5 Z0
 G01 X4 Y5 Z0
