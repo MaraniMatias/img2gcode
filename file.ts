@@ -1,10 +1,8 @@
-type Axes = { x:number, y:number, z?:number};
 interface Line {
   comment  :string;
-  axes     :Axes;
-  show     :boolean;
   code()   :string;
 }
+
 import * as fs from "fs";
 export default
  /**
@@ -33,7 +31,7 @@ class File {
   private concat(gCode: Line[]) :string[] {
     for (let index = 0; index < gCode.length; index++) {
       let element = gCode[index];
-      if(element.show){ this._gCodeInit.push( element.code() ); }
+      this._gCodeInit.push( element.code() );
     }
     return this._gCodeInit;
   }

@@ -78,7 +78,6 @@ function getAllPixel(image:lwip.Image) :Pixel[][]{
     for (let y = 0; y < _height ; y++) {
       let colour = image.getPixel(x,y);
       let intensity = (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a/100 : 1);
-      // si intensity == 765 ponerlo ¿?
       row.push({ axes:{x,y}, intensity , be : false });
     }
     newArray.push(row);
