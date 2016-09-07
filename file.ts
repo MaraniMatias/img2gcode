@@ -20,6 +20,7 @@ class File {
       this._gCodeInit = gCodeInit;
     }else{
       this._gCodeInit = [
+        ";---> this code is for cnc-ino <---",
         'G21 ; Set units to mm',
         'G90 ; Absolute positioning'
       ]
