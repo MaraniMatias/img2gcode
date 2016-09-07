@@ -1,4 +1,5 @@
 "use strict";
+const line_1 = require("./line");
 const lwip = require('lwip');
 const path = require('path');
 const _log = {
@@ -14,21 +15,16 @@ const _log = {
     main: false,
     size: false
 };
-var _dirGCode = 'myGcode.gcode';
-var _dirImg;
-var _gCode = [];
-var _height = 0;
-var _width = 0;
-var _img = [];
-var _pixel = {
+var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, _img = [], _gCode = [], _pixel = {
     toMm: 1,
     diameter: 1
 };
 var config = {
     toolDiameter: 2,
-    WhiteToZ: 3,
-    sevaZ: 7,
-    scaleAxes: 10
+    scaleAxes: 10,
+    whiteZ: 2,
+    blackZ: 0,
+    sevaZ: 7
 };
 start("./img/test.png");
 function start(dirImg) {
@@ -90,8 +86,7 @@ function getFirstPixel() {
                 for (let x2 = 0; x2 < _pixel.diameter; x2++) {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-                        let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
-                        let countBlack = 0;
+                        let countBlack = 0, p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
                         if (p.intensity < 765) {
                             countBlack++;
                             if (countBlack > _pixel.diameter || !p.be) {
@@ -118,7 +113,7 @@ function getFirstPixel() {
 function main() {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
-    console.log(`G01 X0 Y0 Z${config.sevaZ}; con Z max`);
+    console.log(`G01 X0 Y0 Z${config.sevaZ} ; con Z max`);
     let firstPixel = getFirstPixel();
     addPixel({
         x: firstPixel[0][0].axes.x,
@@ -142,20 +137,38 @@ function toGCode(oldPixel, newPixel) {
         console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
         console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
     }
-    let pixelLast = newPixel[0][0];
-    let pixelFist = oldPixel[0][0];
-    addPixel({
-        x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
-    });
+    let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
+    if (distanceIsOne(oldPixel, newPixel)) {
+        addPixel({
+            x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+            y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+            z: config.blackZ
+        });
+    }
+    else {
+        addPixel({
+            z: config.whiteZ
+        });
+        addPixel({
+            x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+            y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+        });
+        addPixel({
+            z: config.blackZ
+        });
+    }
     appliedAllPixel(oldPixel, (p) => { p.be = true; });
     return newPixel;
 }
 function addPixel(axes) {
     let sum = _pixel.diameter / 2;
-    let X = (axes.x + sum) * _pixel.toMm;
-    let Y = (axes.y + sum) * _pixel.toMm;
-    console.log(`G01 X${X} Y${Y}`, axes.z ? ` Z${axes.z};` : ';');
+    let X = axes.x ? (axes.x + sum) * _pixel.toMm : false;
+    let Y = axes.y ? (axes.y + sum) * _pixel.toMm : false;
+    if (_gCode.length == 0) {
+        console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
+        _gCode.push(new line_1.default(false, { intensity: 765, axes: { x: 5, y: 5 } }));
+    }
+    console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');
 }
 function distanceIsOne(oldPixel, newPixel) {
     let arrNewPixel = Array();
@@ -198,6 +211,8 @@ function lootAtUp(oldPixelBlack) {
     let pixels = [];
     for (let iX = 0; iX < oldPixelBlack.length; iX++) {
         let e = oldPixelBlack[iX][0];
+        if (e.axes.y === 0)
+            break;
         let pixel = _img[e.axes.x][e.axes.y - 1];
         if (pixel)
             pixels.push(pixel);
@@ -211,6 +226,8 @@ function lootAtLeft(oldPixelBlack) {
     let pixels = [];
     for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
         let e = oldPixelBlack[0][iColumn];
+        if (e.axes.x === 0)
+            break;
         let pixel = _img[e.axes.x - 1][e.axes.y];
         if (pixel)
             pixels.push(pixel);
@@ -224,6 +241,8 @@ function lootAtDown(oldPixelBlack) {
     let pixels = [];
     for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
         let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
+        if (e.axes.y === _width)
+            break;
         let pixel = _img[e.axes.x][e.axes.y + 1];
         if (pixel)
             pixels.push(pixel);
@@ -237,6 +256,8 @@ function lootAtRight(oldPixelBlack) {
     let pixels = [];
     for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
         let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
+        if (e.axes.x === _height)
+            break;
         let pixel = _img[e.axes.x + 1][e.axes.y];
         if (pixel)
             pixels.push(pixel);

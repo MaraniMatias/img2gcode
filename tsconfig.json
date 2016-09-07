@@ -1,9 +1,7 @@
 {
-  "files": [
-    "typings/index.d.ts",
-    "index.ts",
-    "file.ts",
-    "line.ts"
+  "exclude": [
+    "old.ts",
+    "version-1.ts"
   ],
   "compilerOptions": {
     "allowJs": true,

@@ -1,11 +1,20 @@
 G21 ; Set units to mm
 G90 ; Absolute positioning
-G01 X0 Y0 Z1; con Z max
-G01 X0 Y0; ---> pixel start <---
-G01 X2 Y2;
-G01 X3 Y2;
-G01 X4 Y2;
-G01 X5 Y2;
-G01 X6 Y2;
-G01 X7 Y2;
-G01 X8 Y2;
+G01 X0 Y0 Z7 ; con Z max
+G01 X2 Y5 Z7;
+G01 X2 Y5 ;
+G01 X3 Y5 Z0;
+G01 X4 Y5 Z0;
+G01 X5 Y5 Z0;
+G01 X6 Y5 Z0;
+G01 X7 Y5 Z0;
+G01 X8 Y5 Z0;
+G01 X8 Y4 Z0;
+G01 X8 Y3 Z0;
+G01 X8 Y2 Z0;
+G01   Z2;
+G01 X8 Y6 ;
+G01   Z0;
+G01 X8 Y7 Z0;
+G01 X8 Y8 Z0;
+G01 X8 Y8 Z0;

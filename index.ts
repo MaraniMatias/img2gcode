@@ -1,4 +1,4 @@
-type Axes = { x:number, y:number, z?:number };
+type Axes = { x?:number, y?:number, z?:number };
 type Pixel = {  intensity :number , axes:Axes ,be :boolean};
 
 import Line from "./line";
@@ -22,22 +22,24 @@ const _log = {
   main: false,
   size: false
 };
-var _dirGCode :string ='myGcode.gcode';
-var _dirImg   :string;
-var _gCode    :Line[] = [];
-var _height   :number = 0;
-var _width    :number = 0;
-var _img: Pixel[][] = [];
-var _pixel = {
+var _dirGCode :string ='myGcode.gcode',
+  _dirImg: string,
+  _gCode: Line[] = [],
+  _height: number = 0,
+  _width: number = 0,
+  _img: Pixel[][] = [],
+  _gCode: Line[] = [],
+  _pixel = {
   toMm: 1, // 1 pixel es X mm
   diameter: 1
 }
 
 var config = {  // It is mm
-  toolDiameter  : 2,
-  WhiteToZ      : 3,
-  sevaZ         : 7,
-  scaleAxes     : 10
+  toolDiameter: 2,
+  scaleAxes: 10,
+  whiteZ: 2,
+  blackZ: 0,
+  sevaZ: 7
 }
 //var self = this;
 
@@ -115,9 +117,9 @@ function getFirstPixel() :Pixel[][] {
       for (let x2 = 0; x2 < _pixel.diameter; x2++) {
         let row: Pixel[] = [];
         for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-          let p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
+          let countBlack = 0,
+            p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
 
-          let countBlack = 0;
           if (p.intensity < 765) {
             countBlack++;
             if (countBlack > _pixel.diameter || !p.be){
@@ -148,7 +150,7 @@ function main() {
 //  try {
     console.log('G21 ; Set units to mm');
     console.log('G90 ; Absolute positioning');
-    console.log(`G01 X0 Y0 Z${config.sevaZ}; con Z max`);
+    console.log(`G01 X0 Y0 Z${config.sevaZ} ; con Z max`);
 
     let firstPixel: Pixel[][] = getFirstPixel();
     addPixel({
@@ -171,31 +173,45 @@ function main() {
 }
 
 function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
-  //console.log(distanceIsOne(oldPixel,newPixel));
   if(_log.toGCode){
     console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
     console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
   }
 
-//  let pixelLast = newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1];
-//  let pixelFist = oldPixel[0][0];
-  let pixelLast = newPixel[0][0];
-  let pixelFist = oldPixel[0][0];
-  addPixel({
-    x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-    y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
-  })
+  let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
+  if ( distanceIsOne(oldPixel, newPixel) ) {
+    addPixel({
+      x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+      y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+      z: config.blackZ
+    });
+  } else {
+    addPixel({
+      z: config.whiteZ
+    });
+    addPixel({
+      x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+      y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+    });
+    addPixel({
+      z: config.blackZ
+    });
+  }
 
   appliedAllPixel(oldPixel, (p: Pixel) => { p.be = true; });
   return newPixel;
 
 }
 
-function addPixel(axes:Axes) {
+function addPixel(axes: Axes) {
   let sum = _pixel.diameter / 2;
-  let X = (axes.x + sum)*_pixel.toMm;
-  let Y = (axes.y + sum)*_pixel.toMm;
-  console.log(`G01 X${X} Y${Y}`,axes.z?` Z${axes.z};`:';');
+  let X = axes.x? (axes.x + sum)*_pixel.toMm : false;
+  let Y = axes.y ? (axes.y + sum) * _pixel.toMm : false;
+  if ( _gCode.length==0){
+    console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
+    _gCode.push(new Line(false, { intensity:765, axes:{x:5 ,y:5} }));
+  }
+  console.log('G01',axes.x?`X${X}`:'',axes.y? `Y${Y}`:'',axes.z!==undefined?`Z${axes.z};`:';');
 }
 
 function distanceIsOne(oldPixel: Pixel[][], newPixel: Pixel[][]): boolean{
@@ -245,7 +261,8 @@ function lootAtUp(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iX = 0; iX < oldPixelBlack.length; iX++) {
     let e = oldPixelBlack[iX][0];
-    let pixel = _img[e.axes.x][e.axes.y-1]
+    if (e.axes.y === 0) break;
+    let pixel = _img[e.axes.x][e.axes.y - 1];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
       // 2,1 3,1
@@ -259,7 +276,8 @@ function lootAtLeft(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
     let e = oldPixelBlack[0][iColumn];
-    let pixel = _img[e.axes.x-1][e.axes.y]
+    if (e.axes.x === 0) break;
+    let pixel = _img[e.axes.x - 1][e.axes.y];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
       // 2,1 2,2
@@ -272,8 +290,9 @@ function lootAtLeft(oldPixelBlack:Pixel[][]) :Pixel[] {
 function lootAtDown(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
-    let e = oldPixelBlack[iY][oldPixelBlack[0].length-1];
-    let pixel = _img[e.axes.x][e.axes.y+1]
+    let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
+    if (e.axes.y === _width) break;
+    let pixel = _img[e.axes.x][e.axes.y + 1];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
       // 2,2 3,2
@@ -286,8 +305,9 @@ function lootAtDown(oldPixelBlack:Pixel[][]) :Pixel[] {
 function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
-    let e = oldPixelBlack[oldPixelBlack.length-1][iRow];
-    let pixel = _img[e.axes.x+1][e.axes.y]
+    let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
+    if (e.axes.x === _height) break;
+    let pixel = _img[e.axes.x + 1][e.axes.y];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
       // 3,1 3,2
@@ -390,51 +410,3 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
 
   return arrPixel;
 }
-
-/*
-
-  // White to Black
-  if ( oldPixel.intensity > newPixel.intensity ) {
-    if ( ! distanceIsOne(newPixel,oldPixel) ) {
-      addPixel({
-        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-        intensity : 765
-      });
-      addPixel({
-        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-        intensity : 765
-      });
-    }
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      intensity : newPixel.intensity
-    });
-  }
-
-  // Black to White
-  else if ( oldPixel.intensity < newPixel.intensity ) {
-    addPixel({
-      axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-      intensity : 765
-    })
-  }
-
-  // Black to Black
-  else if (newPixel.intensity < 765 && oldPixel.intensity === newPixel.intensity ) {
-    if ( ! distanceIsOne(newPixel,oldPixel) ) {
-      addPixel({
-        axes : { x : oldPixel.axes.x, y : oldPixel.axes.y , z : 765 },
-        intensity : 765
-      });
-      addPixel({
-        axes : { x : newPixel.axes.x, y : newPixel.axes.y , z : 765 },
-        intensity : 765
-      });
-    }
-    addPixel({
-      axes : { x : newPixel.axes.x, y : newPixel.axes.y, z : newPixel.intensity },
-      intensity : newPixel.intensity
-    });
-  } else {  addPixel(newPixel,false);  }
-
-*/
