@@ -36,8 +36,8 @@ var _dirGCode :string ='myGcode.gcode',
   }
 
 var config = {  // It is mm
-  toolDiameter: 1,
-  scaleAxes: 20,
+  toolDiameter: 3,
+  scaleAxes: 10,
   whiteZ: 2,
   blackZ: 0,
   sevaZ: 7
@@ -260,7 +260,7 @@ function lootAtUp(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iX = 0; iX < oldPixelBlack.length; iX++) {
     let e = oldPixelBlack[iX][0];
-    if (e.axes.y === 0) break;
+    if (e === undefined || e.axes.y === 0) break;
     let pixel = _img[e.axes.x][e.axes.y - 1];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
@@ -275,7 +275,7 @@ function lootAtLeft(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
     let e = oldPixelBlack[0][iColumn];
-    if (e.axes.x === 0) break;
+    if (e === undefined || e.axes.x === 0) break;
     let pixel = _img[e.axes.x - 1][e.axes.y];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
@@ -290,7 +290,7 @@ function lootAtDown(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
     let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
-    if (e.axes.y === _width) break;
+    if (e === undefined || e.axes.y === _width) break;
     let pixel = _img[e.axes.x][e.axes.y + 1];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){
@@ -305,7 +305,7 @@ function lootAtRight(oldPixelBlack:Pixel[][]) :Pixel[] {
   let pixels :Pixel[] = [];
   for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
     let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
-    if (e.axes.x === _height) break;
+    if (e === undefined || e.axes.x === _height) break;
     let pixel = _img[e.axes.x + 1][e.axes.y];
     if(pixel) pixels.push(pixel);
     if(_log.lookAt){

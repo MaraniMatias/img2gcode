@@ -22,8 +22,8 @@ var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, 
     diameter: 1
 };
 var config = {
-    toolDiameter: 1,
-    scaleAxes: 20,
+    toolDiameter: 3,
+    scaleAxes: 10,
     whiteZ: 2,
     blackZ: 0,
     sevaZ: 7
@@ -229,7 +229,7 @@ function lootAtUp(oldPixelBlack) {
     let pixels = [];
     for (let iX = 0; iX < oldPixelBlack.length; iX++) {
         let e = oldPixelBlack[iX][0];
-        if (e.axes.y === 0)
+        if (e === undefined || e.axes.y === 0)
             break;
         let pixel = _img[e.axes.x][e.axes.y - 1];
         if (pixel)
@@ -244,7 +244,7 @@ function lootAtLeft(oldPixelBlack) {
     let pixels = [];
     for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
         let e = oldPixelBlack[0][iColumn];
-        if (e.axes.x === 0)
+        if (e === undefined || e.axes.x === 0)
             break;
         let pixel = _img[e.axes.x - 1][e.axes.y];
         if (pixel)
@@ -259,7 +259,7 @@ function lootAtDown(oldPixelBlack) {
     let pixels = [];
     for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
         let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
-        if (e.axes.y === _width)
+        if (e === undefined || e.axes.y === _width)
             break;
         let pixel = _img[e.axes.x][e.axes.y + 1];
         if (pixel)
@@ -274,7 +274,7 @@ function lootAtRight(oldPixelBlack) {
     let pixels = [];
     for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
         let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
-        if (e.axes.x === _height)
+        if (e === undefined || e.axes.x === _height)
             break;
         let pixel = _img[e.axes.x + 1][e.axes.y];
         if (pixel)
