@@ -23,7 +23,7 @@ var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, 
 };
 var config = {
     toolDiameter: 1,
-    scaleAxes: 10,
+    scaleAxes: 20,
     whiteZ: 2,
     blackZ: 0,
     sevaZ: 7
@@ -83,30 +83,28 @@ function getFirstPixel() {
             if (_log.getFirstPixel) {
                 console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`);
             }
-            let pixels = [];
-            if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
+            let pixels = [], diameter = _pixel.diameter < 1 ? 1 : _pixel.diameter;
+            if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y].intensity < 765) {
                 for (let x2 = 0; x2 < _pixel.diameter; x2++) {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
                         let countBlack = 0, p = _img[x + x2 < _height ? x + x2 : _height][y + y2 < _width ? y + y2 : _width];
                         if (p.intensity < 765) {
                             countBlack++;
-                            if (countBlack > _pixel.diameter || !p.be) {
+                            if (countBlack > diameter || !p.be) {
                                 row.push(p);
                             }
                         }
                     }
                     pixels.push(row);
                 }
-                if (pixels[0].length === _pixel.diameter && pixels.length === _pixel.diameter) {
+                if (pixels[0].length === diameter && pixels.length === diameter) {
                     return pixels;
                 }
             }
             else {
                 if (_log.getFirstPixel) {
-                    console.log(`${x + _pixel.diameter}< ${_width} && 
-          ${y + _pixel.diameter}<${_height} && 
-          ${_img[x][y].intensity} < 765`);
+                    console.log(`${x + _pixel.diameter} < ${_width} && ${y + _pixel.diameter} < ${_height} && ${_img[x][y].intensity} < 765`);
                 }
             }
         }
@@ -172,7 +170,7 @@ function addPixel(axes) {
     let sum = _pixel.diameter / 2;
     let X = axes.x ? (axes.x + sum) * _pixel.toMm : undefined;
     let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
-    if (_gCode.length == 0) {
+    if (_gCode.length === 0) {
         if (_log.addPixel)
             console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
         _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, 'With Z max'));
@@ -302,11 +300,11 @@ function AllBlack(oldPixelBlack) {
     return answer;
 }
 function nextBlackToMove(oldPixelBlack) {
+    let arrPixel = [];
     let PLootAtUp = lootAtUp(oldPixelBlack);
     let PLootAtLeft = lootAtLeft(oldPixelBlack);
     let PLootAtRight = lootAtRight(oldPixelBlack);
     let PLootAtDown = lootAtDown(oldPixelBlack);
-    let arrPixel = [];
     if (AllBlack(PLootAtUp)) {
         if (_log.nextBlackToMove)
             console.log("PLootAtUp\n", PLootAtUp);

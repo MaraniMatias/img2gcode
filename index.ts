@@ -37,7 +37,7 @@ var _dirGCode :string ='myGcode.gcode',
 
 var config = {  // It is mm
   toolDiameter: 1,
-  scaleAxes: 10,
+  scaleAxes: 20,
   whiteZ: 2,
   blackZ: 0,
   sevaZ: 7
@@ -108,38 +108,35 @@ function size(arr : any[]) :number {
  * @returns {Pixel[][]}
  */
 function getFirstPixel() :Pixel[][] {
-
   for (let x = 0; x < _img.length; x++) {
   for (let y = 0; y < _img[x].length; y++) {
     if (_log.getFirstPixel) { console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`); }
-    let pixels :Pixel[][] = [];
-    if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y] && _img[x][y].intensity < 765) {
+    let pixels: Pixel[][] = [],
+      diameter = _pixel.diameter < 1 ? 1 : _pixel.diameter;
+    if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y].intensity < 765) {
       for (let x2 = 0; x2 < _pixel.diameter; x2++) {
         let row: Pixel[] = [];
         for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-          let countBlack = 0, p = _img[x + x2 < _height ? x + x2 : _height][y + y2 < _width ? y + y2 : _width];          if (p.intensity < 765) {
+          let countBlack = 0, p = _img[x + x2 < _height ? x + x2 : _height][y + y2 < _width ? y + y2 : _width];
+          if (p.intensity < 765) {
             countBlack++;
-            if (countBlack > _pixel.diameter || !p.be){
+            if ( countBlack > diameter || !p.be){
               row.push(p);
             }
           }
         }
         pixels.push(row);
       }
-      //if( size(pixels) === _pixel.diameter * 2 ){
-      if ( pixels[0].length === _pixel.diameter && pixels.length === _pixel.diameter) {
+      if ( pixels[0].length === diameter && pixels.length === diameter) {
         return pixels;
       }
     } else {
       if (_log.getFirstPixel) {
-        console.log(`${x + _pixel.diameter}< ${_width} && 
-          ${y + _pixel.diameter}<${_height} && 
-          ${_img[x][y].intensity} < 765`);
+        console.log(`${x + _pixel.diameter} < ${_width} && ${y + _pixel.diameter} < ${_height} && ${_img[x][y].intensity} < 765`);
       }
     }
   }// for
   }// for
-
 }
 
 function main() {
@@ -203,7 +200,7 @@ function addPixel(axes: Axes) {
   let sum = _pixel.diameter / 2;
   let X = axes.x ? (axes.x + sum) * _pixel.toMm : undefined;
   let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
-  if ( _gCode.length==0){
+  if (_gCode.length === 0) {
     if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
     _gCode.push(new Line({ x: 0, y: 0, z:config.sevaZ },'With Z max') );
     _gCode.push(new Line({ x: X, y: Y, z: config.sevaZ }));
@@ -248,7 +245,7 @@ function distanceIsOne(oldPixel: Pixel[][], newPixel: Pixel[][]): boolean{
 function appliedAllPixel(arr: Pixel[][], cb) {
   for (let iRow = 0; iRow < arr.length; iRow++) {
     if ( _log.appliedAllPixel ) console.log("iRow", iRow);
-    if ( arr[iRow].length === 1 ) {
+    if (arr[iRow].length === 1) {
       cb(arr[iRow][0], iRow);
     }
     for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
@@ -342,7 +339,8 @@ function AllBlack(oldPixelBlack:Pixel[]) :boolean{
  * 
  * @param {Pixel[][]} oldPixelBlack
  */
-function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
+function nextBlackToMove(oldPixelBlack: Pixel[][]): Pixel[][]  {
+  let arrPixel :Pixel[][] = [];
   // look at "1 2 3" up
   let PLootAtUp = lootAtUp(oldPixelBlack);
   // look at "1 4 7" left (<-o)
@@ -351,8 +349,6 @@ function nextBlackToMove(oldPixelBlack:Pixel[][]) :Pixel[][]  {
   let PLootAtRight = lootAtRight(oldPixelBlack);
   // look at "7 8 9" down
   let PLootAtDown = lootAtDown(oldPixelBlack);
-
-  let arrPixel :Pixel[][] = [];
 
   // sortear por donde empezar ?¿?¿?¿
   if( AllBlack(PLootAtUp) ){
