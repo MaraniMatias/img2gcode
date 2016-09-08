@@ -38,6 +38,7 @@ var _dirGCode :string ='myGcode.gcode',
 var config = {  // It is mm
   toolDiameter: 1,
   scaleAxes: 10,
+  //deepStep: 0,
   whiteZ: 2,
   blackZ: 0,
   sevaZ: 7
