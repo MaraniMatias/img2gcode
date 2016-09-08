@@ -22,7 +22,7 @@ var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, 
     diameter: 1
 };
 var config = {
-    toolDiameter: 3,
+    toolDiameter: 1,
     scaleAxes: 10,
     whiteZ: 2,
     blackZ: 0,
@@ -30,7 +30,7 @@ var config = {
 };
 start("./img/test.png");
 function start(dirImg) {
-    console.log("-> Imagen: ", dirImg, "config:\n", config);
+    console.log("-> Imagen: ", dirImg, "\nconfig:", config);
     _dirImg = path.resolve(dirImg);
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
@@ -81,10 +81,13 @@ function getFirstPixel() {
     for (let x = 0; x < _img.length; x++) {
         for (let y = 0; y < _img[x].length; y++) {
             if (_log.getFirstPixel) {
-                console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`);
+                console.log(`for (${x},${y}) -> {${_img[x][y].axes.x},${_img[x][y].axes.y}} -> ${_img[x][y].intensity} --- ${_height},${_width} ${_pixel.diameter}`);
             }
             let pixels = [], diameter = _pixel.diameter < 1 ? 1 : _pixel.diameter;
-            if (x + _pixel.diameter < _width && y + _pixel.diameter < _height && _img[x][y].intensity < 765) {
+            if (_log.getFirstPixel) {
+                console.log(`[${x},${y}] x${x + _pixel.diameter} < ${_width} y${y + _pixel.diameter} < ${_height} -> ${_img[x][y].intensity}`);
+            }
+            if (x + _pixel.diameter <= _width && y + _pixel.diameter <= _height && _img[x][y].intensity < 765) {
                 for (let x2 = 0; x2 < _pixel.diameter; x2++) {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
@@ -120,10 +123,10 @@ function main() {
         let w = size(_img) / _pixel.diameter;
         while (w > 0) {
             if (_log.main)
-                console.log("firstPixel", '\n', firstPixel[0][0].axes);
+                console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
             let nexPixels = nextBlackToMove(firstPixel);
             if (_log.main)
-                console.log("nexPixels", '\n', nexPixels[0][0].axes);
+                console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
             if (!nexPixels) {
                 new file_1.default().save(_dirGCode, _gCode, () => {
                     console.log("-> Sava As:", _dirGCode);
@@ -135,36 +138,41 @@ function main() {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 function toGCode(oldPixel, newPixel) {
-    if (_log.toGCode) {
-        console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
-        console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
+    try {
+        if (_log.toGCode) {
+            console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
+            console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
+        }
+        let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
+        if (distanceIsOne(oldPixel, newPixel)) {
+            addPixel({
+                x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+                y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+                z: config.blackZ
+            });
+        }
+        else {
+            addPixel({
+                z: config.whiteZ
+            });
+            addPixel({
+                x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+                y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+            });
+            addPixel({
+                z: config.blackZ
+            });
+        }
+        appliedAllPixel(oldPixel, (p) => { p.be = true; });
+        return newPixel;
     }
-    let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
-    if (distanceIsOne(oldPixel, newPixel)) {
-        addPixel({
-            x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-            y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-            z: config.blackZ
-        });
+    catch (err) {
+        throw new Error("pixels are not valid for this configuration.");
     }
-    else {
-        addPixel({
-            z: config.whiteZ
-        });
-        addPixel({
-            x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-            y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
-        });
-        addPixel({
-            z: config.blackZ
-        });
-    }
-    appliedAllPixel(oldPixel, (p) => { p.be = true; });
-    return newPixel;
 }
 function addPixel(axes) {
     let sum = _pixel.diameter / 2;
@@ -259,7 +267,7 @@ function lootAtDown(oldPixelBlack) {
     let pixels = [];
     for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
         let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
-        if (e === undefined || e.axes.y === _width)
+        if (e === undefined || e.axes.y === _width - 1)
             break;
         let pixel = _img[e.axes.x][e.axes.y + 1];
         if (pixel)
@@ -274,7 +282,7 @@ function lootAtRight(oldPixelBlack) {
     let pixels = [];
     for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length - 1].length; iRow++) {
         let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
-        if (e === undefined || e.axes.x === _height)
+        if (e === undefined || e.axes.x === _height - 1)
             break;
         let pixel = _img[e.axes.x + 1][e.axes.y];
         if (pixel)
@@ -287,6 +295,8 @@ function lootAtRight(oldPixelBlack) {
 }
 function AllBlack(oldPixelBlack) {
     let answer = true;
+    if (oldPixelBlack[0] === undefined)
+        return false;
     for (let x = 0; x < oldPixelBlack.length; x++) {
         if (oldPixelBlack[x].intensity === 765 || oldPixelBlack[x].be) {
             answer = false;
