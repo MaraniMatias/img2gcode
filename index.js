@@ -22,7 +22,7 @@ var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, 
     diameter: 1
 };
 var config = {
-    toolDiameter: 2,
+    toolDiameter: 1,
     scaleAxes: 10,
     whiteZ: 2,
     blackZ: 0,
@@ -30,7 +30,7 @@ var config = {
 };
 start("./img/test.png");
 function start(dirImg) {
-    console.log("-> Imagen: ", dirImg);
+    console.log("-> Imagen: ", dirImg, "config:\n", config);
     _dirImg = path.resolve(dirImg);
     _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     lwip.open(_dirImg, function (err, image) {
@@ -80,7 +80,7 @@ function size(arr) {
 function getFirstPixel() {
     for (let x = 0; x < _img.length; x++) {
         for (let y = 0; y < _img[x].length; y++) {
-            if (_log.main) {
+            if (_log.getFirstPixel) {
                 console.log(`for ${x},${y} -> ${_img[x][y].axes.x},${_img[x][y].axes.y} -> ${_img[x][y].intensity}`);
             }
             let pixels = [];
@@ -88,7 +88,7 @@ function getFirstPixel() {
                 for (let x2 = 0; x2 < _pixel.diameter; x2++) {
                     let row = [];
                     for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-                        let countBlack = 0, p = _img[x + x2 < _width ? x + x2 : _width][y + y2 < _height ? y + y2 : _height];
+                        let countBlack = 0, p = _img[x + x2 < _height ? x + x2 : _height][y + y2 < _width ? y + y2 : _width];
                         if (p.intensity < 765) {
                             countBlack++;
                             if (countBlack > _pixel.diameter || !p.be) {
@@ -98,7 +98,7 @@ function getFirstPixel() {
                     }
                     pixels.push(row);
                 }
-                if (size(pixels) === _pixel.diameter * 2) {
+                if (pixels[0].length === _pixel.diameter && pixels.length === _pixel.diameter) {
                     return pixels;
                 }
             }
@@ -119,19 +119,19 @@ function main() {
             x: firstPixel[0][0].axes.x,
             y: firstPixel[0][0].axes.y
         });
-        let w = size(_img) / _pixel.diameter * 2;
-        while (w >= 0) {
+        let w = size(_img) / _pixel.diameter;
+        while (w > 0) {
             if (_log.main)
-                console.log("firstPixel", '\n', firstPixel[0][0].axes, firstPixel[0][1].axes, '\n', firstPixel[1][0].axes, firstPixel[1][1].axes);
+                console.log("firstPixel", '\n', firstPixel[0][0].axes);
             let nexPixels = nextBlackToMove(firstPixel);
+            if (_log.main)
+                console.log("nexPixels", '\n', nexPixels[0][0].axes);
             if (!nexPixels) {
                 new file_1.default().save(_dirGCode, _gCode, () => {
                     console.log("-> Sava As:", _dirGCode);
                 });
                 break;
             }
-            if (_log.main)
-                console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
             firstPixel = toGCode(firstPixel, nexPixels);
             w--;
         }
@@ -213,7 +213,14 @@ function distanceIsOne(oldPixel, newPixel) {
 }
 function appliedAllPixel(arr, cb) {
     for (let iRow = 0; iRow < arr.length; iRow++) {
+        if (_log.appliedAllPixel)
+            console.log("iRow", iRow);
+        if (arr[iRow].length === 1) {
+            cb(arr[iRow][0], iRow);
+        }
         for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
+            if (_log.appliedAllPixel)
+                console.log("iColumn", iColumn);
             if (_log.appliedAllPixel)
                 console.log(_img[arr[iRow][iColumn].axes.x][arr[iRow][iColumn].axes.y]);
             cb(arr[iRow][iColumn], iRow, iColumn);
