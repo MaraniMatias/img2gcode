@@ -23,8 +23,7 @@ const _log = {
   main: false,
   size: false
 };
-var _dirGCode :string ='myGcode.gcode',
-  _dirImg: string,
+var
   _gCode: Line[] = [],
   _height: number = 0,
   _width: number = 0,
@@ -37,10 +36,16 @@ var _dirGCode :string ='myGcode.gcode',
 var config = {  // It is mm
   toolDiameter: 2,
   scaleAxes: 40,
+  totalStep: 1,
   deepStep: -1,
   whiteZ: 0,
   blackZ: -2,
-  sevaZ: 2
+  sevaZ: 2,
+  dir : {
+    gCode: 'myGcode.gcode',
+    img: '',
+  },
+  imgSize:''
 }
 //var self = this;
 
@@ -50,10 +55,10 @@ start("./img/test.png");
  * @param {string} dirImg image path
  */
 function start(dirImg :string) {
+  config.dir.img = path.resolve(dirImg);
+  config.dir.gCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
   console.log("-> Imagen: ",dirImg,"\nconfig:",config)
-  _dirImg = path.resolve(dirImg);
-  _dirGCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
-  lwip.open(_dirImg, function(err:Error, image) {
+  lwip.open(config.dir.img, function(err:Error, image) {
     if(err)console.log(err.message);
     _height = image.height();
     _width = image.width();
@@ -142,6 +147,8 @@ function getFirstPixel() :Pixel[][] {
 
 function main() {
   try {
+    config.imgSize = `${_width},${_height}`;
+    config.totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
     let firstPixel: Pixel[][] = getFirstPixel();
     addPixel({
       x: firstPixel[0][0].axes.x,
@@ -154,10 +161,7 @@ function main() {
       let nexPixels = nextBlackToMove(firstPixel);
       if (_log.main) console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
       if (!nexPixels) {
-        new File().save({
-          dir: _dirGCode, gcode: _gCode, deepStep: config.deepStep, sevaZ: config.sevaZ,
-          totalStep: (config.blackZ - config.whiteZ) / config.deepStep
-        },(dirGCode) => {
+        new File().save(_gCode,config,(dirGCode) => {
           console.log("-> Sava As:", dirGCode);
         });
         break;
@@ -186,6 +190,8 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
       });
     } else {
       addPixel({
+        x:_gCode[_gCode.length-1].axes.x,
+        y:_gCode[_gCode.length-1].axes.y,
         z: config.whiteZ
       });
       addPixel({

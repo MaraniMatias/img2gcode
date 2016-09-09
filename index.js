@@ -17,24 +17,30 @@ const _log = {
     main: false,
     size: false
 };
-var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, _img = [], _pixel = {
+var _gCode = [], _height = 0, _width = 0, _img = [], _pixel = {
     toMm: 1,
     diameter: 1
 };
 var config = {
     toolDiameter: 2,
     scaleAxes: 40,
+    totalStep: 1,
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
-    sevaZ: 2
+    sevaZ: 2,
+    dir: {
+        gCode: 'myGcode.gcode',
+        img: '',
+    },
+    imgSize: ''
 };
 start("./img/test.png");
 function start(dirImg) {
+    config.dir.img = path.resolve(dirImg);
+    config.dir.gCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
     console.log("-> Imagen: ", dirImg, "\nconfig:", config);
-    _dirImg = path.resolve(dirImg);
-    _dirGCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
-    lwip.open(_dirImg, function (err, image) {
+    lwip.open(config.dir.img, function (err, image) {
         if (err)
             console.log(err.message);
         _height = image.height();
@@ -116,6 +122,8 @@ function getFirstPixel() {
 }
 function main() {
     try {
+        config.imgSize = `${_width},${_height}`;
+        config.totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
         let firstPixel = getFirstPixel();
         addPixel({
             x: firstPixel[0][0].axes.x,
@@ -129,10 +137,7 @@ function main() {
             if (_log.main)
                 console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
             if (!nexPixels) {
-                new file_1.default().save({
-                    dir: _dirGCode, gcode: _gCode, deepStep: config.deepStep, sevaZ: config.sevaZ,
-                    totalStep: (config.blackZ - config.whiteZ) / config.deepStep
-                }, (dirGCode) => {
+                new file_1.default().save(_gCode, config, (dirGCode) => {
                     console.log("-> Sava As:", dirGCode);
                 });
                 break;
@@ -161,6 +166,8 @@ function toGCode(oldPixel, newPixel) {
         }
         else {
             addPixel({
+                x: _gCode[_gCode.length - 1].axes.x,
+                y: _gCode[_gCode.length - 1].axes.y,
                 z: config.whiteZ
             });
             addPixel({
