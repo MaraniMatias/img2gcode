@@ -1,4 +1,4 @@
-type Axes = { x?:number, y?:number, z?:number};
+type Axes = { x?:number, y?:number, z?:number|boolean };
 /**
  * Line
  */
@@ -29,11 +29,12 @@ export default class Line {
    * code
    * Arma code for that line with data
    */
-  public code() : string {
-    let x = this._axes.x!==undefined ? ` X${this._axes.x}`:'';
-    let y = this._axes.y!==undefined ? ` Y${this._axes.y}`:'';
-    let z = this._axes.z!==undefined ? ` Z${this._axes.z}`:'';
-    let comment = this._comment ? `; ${this._comment}`:'';
-    return "G01"+x+y+z+comment ;
+  public code(step?:number): string {
+    let x = this._axes.x !== undefined ? ` X${this._axes.x}` : '';
+    let y = this._axes.y !== undefined ? ` Y${this._axes.y}` : '';
+    let z = this._axes.z !== undefined ? ` Z${this._axes.z}` : '';
+    let comment = this._comment ? `; ${this._comment}` : '';
+    let s = this._axes.z ? z : ` Z${step}`;
+    return "G01"+x+y+s+comment ;
   }
 }

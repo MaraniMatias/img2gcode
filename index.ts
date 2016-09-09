@@ -1,4 +1,4 @@
-type Axes = { x?:number, y?:number, z?:number };
+type Axes = { x?:number, y?:number, z?:number|boolean };
 type Pixel = {  intensity :number , axes:Axes ,be :boolean};
 
 import Line from "./line";
@@ -38,14 +38,14 @@ var _dirGCode :string ='myGcode.gcode',
 var config = {  // It is mm
   toolDiameter: 1,
   scaleAxes: 10,
-  //deepStep: 0,
-  whiteZ: 2,
-  blackZ: 0,
-  sevaZ: 7
+  deepStep: -1,
+  whiteZ: 0,
+  blackZ: -2,
+  sevaZ: 2
 }
 //var self = this;
 
-start("./img/test.png");// negro en los limites
+start("./img/test.png");
 
 /**
  * @param {string} dirImg image path
@@ -155,8 +155,11 @@ function main() {
       let nexPixels = nextBlackToMove(firstPixel);
       if (_log.main) console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
       if (!nexPixels) {
-        new File().save(_dirGCode, _gCode, () => {
-          console.log("-> Sava As:", _dirGCode);
+        new File().save({
+          dir: _dirGCode, gcode: _gCode, deepStep: config.deepStep, sevaZ: config.sevaZ,
+          totalStep: (config.blackZ - config.whiteZ) / config.deepStep
+        },(dirGCode) => {
+          console.log("-> Sava As:", dirGCode);
         });
         break;
       }
@@ -180,7 +183,7 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
       addPixel({
         x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
         y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-        z: config.blackZ
+        z: false//config.blackZ
       });
     } else {
       addPixel({
@@ -191,7 +194,7 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
         y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
       });
       addPixel({
-        z: config.blackZ
+        z: false//config.blackZ
       });
     }
 
@@ -209,8 +212,6 @@ function addPixel(axes: Axes) {
   if (_gCode.length === 0) {
     if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
     _gCode.push(new Line({ x: 0, y: 0, z:config.sevaZ },'With Z max') );
-    _gCode.push(new Line({ x: X, y: Y, z: config.sevaZ }));
-    _gCode.push(new Line({ x: X, y: Y, z: config.blackZ }));
   }
   if(_log.addPixel) console.log('G01',axes.x?`X${X}`:'',axes.y? `Y${Y}`:'',axes.z!==undefined?`Z${axes.z};`:';');
   _gCode.push(new Line({ x:X, y:Y, z:axes.z }) );

@@ -24,9 +24,10 @@ var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, 
 var config = {
     toolDiameter: 1,
     scaleAxes: 10,
-    whiteZ: 2,
-    blackZ: 0,
-    sevaZ: 7
+    deepStep: -1,
+    whiteZ: 0,
+    blackZ: -2,
+    sevaZ: 2
 };
 start("./img/test.png");
 function start(dirImg) {
@@ -128,8 +129,11 @@ function main() {
             if (_log.main)
                 console.log("nexPixels", '\n', nexPixels[0][0].axes, nexPixels[0][1].axes, '\n', nexPixels[1][0].axes, nexPixels[1][1].axes);
             if (!nexPixels) {
-                new file_1.default().save(_dirGCode, _gCode, () => {
-                    console.log("-> Sava As:", _dirGCode);
+                new file_1.default().save({
+                    dir: _dirGCode, gcode: _gCode, deepStep: config.deepStep, sevaZ: config.sevaZ,
+                    totalStep: (config.blackZ - config.whiteZ) / config.deepStep
+                }, (dirGCode) => {
+                    console.log("-> Sava As:", dirGCode);
                 });
                 break;
             }
@@ -152,7 +156,7 @@ function toGCode(oldPixel, newPixel) {
             addPixel({
                 x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
                 y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-                z: config.blackZ
+                z: false
             });
         }
         else {
@@ -164,7 +168,7 @@ function toGCode(oldPixel, newPixel) {
                 y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
             });
             addPixel({
-                z: config.blackZ
+                z: false
             });
         }
         appliedAllPixel(oldPixel, (p) => { p.be = true; });
@@ -182,8 +186,6 @@ function addPixel(axes) {
         if (_log.addPixel)
             console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
         _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, 'With Z max'));
-        _gCode.push(new line_1.default({ x: X, y: Y, z: config.sevaZ }));
-        _gCode.push(new line_1.default({ x: X, y: Y, z: config.blackZ }));
     }
     if (_log.addPixel)
         console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');

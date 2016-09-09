@@ -15,12 +15,13 @@ class Line {
     get axes() {
         return this._axes;
     }
-    code() {
+    code(step) {
         let x = this._axes.x !== undefined ? ` X${this._axes.x}` : '';
         let y = this._axes.y !== undefined ? ` Y${this._axes.y}` : '';
         let z = this._axes.z !== undefined ? ` Z${this._axes.z}` : '';
         let comment = this._comment ? `; ${this._comment}` : '';
-        return "G01" + x + y + z + comment;
+        let s = this._axes.z ? z : ` Z${step}`;
+        return "G01" + x + y + s + comment;
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
