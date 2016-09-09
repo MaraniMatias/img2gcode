@@ -16,11 +16,11 @@ class File {
     concat(config) {
         for (let count = 0, step = 0; count <= config.totalStep; count++, step = step + config.deepStep) {
             for (let index = 0; index < config.gcode.length; index++) {
-                let element = config.gcode[index];
-                this._gCodeInit.push(element.code(step));
+                let e = config.gcode[index];
+                this._gCodeInit.push(e.code(step));
             }
             let e = config.gcode[config.gcode.length - 1];
-            this._gCodeInit.push(`G01 X${e._axes.x} Y${e._axes.y} Z${config.sevaZ}; With new deep step`);
+            this._gCodeInit.push(`G01 X${e.axes.x} Y${e.axes.y} Z${config.sevaZ}; With new deep step`);
         }
         this._gCodeInit.push(`G01 Z${config.sevaZ}; With Z max`);
         return this._gCodeInit;

@@ -29,15 +29,14 @@ var _dirGCode :string ='myGcode.gcode',
   _height: number = 0,
   _width: number = 0,
   _img: Pixel[][] = [],
-  _gCode: Line[] = [],
   _pixel = {
     toMm: 1, // 1 pixel es X mm
     diameter: 1
   }
 
 var config = {  // It is mm
-  toolDiameter: 1,
-  scaleAxes: 10,
+  toolDiameter: 2,
+  scaleAxes: 40,
   deepStep: -1,
   whiteZ: 0,
   blackZ: -2,
@@ -211,7 +210,8 @@ function addPixel(axes: Axes) {
   let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
   if (_gCode.length === 0) {
     if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-    _gCode.push(new Line({ x: 0, y: 0, z:config.sevaZ },'With Z max') );
+    _gCode.push(new Line({ x:0,y:0, z:config.sevaZ },`X0 Y0 Z${config.sevaZ} Line Init`) );
+    _gCode.push(new Line({ x:X,y:Y, z:config.sevaZ },'With Z max ') );
   }
   if(_log.addPixel) console.log('G01',axes.x?`X${X}`:'',axes.y? `Y${Y}`:'',axes.z!==undefined?`Z${axes.z};`:';');
   _gCode.push(new Line({ x:X, y:Y, z:axes.z }) );

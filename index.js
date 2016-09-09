@@ -17,13 +17,13 @@ const _log = {
     main: false,
     size: false
 };
-var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, _img = [], _gCode = [], _pixel = {
+var _dirGCode = 'myGcode.gcode', _dirImg, _gCode = [], _height = 0, _width = 0, _img = [], _pixel = {
     toMm: 1,
     diameter: 1
 };
 var config = {
-    toolDiameter: 1,
-    scaleAxes: 10,
+    toolDiameter: 2,
+    scaleAxes: 40,
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
@@ -185,7 +185,8 @@ function addPixel(axes) {
     if (_gCode.length === 0) {
         if (_log.addPixel)
             console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-        _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, 'With Z max'));
+        _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, `X0 Y0 Z${config.sevaZ} Line Init`));
+        _gCode.push(new line_1.default({ x: X, y: Y, z: config.sevaZ }, 'With Z max '));
     }
     if (_log.addPixel)
         console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');
