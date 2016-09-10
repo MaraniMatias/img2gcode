@@ -57,7 +57,7 @@ start("./img/test.png");
 function start(dirImg :string) {
   config.dir.img = path.resolve(dirImg);
   config.dir.gCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
-  console.log("-> Imagen: ",dirImg,"\nconfig:",config)
+  console.log("-> Imagen: ",dirImg,"\nconfig:",config);
   lwip.open(config.dir.img, function(err:Error, image) {
     if(err)console.log(err.message);
     _height = image.height();
@@ -190,13 +190,12 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
       });
     } else {
       addPixel({
-        x:_gCode[_gCode.length-1].axes.x,
-        y:_gCode[_gCode.length-1].axes.y,
-        z: config.whiteZ
+        z: config.sevaZ
       });
       addPixel({
         x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+        z: config.sevaZ
       });
       addPixel({
         z: false//config.blackZ
@@ -241,15 +240,15 @@ function distanceIsOne(oldPixel: Pixel[][], newPixel: Pixel[][]): boolean{
     for (let iy = 0; iy < arrOldPixel.length; iy++) { let oPixel = arrOldPixel[iy];
       let disX = nPixel.axes.x - oPixel.axes.x;
       let disY = nPixel.axes.y - oPixel.axes.y;
-      if (_log.distanceIsOne) {
-        console.log("disX", disX, "disY", disY, "newPixel", nPixel.axes, "oldPixel",
-          oPixel.axes, disX === 1 || disY === 1 || disX === -1 || disY === -1);
-      }
       let sigX = disX > 0 ? 1 : -1;
       let sigY = disY > 0 ? 1 : -1;
-      return ( disX === sigX && ( disY === 0 || disY === sigY ) ) ||
-      ( disY === sigY && ( disX === 0 || disX === sigX ) ) ||
-      disY === 0 && disX === 0
+      if (_log.distanceIsOne) {
+        console.log("disX", disX, "disY", disY, "newPixel", nPixel.axes, "oldPixel",
+          oPixel.axes, ( disX === sigX && ( disY === 0 || disY === sigY ) ) || ( disY === sigY && ( disX === 0 || disX === sigX ) ) || disY === 0 && disX === 0);
+      }
+      return  ( disX === sigX && ( disY === 0 || disY === sigY ) ) ||
+              ( disY === sigY && ( disX === 0 || disX === sigX ) ) ||
+              disY === 0 && disX === 0
     }
   }
 

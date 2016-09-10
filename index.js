@@ -166,13 +166,12 @@ function toGCode(oldPixel, newPixel) {
         }
         else {
             addPixel({
-                x: _gCode[_gCode.length - 1].axes.x,
-                y: _gCode[_gCode.length - 1].axes.y,
-                z: config.whiteZ
+                z: config.sevaZ
             });
             addPixel({
                 x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-                y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y)
+                y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+                z: config.sevaZ
             });
             addPixel({
                 z: false
@@ -216,11 +215,11 @@ function distanceIsOne(oldPixel, newPixel) {
             let oPixel = arrOldPixel[iy];
             let disX = nPixel.axes.x - oPixel.axes.x;
             let disY = nPixel.axes.y - oPixel.axes.y;
-            if (_log.distanceIsOne) {
-                console.log("disX", disX, "disY", disY, "newPixel", nPixel.axes, "oldPixel", oPixel.axes, disX === 1 || disY === 1 || disX === -1 || disY === -1);
-            }
             let sigX = disX > 0 ? 1 : -1;
             let sigY = disY > 0 ? 1 : -1;
+            if (_log.distanceIsOne) {
+                console.log("disX", disX, "disY", disY, "newPixel", nPixel.axes, "oldPixel", oPixel.axes, (disX === sigX && (disY === 0 || disY === sigY)) || (disY === sigY && (disX === 0 || disX === sigX)) || disY === 0 && disX === 0);
+            }
             return (disX === sigX && (disY === 0 || disY === sigY)) ||
                 (disY === sigY && (disX === 0 || disX === sigX)) ||
                 disY === 0 && disX === 0;
