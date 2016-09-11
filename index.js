@@ -90,7 +90,7 @@ function getFirstPixel() {
             if (_log.getFirstPixel) {
                 console.log(`for (${x},${y}) -> {${_img[x][y].axes.x},${_img[x][y].axes.y}} -> ${_img[x][y].intensity} --- ${_height},${_width} ${_pixel.diameter}`);
             }
-            let pixels = [], diameter = _pixel.diameter < 1 ? 1 : _pixel.diameter;
+            let pixels = [], diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
             if (_log.getFirstPixel) {
                 console.log(`[${x},${y}] x${x + _pixel.diameter} < ${_width} y${y + _pixel.diameter} < ${_height} -> ${_img[x][y].intensity}`);
             }
@@ -108,7 +108,7 @@ function getFirstPixel() {
                     }
                     pixels.push(row);
                 }
-                if (pixels[0].length === diameter && pixels.length === diameter) {
+                if (pixels[0].length === diameter && pixels[pixels.length - 1].length === diameter) {
                     return pixels;
                 }
             }
@@ -181,7 +181,8 @@ function toGCode(oldPixel, newPixel) {
         return newPixel;
     }
     catch (err) {
-        throw new Error("pixels are not valid for this configuration.");
+        console.error("oldPixel", oldPixel, "\nnewPixel", newPixel);
+        throw new Error("pixels are not valid for this configuration.\n" + err);
     }
 }
 function addPixel(axes) {
@@ -367,10 +368,10 @@ function nextBlackToMove(oldPixelBlack) {
         }
     }
     else {
-        if (_log.nextBlackToMove) {
-            console.log("buscar por otro lado -> avanzar y buscar otro");
-        }
         arrPixel = getFirstPixel();
+        if (_log.nextBlackToMove) {
+            console.log("Avanzar y buscar con getFirstPixel.\nArrPixel:\n", arrPixel);
+        }
     }
     if (_log.nextBlackToMove) {
         appliedAllPixel(arrPixel, (e, iRow, iColumn) => {
