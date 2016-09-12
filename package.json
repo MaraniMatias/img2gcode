@@ -1,7 +1,7 @@
 {
   "name": "img2gcode",
-  "version": "0.0.2",
-  "description": "Espero que alguien más le sirva  ([MIT](http://opensource.org/licenses/mit-license.php)). Autores: Marani Matias E.",
+  "version": "0.0.3",
+  "description": "convert jpg, png,gif to gcode  with nodejs.",
   "main": "./lib/index.js",
   "scripts": {
     "start": "node index.js",

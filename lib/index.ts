@@ -405,7 +405,7 @@ function nextBlackToMove(oldPixelBlack: Pixel[][]): Pixel[][]  {
   return arrPixel;
 }
 
-start({  // It is mm
+/*start({  // It is mm
   toolDiameter: 2,
   scaleAxes: 40,
   totalStep: 1,
@@ -415,4 +415,6 @@ start({  // It is mm
   sevaZ: 2,
   dirImg:'./test/test.png',
   imgSize:''
-});
+});*/
+
+module.exports = start;
