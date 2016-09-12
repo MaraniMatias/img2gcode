@@ -1,4 +1,5 @@
 "use strict";
+const path = require('path');
 const fs = require("fs");
 class File {
     constructor(gCodeInit) {
@@ -26,13 +27,14 @@ class File {
         return this._gCodeInit;
     }
     save(gcode, config, cb) {
-        this._gCodeInit.push(`; ${config.dir.img}`, `; ${config.dir.gCode}`, `; Img Size: ${config.imgSize}`, `; Tool Diameter: ${config.toolDiameter}`, `; Scale Axes: ${config.scaleAxes}`, `; Deep Step: ${config.deepStep}`, `; Z Save: ${config.sevaZ}`, `; Z White: ${config.whiteZ}`, `; Z Black: ${config.blackZ}`);
-        fs.unlink(config.dir.gCode, (err) => {
-            fs.writeFile(config.dir.gCode, this.concat(gcode, config).join('\n'), { encoding: "utf8" }, (err) => {
+        let dirimg = path.resolve(config.dirImg), dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
+        this._gCodeInit.push(`; ${dirimg}`, `; ${dirgcode}`, `; Img Size: ${config.imgSize}`, `; Tool Diameter: ${config.toolDiameter}`, `; Scale Axes: ${config.scaleAxes}`, `; Deep Step: ${config.deepStep}`, `; Z Save: ${config.sevaZ}`, `; Z White: ${config.whiteZ}`, `; Z Black: ${config.blackZ}`);
+        fs.unlink(dirgcode, (err) => {
+            fs.writeFile(dirgcode, this.concat(gcode, config).join('\n'), { encoding: "utf8" }, (err) => {
                 if (err)
                     throw err.message;
                 if (cb)
-                    cb(config.dir.gCode);
+                    cb(dirgcode);
             });
         });
     }

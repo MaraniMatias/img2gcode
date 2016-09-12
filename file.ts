@@ -1,27 +1,24 @@
 type Axes = { x?:number, y?:number, z?:number|boolean };
-import Line from "./line";
 interface config {
   toolDiameter: number;
   scaleAxes: number;
   totalStep: number;
   deepStep: number;
-  imgSize: string;
+  imgSize:string;
+  dirImg: string;
   whiteZ: number;
   blackZ: number;
   sevaZ: number;
-  dir : {
-    gCode: string;
-    img: string;
-  }
 }
-
+import Line from "./line";
+import * as path  from 'path';
 import * as fs from "fs";
 export default
  /**
  * File
  */
 class File {
-  
+
   /**
    * Creates an instance of File.
    * 
@@ -39,7 +36,8 @@ class File {
     }
   }
   
-  private _gCodeInit : string[];
+  private _gCodeInit: string[];
+
   private concat(gcode: Line[],config: config): string[] {
     for (let count = 0, step = 0; count <= config.totalStep; count++ , step = step + config.deepStep) {
       for (let index = 0; index < gcode.length; index++) {
@@ -52,17 +50,20 @@ class File {
     this._gCodeInit.push(`G01 Z${config.sevaZ}; With Z max`);
     return this._gCodeInit;
   }
-  
+
   /**
    * Save 
    * 
    * @param {string} dirGCode path the gCode file
    * @param {Line[]} gCode array de lineas para converti en gcode
    */
-  public save(gcode:Line[],config: config, cb?: (dirGCode: string) => void) {
+  public save(gcode: Line[], config: config, cb?: (dirGCode: string) => void) {
+    let dirimg = path.resolve(config.dirImg),
+      dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
+
     this._gCodeInit.push(
-      `; ${config.dir.img}`,
-      `; ${config.dir.gCode}`,
+      `; ${dirimg}`,
+      `; ${dirgcode}`,
       `; Img Size: ${config.imgSize}`,
       `; Tool Diameter: ${config.toolDiameter}`,
       `; Scale Axes: ${config.scaleAxes}`,
@@ -71,10 +72,10 @@ class File {
       `; Z White: ${config.whiteZ}`,
       `; Z Black: ${config.blackZ}`
     );
-    fs.unlink(config.dir.gCode,(err)=>{
-      fs.writeFile(config.dir.gCode, this.concat(gcode,config).join('\n'),{ encoding: "utf8" },(err)=>{
+    fs.unlink(dirgcode, (err) => {
+      fs.writeFile(dirgcode, this.concat(gcode, config).join('\n'), { encoding: "utf8" }, (err) => {
         if(err) throw err.message;
-        if(cb) cb(config.dir.gCode);
+        if(cb) cb(dirgcode);
       });
     });
   }

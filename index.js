@@ -2,7 +2,6 @@
 const line_1 = require("./line");
 const file_1 = require("./file");
 const lwip = require('lwip');
-const path = require('path');
 const _log = {
     appliedAllPixel: false,
     nextBlackToMove: false,
@@ -21,40 +20,21 @@ var _gCode = [], _height = 0, _width = 0, _img = [], _pixel = {
     toMm: 1,
     diameter: 1
 };
-var config = {
-    toolDiameter: 2,
-    scaleAxes: 40,
-    totalStep: 1,
-    deepStep: -1,
-    whiteZ: 0,
-    blackZ: -2,
-    sevaZ: 2,
-    dir: {
-        gCode: 'myGcode.gcode',
-        img: '',
-    },
-    imgSize: ''
-};
-start("./img/test.png");
-function start(dirImg) {
-    config.dir.img = path.resolve(dirImg);
-    config.dir.gCode = dirImg.substring(0, dirImg.lastIndexOf(".")) + '.gcode';
-    console.log("-> Imagen: ", dirImg, "\nconfig:", config);
-    lwip.open(config.dir.img, function (err, image) {
+function start(config) {
+    console.log("-> Imagen: ", config.dirImg, "\nconfig:", config);
+    lwip.open(config.dirImg, function (err, image) {
         if (err)
-            console.log(err.message);
+            throw new Error(err.message);
         _height = image.height();
         _width = image.width();
         _img = getAllPixel(image);
+        config.imgSize = `(${_height},${_width})`;
         _pixel.toMm = config.scaleAxes / _height;
         _pixel.diameter = config.toolDiameter / _pixel.toMm;
-        if (_log.start) {
-            console.log("_height", _height, "_width", _width);
-        }
         if (_log.getAllPixel) {
             console.log("_img:", _img);
         }
-        main();
+        main(config);
     });
 }
 function getAllPixel(image) {
@@ -120,15 +100,13 @@ function getFirstPixel() {
         }
     }
 }
-function main() {
+function main(config) {
     try {
-        config.imgSize = `${_width},${_height}`;
-        config.totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
         let firstPixel = getFirstPixel();
         addPixel({
             x: firstPixel[0][0].axes.x,
             y: firstPixel[0][0].axes.y
-        });
+        }, config.sevaZ);
         let w = size(_img) / _pixel.diameter;
         while (w > 0) {
             if (_log.main)
@@ -142,7 +120,7 @@ function main() {
                 });
                 break;
             }
-            firstPixel = toGCode(firstPixel, nexPixels);
+            firstPixel = toGCode(firstPixel, nexPixels, config.sevaZ);
             w--;
         }
     }
@@ -150,7 +128,7 @@ function main() {
         console.error(error);
     }
 }
-function toGCode(oldPixel, newPixel) {
+function toGCode(oldPixel, newPixel, sevaZ) {
     try {
         if (_log.toGCode) {
             console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
@@ -166,12 +144,12 @@ function toGCode(oldPixel, newPixel) {
         }
         else {
             addPixel({
-                z: config.sevaZ
+                z: sevaZ
             });
             addPixel({
                 x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
                 y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-                z: config.sevaZ
+                z: sevaZ
             });
             addPixel({
                 z: false
@@ -185,15 +163,15 @@ function toGCode(oldPixel, newPixel) {
         throw new Error("pixels are not valid for this configuration.\n" + err);
     }
 }
-function addPixel(axes) {
+function addPixel(axes, sevaZ) {
     let sum = _pixel.diameter / 2;
     let X = axes.x ? (axes.x + sum) * _pixel.toMm : undefined;
     let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
     if (_gCode.length === 0) {
         if (_log.addPixel)
-            console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-        _gCode.push(new line_1.default({ x: 0, y: 0, z: config.sevaZ }, `X0 Y0 Z${config.sevaZ} Line Init`));
-        _gCode.push(new line_1.default({ x: X, y: Y, z: config.sevaZ }, 'With Z max '));
+            console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${sevaZ};`);
+        _gCode.push(new line_1.default({ x: 0, y: 0, z: sevaZ }, `X0 Y0 Z${sevaZ} Line Init`));
+        _gCode.push(new line_1.default({ x: X, y: Y, z: sevaZ }, 'With Z max '));
     }
     if (_log.addPixel)
         console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', axes.z !== undefined ? `Z${axes.z};` : ';');
@@ -380,4 +358,15 @@ function nextBlackToMove(oldPixelBlack) {
     }
     return arrPixel;
 }
+start({
+    toolDiameter: 2,
+    scaleAxes: 40,
+    totalStep: 1,
+    deepStep: -1,
+    whiteZ: 0,
+    blackZ: -2,
+    sevaZ: 2,
+    dirImg: './img/test.png',
+    imgSize: ''
+});
 //# sourceMappingURL=index.js.map

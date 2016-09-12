@@ -1,14 +1,23 @@
 type Axes = { x?:number, y?:number, z?:number|boolean };
 type Pixel = {  intensity :number , axes:Axes ,be :boolean};
+interface config {
+  toolDiameter: number;
+  scaleAxes: number;
+  totalStep: number;
+  deepStep: number;
+  imgSize:string;
+  dirImg: string;
+  whiteZ: number;
+  blackZ: number;
+  sevaZ: number;
+}
 
 import Line from "./line";
 import File from "./file";
 import * as lwip  from 'lwip';
-import * as path  from 'path';
 // 0 -- X
 // |
 // Y
-// si la linea es > toolDiameter / 2 se hace
 const _log = {
   appliedAllPixel: false,
   nextBlackToMove: false,
@@ -32,44 +41,35 @@ var
     toMm: 1, // 1 pixel es X mm
     diameter: 1
   }
-
-var config = {  // It is mm
-  toolDiameter: 2,
-  scaleAxes: 40,
-  totalStep: 1,
-  deepStep: -1,
-  whiteZ: 0,
-  blackZ: -2,
-  sevaZ: 2,
-  dir : {
-    gCode: 'myGcode.gcode',
-    img: '',
-  },
-  imgSize:''
-}
 //var self = this;
 
-start("./img/test.png");
-
 /**
- * @param {string} dirImg image path
+ * It is mm
+ *@param {
+ *  toolDiameter: 2,
+ *  scaleAxes: 40,
+ *  totalStep: 1,
+ *  deepStep: -1,
+ *  whiteZ: 0,
+ *  blackZ: -2,
+ *  sevaZ: 2,
+ *  dirImg:'./img/test.png',
+ *  imgSize:''
+ *} It is mm
  */
-function start(dirImg :string) {
-  config.dir.img = path.resolve(dirImg);
-  config.dir.gCode = dirImg.substring(0,dirImg.lastIndexOf("."))+'.gcode';
-  console.log("-> Imagen: ",dirImg,"\nconfig:",config);
-  lwip.open(config.dir.img, function(err:Error, image) {
-    if(err)console.log(err.message);
+function start(config:config) {
+  console.log("-> Imagen: ",config.dirImg,"\nconfig:",config);
+  lwip.open(config.dirImg, function(err:Error, image) {
+    if(err) throw new Error(err.message);
     _height = image.height();
     _width = image.width();
     _img = getAllPixel(image);
-
+    config.imgSize = `(${_height},${_width})`
     _pixel.toMm = config.scaleAxes / _height;
     _pixel.diameter = config.toolDiameter / _pixel.toMm;
 
-    if(_log.start){ console.log("_height",_height,"_width",_width); }
     if(_log.getAllPixel){ console.log("_img:",_img); }
-    main();
+    main(config);
   });
 }
 
@@ -145,15 +145,14 @@ function getFirstPixel() :Pixel[][] {
   }// for
 }
 
-function main() {
+function main(config:config) {
   try {
-    config.imgSize = `${_width},${_height}`;
-    config.totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
+    
     let firstPixel: Pixel[][] = getFirstPixel();
     addPixel({
       x: firstPixel[0][0].axes.x,
       y: firstPixel[0][0].axes.y
-    });
+    },config.sevaZ);
 
     let w = size(_img) / _pixel.diameter;
     while (w > 0) {
@@ -166,7 +165,7 @@ function main() {
         });
         break;
       }
-      firstPixel = toGCode(firstPixel, nexPixels);
+      firstPixel = toGCode(firstPixel, nexPixels, config.sevaZ);
       w--;
     }
   } catch (error) {
@@ -174,33 +173,33 @@ function main() {
   }
 }
 
-function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
+function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][],sevaZ:number): Pixel[][] {
   try {
     if (_log.toGCode) {
       console.log("firstPixel", '\n', oldPixel[0][0].axes, oldPixel[0][1].axes, '\n', oldPixel[1][0].axes, oldPixel[1][1].axes);
       console.log("nexPixels", '\n', newPixel[0][0].axes, newPixel[0][1].axes, '\n', newPixel[1][0].axes, newPixel[1][1].axes);
     }
 
-    let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
-    if (distanceIsOne(oldPixel, newPixel)) {
-      addPixel({
-        x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-        z: false//config.blackZ
-      });
-    } else {
-      addPixel({
-        z: config.sevaZ
-      });
-      addPixel({
-        x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-        y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-        z: config.sevaZ
-      });
-      addPixel({
-        z: false//config.blackZ
-      });
-    }
+      let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
+      if (distanceIsOne(oldPixel, newPixel)) {
+        addPixel({
+          x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+          y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+          z: false//config.blackZ
+        });
+      } else {
+        addPixel({
+          z: sevaZ
+        });
+        addPixel({
+          x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
+          y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+          z: sevaZ
+        });
+        addPixel({
+          z: false//config.blackZ
+        });
+      }
 
     appliedAllPixel(oldPixel, (p: Pixel) => { p.be = true; });
     return newPixel;
@@ -210,14 +209,14 @@ function toGCode(oldPixel: Pixel[][], newPixel: Pixel[][]): Pixel[][] {
   }
 }
 
-function addPixel(axes: Axes) {
+function addPixel(axes: Axes, sevaZ?:number) {
   let sum = _pixel.diameter / 2;
   let X = axes.x ? (axes.x + sum) * _pixel.toMm : undefined;
   let Y = axes.y ? (axes.y + sum) * _pixel.toMm : undefined;
   if (_gCode.length === 0) {
-    if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${config.sevaZ};`);
-    _gCode.push(new Line({ x:0,y:0, z:config.sevaZ },`X0 Y0 Z${config.sevaZ} Line Init`) );
-    _gCode.push(new Line({ x:X,y:Y, z:config.sevaZ },'With Z max ') );
+    if(_log.addPixel) console.log('G01', axes.x ? `X${X}` : '', axes.y ? `Y${Y}` : '', `Z${sevaZ};`);
+    _gCode.push(new Line({ x:0,y:0, z:sevaZ },`X0 Y0 Z${sevaZ} Line Init`) );
+    _gCode.push(new Line({ x:X,y:Y, z:sevaZ },'With Z max ') );
   }
   if(_log.addPixel) console.log('G01',axes.x?`X${X}`:'',axes.y? `Y${Y}`:'',axes.z!==undefined?`Z${axes.z};`:';');
   _gCode.push(new Line({ x:X, y:Y, z:axes.z }) );
@@ -405,3 +404,15 @@ function nextBlackToMove(oldPixelBlack: Pixel[][]): Pixel[][]  {
   }
   return arrPixel;
 }
+
+start({  // It is mm
+  toolDiameter: 2,
+  scaleAxes: 40,
+  totalStep: 1,
+  deepStep: -1,
+  whiteZ: 0,
+  blackZ: -2,
+  sevaZ: 2,
+  dirImg:'./img/test.png',
+  imgSize:''
+});
