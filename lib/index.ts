@@ -405,16 +405,4 @@ function nextBlackToMove(oldPixelBlack: Pixel[][]): Pixel[][]  {
   return arrPixel;
 }
 
-/*start({  // It is mm
-  toolDiameter: 2,
-  scaleAxes: 40,
-  totalStep: 1,
-  deepStep: -1,
-  whiteZ: 0,
-  blackZ: -2,
-  sevaZ: 2,
-  dirImg:'./test/test.png',
-  imgSize:''
-});*/
-
-module.exports = start;
+export default start;
