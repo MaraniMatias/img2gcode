@@ -413,6 +413,6 @@ start({  // It is mm
   whiteZ: 0,
   blackZ: -2,
   sevaZ: 2,
-  dirImg:'./img/test.png',
+  dirImg:'./test/test.png',
   imgSize:''
 });

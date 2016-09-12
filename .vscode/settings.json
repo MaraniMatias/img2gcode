@@ -2,7 +2,7 @@
 {
 // Configure glob patterns for excluding files and folders.
 "files.exclude": {
-  //"**/*.js": { "when": "$(basename).ts"},
+  "**/*.js": { "when": "$(basename).ts"},
   "**/*.js.map"     :  true,
   "**/.git"         :  true,
   "**/.DS_Store"    :  true,
