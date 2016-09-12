@@ -14,6 +14,7 @@ var img2gcode = require("img2gcode");
     dirImg:'./test.png',
     imgSize:''
   });
+```
 
 ## Licencia.
 Espero que alguien más le sirva ([MIT](http://opensource.org/licenses/mit-license.php)).
