@@ -14,7 +14,7 @@ build/
 #.vscode/
 #app/node_modules/
 node_modules/
-typings/
+#typings/
 app/components/
 *.png
 *.svg

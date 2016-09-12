@@ -1,4 +1,4 @@
-# imgToGCode
+# image to gcode
 convert jpg, png,gif to gcode  with nodejs and lwip<<<<<<< HEAD
 
 ## Licencia.

@@ -1,20 +1,39 @@
 {
-  "name": "imgtocnc",
-  "version": "0.0.1",
+  "name": "img2gcode",
+  "version": "0.0.2",
   "description": "Espero que alguien más le sirva  ([MIT](http://opensource.org/licenses/mit-license.php)). Autores: Marani Matias E.",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "start": "node index.js",
     "tsc": "tsc index.ts --target es5 ; node index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaraniMatias/img2gcode.git"
+  },
   "author": "Marani Matias Ezequiel",
+  "email": "maranimatias@gmail.com",
   "license": "ISC",
   "dependencies": {
     "lwip": "^0.0.9"
   },
   "devDependencies": {},
+  "keywords": [
+    "img",
+    "png",
+    "jpeg",
+    "gcode",
+    "img2gcode",
+    "img to gcode",
+    "png2gcode",
+    "png to gcode",
+    "jpeg2gcode",
+    "jpeg to gcode",
+    "image to gcode",
+    "image to cnc"
+  ],
   "engines": {
     "node" : "6.5.0",
-    "npm" : "3.10.6"
+    "npm" : "3.10.7"
   }
 }
