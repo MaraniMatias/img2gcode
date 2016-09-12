@@ -11,8 +11,7 @@ var img2gcode = require("img2gcode");
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 2,
-    dirImg:'./test.png',
-    imgSize:''
+    dirImg:'./test.png'
   });
 ```
 

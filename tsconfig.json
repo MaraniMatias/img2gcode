@@ -1,14 +1,17 @@
 {
   "exclude": [
-    "old.ts",
-    "version-1.ts"
+    "node_modules/*"
   ],
   "compilerOptions": {
     "allowJs": true,
-    "target": "es2015",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
+    "inlineSources":true,
+    "newLine":"LF",
+    "help":true,
+    "charset":"utf8",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": true,

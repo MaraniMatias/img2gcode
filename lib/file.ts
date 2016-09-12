@@ -1,18 +1,6 @@
-type Axes = { x?:number, y?:number, z?:number|boolean };
-interface config {
-  toolDiameter: number;
-  scaleAxes: number;
-  totalStep: number;
-  deepStep: number;
-  imgSize:string;
-  dirImg: string;
-  whiteZ: number;
-  blackZ: number;
-  sevaZ: number;
-}
-import Line from "./line";
 import * as path  from 'path';
 import * as fs from "fs";
+
 export default
  /**
  * File
@@ -38,7 +26,7 @@ class File {
   
   private _gCodeInit: string[];
 
-  private concat(gcode: Line[],config: config): string[] {
+  private concat(gcode: imgToCode.Line[],config: imgToCode.config): string[] {
     for (let count = 0, step = 0; count <= config.totalStep; count++ , step = step + config.deepStep) {
       for (let index = 0; index < gcode.length; index++) {
         let e = gcode[index];
@@ -57,7 +45,7 @@ class File {
    * @param {string} dirGCode path the gCode file
    * @param {Line[]} gCode array de lineas para converti en gcode
    */
-  public save(gcode: Line[], config: config, cb?: (dirGCode: string) => void) {
+  public save(gcode: imgToCode.Line[], config: imgToCode.config, cb?: (dirGCode: string) => void) {
     let dirimg = path.resolve(config.dirImg),
       dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
 

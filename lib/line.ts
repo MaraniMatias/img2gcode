@@ -1,13 +1,12 @@
-type Axes = { x?:number, y?:number, z?:number|boolean };
 /**
  * Line
  */
-export default class Line { 
+export default class Line {
   /**
    * @param  {x?:number; y?:number; z?:number;} axes 
    * @param  {string} comment? 
    */
-  constructor(axes :Axes,comment ?:string){
+  constructor(axes :imgToCode.Axes,comment ?:string){
     this._axes = axes;
     if(comment){ this._comment = comment; }
   }
@@ -20,8 +19,8 @@ export default class Line {
     this._comment = v;
   }
 
-  private _axes: Axes;
-  public get axes(): Axes {
+  private _axes: imgToCode.Axes;
+  public get axes(): imgToCode.Axes {
     return this._axes;
   }
 

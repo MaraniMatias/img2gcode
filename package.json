@@ -1,8 +1,9 @@
 {
   "name": "img2gcode",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "convert jpg, png,gif to gcode  with nodejs.",
   "main": "./lib/index.js",
+  "typess":"./lib/img2gcode.d.ts",
   "scripts": {
     "test": "cd ./test/ ; node index.js",
     "tsc": "tsc index.ts --target es5 ; node index.js"
