@@ -3,6 +3,7 @@ convert jpg, png,gif to gcode  with nodejs and [lwip](https://www.npmjs.com/pack
 
 ```Javascript
 var img2gcode = require("img2gcode");
+
   img2gcode({  // It is mm
     toolDiameter: 2,
     scaleAxes: 40,
@@ -12,6 +13,9 @@ var img2gcode = require("img2gcode");
     blackZ: -2,
     sevaZ: 2,
     dirImg:'./test.png'
+  }).then((data) => {
+    console.log(data.config);
+    console.log(data.dirgcode);
   });
 ```
 

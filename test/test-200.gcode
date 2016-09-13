@@ -3,7 +3,7 @@ G21 ; Set units to mm
 G90 ; Absolute positioning
 ; /home/marani/node_js/img-to-GCode/test/test-200.png
 ; /home/marani/node_js/img-to-GCode/test/test-200.gcode
-; Img Size: (200,200)
+; Img Size: (200,200)pixel to (400,400)mm
 ; Tool Diameter: 2
 ; Scale Axes: 400
 ; Deep Step: -1

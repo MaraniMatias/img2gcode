@@ -36,11 +36,12 @@ function start(config: imgToCode.config) {
         _height = image.height();
         _width = image.width();
         _img = getAllPixel(image);
-        config.imgSize = `(${_height},${_width})`
+
         _pixel.toMm = config.scaleAxes / _height;
         _pixel.diameter = config.toolDiameter / _pixel.toMm;
-        analyze(config).then((dirgcode) => {
-          fulfill(dirgcode);
+        config.imgSize = `(${_height},${_width})pixel to (${_height*_pixel.toMm},${_width*_pixel.toMm})mm`
+        analyze(config).then((dirgcode:string) => {
+          fulfill({ dirgcode, config });
         });
       });
     } catch (error) {

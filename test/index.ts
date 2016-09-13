@@ -9,7 +9,9 @@ img2gcode({  // It is mm
   blackZ: -2,
   sevaZ: 2,
   dirImg:'./test-200.png'
-}).then((dirGCode) => {
-  console.log(dirGCode);
+}).then((data) => {
+  console.log(data.config);
+  console.log(data.dirgcode);
 });
+
 //add progress bar
