@@ -1,4 +1,4 @@
-;---> this code is for cnc-ino <---
+(---> this code is for cnc-ino <---)
 G21 ; Set units to mm
 G90 ; Absolute positioning
 ; /home/marani/node_js/img-to-GCode/test/test.png
