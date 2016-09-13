@@ -2,7 +2,7 @@ import img2gcode  from '../lib/index';
 
 img2gcode({  // It is mm
     toolDiameter: 2,
-    scaleAxes: 100,
+    scaleAxes: 700,
     totalStep: 1,
     deepStep: -1,
     whiteZ: 0,
