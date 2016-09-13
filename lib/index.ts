@@ -45,7 +45,7 @@ var
  */
 function start(config: imgToCode.config) {
   try {
-    console.log("-> Imagen: ",config.dirImg,"\nconfig:",config);
+    console.log("-> Imagen: ", config.dirImg, "\nconfig:", config);
     lwip.open(config.dirImg, function(err:Error, image) {
       if(err) throw new Error(err.message);
       _height = image.height();
@@ -55,7 +55,7 @@ function start(config: imgToCode.config) {
       _pixel.toMm = config.scaleAxes / _height;
       _pixel.diameter = config.toolDiameter / _pixel.toMm;
 
-      main(config);
+      analyze(config);
     });
   } catch (error) {
     console.error(error);
@@ -139,7 +139,7 @@ function getFirstPixel(): imgToCode.Pixel[][] {
   }
 }
 
-function main(config: imgToCode.config) {
+function analyze(config: imgToCode.config) {
   try {
     let firstPixel:imgToCode.Pixel[][] = getFirstPixel();
     addPixel({
@@ -160,7 +160,7 @@ function main(config: imgToCode.config) {
       w--;
     }
   } catch (error) {
-    throw new Error(`Main\n ${error}`);
+    throw new Error(`Analyze\n ${error}`);
   }
 }
 

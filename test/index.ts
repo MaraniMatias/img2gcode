@@ -8,6 +8,5 @@ img2gcode({  // It is mm
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 2,
-    dirImg:'./test.png',
-    imgSize:''
+    dirImg:'./test.png'
 });

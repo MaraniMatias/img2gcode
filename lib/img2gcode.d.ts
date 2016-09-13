@@ -9,7 +9,7 @@ declare namespace imgToCode {
     scaleAxes: number;
     totalStep: number;
     deepStep: number;
-    imgSize: string;
+    imgSize?: string;
     dirImg: string;
     whiteZ: number;
     blackZ: number;
