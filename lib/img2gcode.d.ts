@@ -24,4 +24,6 @@ declare namespace imgToCode {
     public code(step?: number): string;
   }
 
+  export function start(config: imgToCode.config): Promise<{ dirgcode: string, config: imgToCode.config }>
+
 }
