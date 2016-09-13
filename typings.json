@@ -5,7 +5,6 @@
     "async": "registry:dt/async#2.0.1+20160804113311",
     "lwip": "registry:dt/lwip#0.0.8+20151229195328",
     "node": "registry:dt/node#6.0.0+20160906151955",
-    "npm": "registry:dt/npm#0.0.0+20160317120654",
-    "promise": "registry:dt/promise#7.1.1+20160602154553"
+    "npm": "registry:dt/npm#0.0.0+20160317120654"
   }
 }
