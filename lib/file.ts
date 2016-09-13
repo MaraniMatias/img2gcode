@@ -49,30 +49,40 @@ class File {
    * @param {string} dirGCode path the gCode file
    * @param {Line[]} gCode array de lineas para converti en gcode
    */
-  public save(gcode: imgToCode.Line[], config: imgToCode.config, cb?: (dirGCode: string) => void) {
-    try{
-      let dirimg = path.resolve(config.dirImg),
-        dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
+  public save(gcode: imgToCode.Line[], config: imgToCode.config) {
+    var self = this;
+    return new Promise(function (fulfill, reject) {
+      try {
+        let dirimg = path.resolve(config.dirImg),
+          dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
+        self._gCodeInit.push(
+          `; ${dirimg}`,
+          `; ${dirgcode}`,
+          `; Img Size: ${config.imgSize}`,
+          `; Tool Diameter: ${config.toolDiameter}`,
+          `; Scale Axes: ${config.scaleAxes}`,
+          `; Deep Step: ${config.deepStep}`,
+          `; Z Save: ${config.sevaZ}`,
+          `; Z White: ${config.whiteZ}`,
+          `; Z Black: ${config.blackZ}`
+        );
+        self.writeFile(dirgcode, self.concat(gcode, config).join('\n'))
+          .then((dirGCode) => { fulfill(dirGCode); });
+      } catch (error) {
+        fulfill(error);
+      }
+    });
+  }
 
-      this._gCodeInit.push(
-        `; ${dirimg}`,
-        `; ${dirgcode}`,
-        `; Img Size: ${config.imgSize}`,
-        `; Tool Diameter: ${config.toolDiameter}`,
-        `; Scale Axes: ${config.scaleAxes}`,
-        `; Deep Step: ${config.deepStep}`,
-        `; Z Save: ${config.sevaZ}`,
-        `; Z White: ${config.whiteZ}`,
-        `; Z Black: ${config.blackZ}`
-      );
+  private writeFile(dirgcode: string, data: string ) {
+    return new Promise(function (fulfill, reject) {
       fs.unlink(dirgcode, (err) => {
-        fs.writeFile(dirgcode, this.concat(gcode, config).join('\n'), { encoding: "utf8" }, (err) => {
-          if(err) throw new Error(err.message);
-          if(cb) cb(dirgcode);
+        fs.writeFile(dirgcode, data, { encoding: "utf8" }, (err) => {
+          if (err) reject(err);
+          else fulfill(dirgcode);
         });
       });
-    } catch (error) {
-      throw error
-    }
+    });
   }
-}
+
+}// class

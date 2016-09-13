@@ -1,9 +1,9 @@
 {
   "name": "img2gcode",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "convert jpg, png,gif to gcode  with nodejs.",
   "main": "./lib/index.js",
-  "typess":"./lib/img2gcode.d.ts",
+  "typess": "./lib/img2gcode.d.ts",
   "scripts": {
     "test": "cd ./test/ ; node index.js",
     "tsc": "tsc index.ts --target es5 ; node index.js"
@@ -16,7 +16,8 @@
   "email": "maranimatias@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "lwip": "^0.0.9"
+    "lwip": "^0.0.9",
+    "promise": "^7.1.1"
   },
   "devDependencies": {},
   "keywords": [
@@ -34,7 +35,7 @@
     "image to cnc"
   ],
   "engines": {
-    "node" : "6.5.0",
-    "npm" : "3.10.7"
+    "node": "6.5.0",
+    "npm": "3.10.7"
   }
 }
