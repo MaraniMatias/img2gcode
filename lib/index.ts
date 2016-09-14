@@ -385,4 +385,4 @@ function nextBlackToMove(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[][] 
   }
 }
 
-export default start;
+export = start

@@ -1,4 +1,4 @@
-import img2gcode  from '../lib/index';
+import * as img2gcode  from '../lib/index.js';
 
 img2gcode({  // It is mm
   toolDiameter: 2,

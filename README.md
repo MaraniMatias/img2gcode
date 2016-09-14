@@ -6,7 +6,7 @@ var img2gcode = require("img2gcode");
 
   img2gcode({  // It is mm
     toolDiameter: 2,
-    scaleAxes: 40,
+    scaleAxes: 400,
     totalStep: 1,
     deepStep: -1,
     whiteZ: 0,
@@ -21,5 +21,5 @@ var img2gcode = require("img2gcode");
 
 ## Licencia.
 Espero que alguien más le sirva ([MIT](http://opensource.org/licenses/mit-license.php)).
-Autores:
+Autor:
 Marani Matias E.
