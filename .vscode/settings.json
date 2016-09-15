@@ -9,6 +9,9 @@
   "**/.vscode"      :  true,
   "**/components"   :  true,
   "**/typings"      :  true,
+  "**/*.png"        :  true,
+  "**/*.jpeg"        :  true,
+  "**/*.xcf"        :  true,
   "**/node_modules" :  true
 }
 

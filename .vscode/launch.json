@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Iniciar",
+      "name": "Test",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/test/index.js",
+      "program": "${workspaceRoot}/lib/test.js",
       "stopOnEntry": false,
       "args": [],
       "cwd": "${workspaceRoot}",

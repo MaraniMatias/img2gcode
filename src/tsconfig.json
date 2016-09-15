@@ -1,0 +1,28 @@
+{
+  "exclude": [
+    "node_modules"
+  ],
+/*
+  "files": [
+    "/src/file.ts",
+    "/src/line.ts",
+    "/src/test.ts",
+    "/src/insdex.ts"
+  ],
+*/
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources":true,
+    "newLine":"LF",
+    "help":true,
+    "charset":"utf8",
+    "emitDecoratorMetadata": true,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true
+  }
+}
