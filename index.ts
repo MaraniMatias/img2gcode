@@ -27,7 +27,7 @@ var
  *  imgSize:''
  *} It is mm
  */
-function start(config: imgToCode.config) {
+function start(config: imgToCode.config): Promise<{data:imgToCode.startPromise}>{
   return new Promise(function (fulfill, reject) {
     try {
       console.log("-> Imagen: ", config.dirImg);//, "\nconfig:", config);

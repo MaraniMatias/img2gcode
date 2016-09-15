@@ -2,14 +2,6 @@
   "exclude": [
     "node_modules"
   ],
-/*
-  "files": [
-    "/src/file.ts",
-    "/src/line.ts",
-    "/src/test.ts",
-    "/src/insdex.ts"
-  ],
-*/
   "compilerOptions": {
     "allowJs": true,
     "target": "es6",

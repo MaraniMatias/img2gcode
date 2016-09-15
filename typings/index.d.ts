@@ -1,4 +1,4 @@
-/// <reference path="../lib/img2gcode.d.ts" />
+/// <reference path="../img2gcode.d.ts" />
 /// <reference path="globals/gulp-typescript/index.d.ts" />
 /// <reference path="globals/gulp/index.d.ts" />
 /// <reference path="globals/lwip/index.d.ts" />
