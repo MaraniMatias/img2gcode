@@ -1,4 +1,5 @@
-import * as img2gcode  from './lib/index.js';
+import * as img2gcode  from '../src/index.js';
+console.log(__dirname+'/img-and-gcode/test.jpeg');
 
 img2gcode({  // It is mm
   toolDiameter:4,
@@ -8,9 +9,9 @@ img2gcode({  // It is mm
   whiteZ: 0,
   blackZ: -2,
   sevaZ: 2,
-  dirImg:'../test/test.jpeg'
+  dirImg:__dirname+'/img-and-gcode/test.jpeg'
 }).then((data) => {
-  console.log(data.config.imgSize);
+  //console.log(data.config.imgSize);
   //console.log(data.dirgcode);  
 });
 

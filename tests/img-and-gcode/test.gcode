@@ -1,8 +1,8 @@
 ;---> this code is for cnc-ino <---
 G21 ; Set units to mm
 G90 ; Absolute positioning
-; /home/marani/node_js/img-to-GCode/test/test.jpeg
-; /home/marani/node_js/img-to-GCode/test/test.gcode
+; /home/marani/node_js/img-to-GCode/tests/img-and-gcode/test.jpeg
+; /home/marani/node_js/img-to-GCode/tests/img-and-gcode/test.gcode
 ; Img Size: (700,700)pixel to (700,700)mm
 ; Tool Diameter: 4
 ; Scale Axes: 700

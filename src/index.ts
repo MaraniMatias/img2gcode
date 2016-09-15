@@ -28,6 +28,9 @@ var
  *} It is mm
  */
 function start(config: imgToCode.config): Promise<{data:imgToCode.startPromise}>{
+  let round = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  }
   return new Promise(function (fulfill, reject) {
     try {
       console.log("-> Imagen: ", config.dirImg);//, "\nconfig:", config);
@@ -79,13 +82,13 @@ function getAllPixel(image: lwip.Image): imgToCode.Pixel[][]{
  * @param {Array} arr
  * @returns {number} size of array
  */
-function size(arr: any[]): number {
+function size(arr: imgToCode.Pixel[][]): number {
   try{
     let size = 0;
     for (let x = 0; x < arr.length; x++) {
       let arrX = arr[x];
       for (let y = 0; y < arrX.length; y++) {
-        if (arrX[y] ) size++;
+        if (arrX[y].intensity <= 765) size++;
       }
     }
     return size
@@ -93,9 +96,7 @@ function size(arr: any[]): number {
     throw new Error(`Size ${arr.length*arr[arr.length-1].length}\n ${error}`);
   }
 }
-function round(num: number): number {
-  return Math.round(num * 100) / 100;
-}
+
 /**
  * pixel negros debajo la her para bajar directamente
  * 
@@ -142,6 +143,8 @@ function analyze(config: imgToCode.config) {
       }, config.sevaZ);
 
       let w = (_height * _width) / _pixel.diameter;
+      console.log("w",w,"size",size(_img));
+      
       while (w > 0) {
         let nexPixels = nextBlackToMove(firstPixel);
         if (!nexPixels) {

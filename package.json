@@ -1,12 +1,12 @@
 {
   "name": "img2gcode",
   "version": "0.0.8",
-  "description": "convert jpg, png,gif to gcode  with nodejs.",
-  "main": "./lib/index.js",
-  "typess": "./img2gcode.d.ts",
+  "description": "convert jpg, png, gif to gcode with nodejs and lwip.",
+  "main": "./src/index.js",
+  "typess": "./src/img2gcode.d.ts",
   "scripts": {
-    "test": "node ./lib/test.js",
-    "tsc": "tsc index.ts --target es5 ; node index.js"
+    "test": "node ./tests/test.js",
+    "tsc": "tsc ./src/index.ts --target es6 ; tsc ./tests/test.ts --target es6"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,8 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-shell": "^0.5.2",
+    "gulp-tsb": "^1.10.4",
     "gulp-typescript": "^2.13.6"
   },
   "keywords": [
@@ -40,5 +42,8 @@
   "engines": {
     "node": "6.5.0",
     "npm": "3.10.7"
+  },
+  "jshintConfig": {
+    "esversion": 6
   }
 }

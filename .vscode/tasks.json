@@ -7,12 +7,38 @@
 // ${cwd}: the current working directory of the spawned process
 
 // A task runner that calls the Typescript compiler (tsc) and
-// Compiles a HelloWorld.ts program
+/*{
+  "version": "0.1.0",
+  "command": "tsc",
+  "isShellCommand": true,
+  "args": ["-p", "${workspaceRoot}/src","${workspaceRoot}/tests"],
+  "showOutput": "silent",
+  "problemMatcher": "$tsc"
+}*/
 {
   "version": "0.1.0",
   "command": "gulp",
   "isShellCommand": true,
-  "args": [""],
-  "showOutput": "always",
-  "problemMatcher": "$tsc"
+  "args": [],
+  "tasks": [
+    {
+      "taskName": "build",
+      "isBuildCommand": true,
+      "problemMatcher": "$gulp-tsc"
+    },
+    {
+      "taskName": "buildTests",
+      "isBuildCommand": true,
+      "problemMatcher": "$tsc"
+    },
+    {
+      "taskName": "test",
+      "args": [],
+      "isTestCommand": true
+    },
+    {
+      "taskName": "watch",
+      "problemMatcher": ["$tsc"]
+    }
+  ]
 }
