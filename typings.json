@@ -11,6 +11,6 @@
   "globalDevDependencies": {
     "gulp": "registry:dt/gulp#3.8.0+20160907112908",
     "gulp-shell": "registry:dt/gulp-shell#0.0.0+20160316155526",
-    "gulp-typescript": "registry:dt/gulp-typescript#0.0.0+20160317120654"
+    "typescript": "registry:dt/typescript#0.4.0+20160317120654"
   }
 }

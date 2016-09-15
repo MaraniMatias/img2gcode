@@ -23,7 +23,7 @@
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
     "gulp-tsb": "^1.10.4",
-    "gulp-typescript": "^2.13.6"
+    "typescript": "^1.8.10"
   },
   "keywords": [
     "img",

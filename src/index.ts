@@ -18,7 +18,6 @@ var
  *@param {
  *  toolDiameter: 2,
  *  scaleAxes: 40,
- *  totalStep: 1,
  *  deepStep: -1,
  *  whiteZ: 0,
  *  blackZ: -2,
@@ -28,9 +27,6 @@ var
  *} It is mm
  */
 function start(config: imgToCode.config): Promise<{data:imgToCode.startPromise}>{
-  let round = (num: number): number => {
-    return Math.round(num * 100) / 100;
-  }
   return new Promise(function (fulfill, reject) {
     try {
       console.log("-> Imagen: ", config.dirImg);//, "\nconfig:", config);
@@ -43,6 +39,7 @@ function start(config: imgToCode.config): Promise<{data:imgToCode.startPromise}>
         _pixel.toMm = round(config.scaleAxes / _height);
         _pixel.diameter = round(config.toolDiameter / _pixel.toMm);
 
+        config.errBlackPixel = size(_img);
         config.imgSize = `(${_height},${_width})pixel to (${round(_height*_pixel.toMm)},${round(_width*_pixel.toMm)})mm`
 
         analyze(config).then((dirgcode: string) => {
@@ -55,7 +52,9 @@ function start(config: imgToCode.config): Promise<{data:imgToCode.startPromise}>
     }
   })
 }
-
+function round(num: number): number {
+  return Math.round(num * 100) / 100;
+}
 /**
  * @param {lwip.Image} image
  * @returns {Pixel[][]}
@@ -88,7 +87,7 @@ function size(arr: imgToCode.Pixel[][]): number {
     for (let x = 0; x < arr.length; x++) {
       let arrX = arr[x];
       for (let y = 0; y < arrX.length; y++) {
-        if (arrX[y].intensity <= 765) size++;
+        if (arrX[y].intensity < 765 && !arrX[y].be) size++;
       }
     }
     return size
@@ -143,11 +142,10 @@ function analyze(config: imgToCode.config) {
       }, config.sevaZ);
 
       let w = (_height * _width) / _pixel.diameter;
-      console.log("w",w,"size",size(_img));
-      
       while (w > 0) {
         let nexPixels = nextBlackToMove(firstPixel);
         if (!nexPixels) {
+          config.errBlackPixel = round( size(_img) * 100 / config.errBlackPixel);
           new File().save(_gCode, config).then((dirGCode) => {
             console.log("-> Sava As:", dirGCode);
             fulfill(dirGCode);
