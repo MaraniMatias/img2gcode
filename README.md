@@ -6,13 +6,12 @@ var img2gcode = require("img2gcode");
 
   img2gcode({  // It is mm
     toolDiameter: 2,
-    scaleAxes: 400,
-    totalStep: 1,
+    scaleAxes: 700,
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 2,
-    dirImg:'./test.png'
+    dirImg:__dirname+'/img-and-gcode/test.jpeg'
   }).then((data) => {
     console.log(data.config);
     console.log(data.dirgcode);

@@ -5,7 +5,7 @@ img2gcode({  // It is mm
   scaleAxes: 700,
   deepStep: -1,
   whiteZ: 0,
-  blackZ: -2,
+  blackZ: -1,
   sevaZ: 1,
   dirImg:__dirname+'/img-and-gcode/test.jpeg'
 }).then((data) => {
