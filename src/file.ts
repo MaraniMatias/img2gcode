@@ -28,7 +28,8 @@ class File {
 
   private concat(gcode: imgToCode.Line[],config: imgToCode.config): string[] {
     try {
-      for (let count = 0, step = 0; count <= config.totalStep; count++ , step = step + config.deepStep) {
+      let totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
+      for (let count = 0, step = config.deepStep; count < totalStep; count++ , step = step + config.deepStep) {
         for (let index = 0; index < gcode.length; index++) {
           let e = gcode[index];
           this._gCodeInit.push(e.code(step));
@@ -59,6 +60,7 @@ class File {
           `; ${dirimg}`,
           `; ${dirgcode}`,
           `; Img Size: ${config.imgSize}`,
+          `; Process Error: ${config.errBlackPixel}`,
           `; Tool Diameter: ${config.toolDiameter}`,
           `; Scale Axes: ${config.scaleAxes}`,
           `; Deep Step: ${config.deepStep}`,

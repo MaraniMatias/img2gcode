@@ -1,6 +1,6 @@
 /**
  * Line
- */
+*/
 export default class Line {
   /**
    * @param  {x?:number; y?:number; z?:number;} axes 

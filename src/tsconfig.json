@@ -1,10 +1,10 @@
 {
   "exclude": [
-    "node_modules/*"
+    "node_modules"
   ],
   "compilerOptions": {
     "allowJs": true,
-    "target": "es6",
+    "target": "ES6",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -13,7 +13,6 @@
     "help":true,
     "charset":"utf8",
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "removeComments": true,
     "noImplicitAny": false,
     "preserveConstEnums": true

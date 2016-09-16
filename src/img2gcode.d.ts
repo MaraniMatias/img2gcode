@@ -4,10 +4,10 @@ declare namespace imgToCode {
   export type Axes = { x?: number, y?: number, z?: number | boolean };
   export type Pixel = { intensity: number, axes: Axes, be: boolean };
 
-  export interface config {
+  export type config = {
+    errBlackPixel?: number; //unprocessedBlackPixel
     toolDiameter: number;
     scaleAxes: number;
-    totalStep: number;
     deepStep: number;
     imgSize?: string;
     dirImg: string;
@@ -15,7 +15,10 @@ declare namespace imgToCode {
     blackZ: number;
     sevaZ: number;
   }
-
+  export interface startPromise {
+    config: config;
+    dirgcode: string;
+  }
   export class Line {
     constructor(axes: Axes, comment?: string);
 
@@ -24,6 +27,6 @@ declare namespace imgToCode {
     public code(step?: number): string;
   }
 
-  export function start(config: imgToCode.config): Promise<{ dirgcode: string, config: imgToCode.config }>
+  export function start(config: imgToCode.config): Promise<{}>
 
 }

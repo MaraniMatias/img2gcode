@@ -9,6 +9,11 @@
   "**/.vscode"      :  true,
   "**/components"   :  true,
   "**/typings"      :  true,
+  "**/typings.d.ts" :  true,
+  "**/tsconfig.json" :  true,
+  "**/*.png"        :  true,
+  "**/*.jpeg"       :  true,
+  "**/*.xcf"        :  true,
   "**/node_modules" :  true
 }
 
