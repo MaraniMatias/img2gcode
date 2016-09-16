@@ -5,7 +5,7 @@ declare namespace imgToCode {
   export type Pixel = { intensity: number, axes: Axes, be: boolean };
 
   export type config = {
-    errBlackPixel: number; //unprocessedBlackPixel
+    errBlackPixel?: number; //unprocessedBlackPixel
     toolDiameter: number;
     scaleAxes: number;
     deepStep: number;
