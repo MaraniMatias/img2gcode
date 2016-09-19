@@ -15,7 +15,7 @@ var
     toMm: 1, // 1 pixel es X mm
     diameter: 1
   },
-  bar = new ProgressBar('[:bar] :percent :etas', {complete: '=',incomplete: ' ',width: 50,total: 100})
+  bar = new ProgressBar('-> [:bar] :percent :etas', {complete: '=',incomplete: ' ',width: 50,total: 100})
 ;
 /**
  * It is mm
