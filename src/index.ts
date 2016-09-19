@@ -3,7 +3,7 @@ import File from "./file";
 import * as lwip  from 'lwip';
 // 0 X width
 // Y height
-var  
+var
   _gCode: imgToCode.Line[] = [],
   _height: number = 0,
   _width: number = 0,
@@ -12,6 +12,7 @@ var
     toMm: 1, // 1 pixel es X mm
     diameter: 1
   }
+;
 
 /**
  * It is mm
@@ -46,15 +47,15 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
           fulfill(config);
         });
       })
-        .then((config: imgToCode.config) => {
-          analyze(config, (dirgcode: string) => {
-            fulfill({ dirgcode, config });
-          });
+      .then((config: imgToCode.config) => {
+        analyze(config, (dirgcode: string) => {
+          fulfill({ dirgcode, config });
         });
+      });
 
     } catch (err) {
       throw new Error(err);
-      //fulfill(error);
+      //reject(error);
     }
   })
 }
@@ -147,10 +148,9 @@ function analyze(config: imgToCode.config,fulfill:(dirGCode: string)=>void) {
         y: firstPixel[0][0].axes.y
       }, config.sevaZ);
 
-      //let w = (_height * _width) / _pixel.diameter;
       let w = 0;
       while (w <= config.errBlackPixel) {
-        console.log(w,"de", config.errBlackPixel,"=>",w*100/config.errBlackPixel );
+        console.log(w, "de", config.errBlackPixel, "=>", w * 100 / config.errBlackPixel);
         let nexPixels = nextBlackToMove(firstPixel);
         if (!nexPixels) {
           config.errBlackPixel = round( size(_img) * 100 / config.errBlackPixel);
@@ -275,114 +275,6 @@ function appliedAllPixel(arr: imgToCode.Pixel[][], cb) {
   }
 }
 
-function lootAtUp(oldPixelBlack: imgToCode.Pixel[][]): imgToCode.Pixel[][] {
-  try {
-    function add(PLootAtUp: imgToCode.Pixel[]) {
-      let arrPixel: imgToCode.Pixel[][] = [];
-      for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
-        let row :imgToCode.Pixel[] = [];
-        row.push( PLootAtUp[iRow] );
-        for (let iColumn = 0; iColumn < oldPixelBlack[iRow].length-1; iColumn++) {
-          row.push(oldPixelBlack[iRow][iColumn]);
-        }
-        arrPixel.push(row);
-console.log("lootAtUp\n",JSON.stringify(arrPixel));
-        return arrPixel
-      }
-    }
-
-    let pixels :imgToCode.Pixel[] = [];
-    for (let iX = 0; iX < oldPixelBlack.length; iX++) {
-      let e = oldPixelBlack[iX][0];
-      if (e === undefined || e.axes.y === 0 || e.be) break;
-      let pixel = _img[e.axes.x][e.axes.y - 1];
-      if (pixel) { pixels.push(pixel); }
-    }
-    return AllBlack(pixels) ? add(pixels) : null;
-
-  } catch (error) {
-    throw new Error(`LootAtUp\n ${error}`);
-  }
-}
-function lootAtLeft(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[][] {
-  try {
-    function add(PLootAtLeft: imgToCode.Pixel[]) {
-      let arrPixel: imgToCode.Pixel[][] = [];
-      arrPixel.push(PLootAtLeft);
-      for (let iRow = oldPixelBlack.length-1; iRow >0 ; iRow--) {
-        arrPixel.push(oldPixelBlack[iRow]);
-      }
-console.log("lootAtLeft\n",JSON.stringify(arrPixel));
-      return arrPixel
-    }
-
-    let pixels: imgToCode.Pixel[] = [];
-    for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
-      let e = oldPixelBlack[0][iColumn];
-      if (e === undefined || e.axes.x === 0 || e.be) break;
-      let pixel = _img[e.axes.x - 1][e.axes.y];
-      if (pixel) { pixels.push(pixel); }
-    }
-    return AllBlack(pixels) ? add(pixels) : null;
-
-  } catch (error) {
-    throw new Error(`LootAtUp\n ${error}`);
-  }
-}
-function lootAtDown(oldPixelBlack:imgToCode.Pixel[][]) :imgToCode.Pixel[][] {
-  try {
-    function add(PLootAtDown: imgToCode.Pixel[]) {
-      let arrPixel: imgToCode.Pixel[][] = [];
-      for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
-        let row :imgToCode.Pixel[] = [];
-        for (let iColumn = 1; iColumn < oldPixelBlack[iRow].length; iColumn++) {
-          row.push(oldPixelBlack[iRow][iColumn]);
-        }
-        row.push(PLootAtDown[iRow]);
-        arrPixel.push(row);
-      }
-console.log("lootAtDown\n",JSON.stringify(arrPixel));
-      return arrPixel
-    }
-
-    let pixels: imgToCode.Pixel[] = [];
-    for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
-      let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
-      if (e === undefined || e.axes.y === _height - 1 || e.be) break;
-      let pixel = _img[e.axes.x][e.axes.y + 1];
-      if (pixel) { pixels.push(pixel); }
-    }  
-    return AllBlack(pixels) ? add(pixels) : null;
-
-  } catch (error) {
-    throw new Error(`LootAtDown\n ${error}`);
-  }
-}
-function lootAtRight(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[][] {
-  try {
-    function add(PLootAtRight: imgToCode.Pixel[]) {
-      let arrPixel: imgToCode.Pixel[][] = [];
-      for (let iRow = 1; iRow < oldPixelBlack.length; iRow++) {
-        arrPixel.push(oldPixelBlack[iRow]);
-      }
-      arrPixel.push(PLootAtRight);
-console.log("lootAtRight\n",JSON.stringify(arrPixel));
-      return arrPixel
-    }
-
-    let pixels: imgToCode.Pixel[] = [];
-    for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
-      let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
-      if (e === undefined || e.axes.x === _width - 1 || e.be) break;
-      let pixel = _img[e.axes.x + 1][e.axes.y];
-      if (pixel) { pixels.push(pixel); }
-    }
-    return AllBlack(pixels) ? add(pixels) : null;
-
-  } catch (error) {
-    throw new Error(`LootAtRight\n ${error}`);
-  }
-}
 /**
  * Pensar con los paso y capas que si es negro pero deveser procesado
  * 
@@ -402,40 +294,150 @@ function AllBlack(oldPixelBlack: imgToCode.Pixel[]): boolean{
     throw new Error(`AllBlack\n ${error}`);
   }
 }
+/////////////////////////////////////////////////////////////////////////////////
+
 /**
  * determinar los pixel negro a corre segun la herr.
  * 
  * @param {Pixel[][]} oldPixelBlack
  */
 function nextBlackToMove(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[][]  {
-  try{
-    let nextPixelBlack = lootAtUp(oldPixelBlack);
-    if (nextPixelBlack) {
+  try {
+    /*
+    console.log("lootAtRight",  JSON.stringify(lootAtRight(oldPixelBlack)));
+    console.log("lootAtLeft",  JSON.stringify(lootAtLeft(oldPixelBlack)));
+    console.log("lootAtUp",  JSON.stringify(lootAtUp(oldPixelBlack)));
+    console.log("lootAtDown",  JSON.stringify(lootAtDown(oldPixelBlack)));
+    */
+/*  let nextPixelBlack = lootAtRight(oldPixelBlack);
+    if (nextPixelBlack!==null&& distanceIsOne(oldPixelBlack, nextPixelBlack)) {
       return nextPixelBlack
     } else {
-    nextPixelBlack = lootAtLeft(oldPixelBlack)
-    if (nextPixelBlack) {
+      nextPixelBlack = lootAtLeft(oldPixelBlack);
+      if (nextPixelBlack!==null&& distanceIsOne(oldPixelBlack, nextPixelBlack)) {
       return nextPixelBlack
     } else {
-      nextPixelBlack = lootAtRight(oldPixelBlack)
-      if (nextPixelBlack){
+      nextPixelBlack = lootAtUp(oldPixelBlack);
+      if (nextPixelBlack !== null && distanceIsOne(oldPixelBlack, nextPixelBlack)) {
         return nextPixelBlack
       } else {
-        nextPixelBlack = lootAtDown(oldPixelBlack)
-        if (nextPixelBlack){
+        nextPixelBlack = lootAtDown(oldPixelBlack);
+        if (nextPixelBlack!==null&& distanceIsOne(oldPixelBlack, nextPixelBlack)) {
           return nextPixelBlack
         } else {
           return getFirstPixel();
         }
       }
     }
+    }*/
+function lootAtUp(oldPixelBlack: imgToCode.Pixel[][]): imgToCode.Pixel[] {
+  try{
+    let pixels :imgToCode.Pixel[] = [];
+    for (let iX = 0; iX < oldPixelBlack.length; iX++) {
+      let e = oldPixelBlack[iX][0];
+      if (e === undefined || e.axes.y === 0) break;
+      let pixel = _img[e.axes.x][e.axes.y - 1];
+      if (pixel) pixels.push(pixel);
+    }
+    return pixels;
+  } catch (error) {
+    throw new Error(`LootAtUp\n ${error}`);
+  }
+}
+function lootAtLeft(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[] {
+  try{
+    let pixels: imgToCode.Pixel[] = [];
+    for (let iColumn = 0; iColumn < oldPixelBlack[0].length; iColumn++) {
+      let e = oldPixelBlack[0][iColumn];
+      if (e === undefined || e.axes.x === 0) break;
+      let pixel = _img[e.axes.x - 1][e.axes.y];
+      if (pixel) pixels.push(pixel);
+    }
+    return pixels;
+  } catch (error) {
+    throw new Error(`LootAtUp\n ${error}`);
+  }
+}
+function lootAtDown(oldPixelBlack:imgToCode.Pixel[][]) :imgToCode.Pixel[] {
+  try{
+    let pixels: imgToCode.Pixel[] = [];
+    for (let iY = 0; iY < oldPixelBlack[0].length; iY++) {
+      let e = oldPixelBlack[iY][oldPixelBlack[0].length - 1];
+      if (e === undefined || e.axes.y === _width - 1) break;
+      let pixel = _img[e.axes.x][e.axes.y + 1];
+      if (pixel) pixels.push(pixel);
+    }
+    return pixels;
+  } catch (error) {
+    throw new Error(`LootAtDown\n ${error}`);
+  }
+}
+function lootAtRight(oldPixelBlack:imgToCode.Pixel[][]):imgToCode.Pixel[] {
+  try{
+    let pixels: imgToCode.Pixel[] = [];
+    for (let iRow = 0; iRow < oldPixelBlack[oldPixelBlack.length-1].length; iRow++) {
+      let e = oldPixelBlack[oldPixelBlack.length - 1][iRow];
+      if (e === undefined || e.axes.x === _height - 1) break;
+      let pixel = _img[e.axes.x + 1][e.axes.y];
+      if (pixel) pixels.push(pixel);
+    }
+    return pixels;
+  } catch (error) {
+    throw new Error(`LootAtRight\n ${error}`);
+  }
+}
+    let arrPixel: imgToCode.Pixel[][] = [];
+    // look at "1 2 3" up
+    let PLootAtUp = lootAtUp(oldPixelBlack);
+    // look at "1 4 7" left (<-o)
+    let PLootAtLeft = lootAtLeft(oldPixelBlack);
+    // look at "3 6 9" right (o->)
+    let PLootAtRight = lootAtRight(oldPixelBlack);
+    // look at "7 8 9" down
+    let PLootAtDown = lootAtDown(oldPixelBlack);
+
+    // sortear por donde empezar ?¿?¿?¿
+    if( AllBlack(PLootAtUp) ){
+      for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
+        let row :imgToCode.Pixel[] = [];
+        row.push( PLootAtUp[iRow] );
+        for (let iColumn = 0; iColumn < oldPixelBlack[iRow].length-1; iColumn++) {
+          row.push( oldPixelBlack[iRow][iColumn] );
+        }
+        arrPixel.push(row);
+      }
+
+    }else if( AllBlack(PLootAtLeft) ){
+      arrPixel.push(PLootAtLeft);
+      for (let iRow = oldPixelBlack.length-1; iRow >0 ; iRow--) {
+        let e = oldPixelBlack[iRow];
+        arrPixel.push(e);
+      }
+
+    }else if( AllBlack(PLootAtRight) ){
+      for (let iRow = 1; iRow < oldPixelBlack.length; iRow++) {
+        let e = oldPixelBlack[iRow];
+        arrPixel.push(e);
+      }
+      arrPixel.push(PLootAtRight);
+
+    }else if( AllBlack(PLootAtDown) ){
+      for (let iRow = 0; iRow < oldPixelBlack.length; iRow++) {
+        let row :imgToCode.Pixel[] = [];
+        for (let iColumn = 1; iColumn < oldPixelBlack[iRow].length; iColumn++) {
+          row.push( oldPixelBlack[iRow][iColumn] );
+        }
+        row.push(PLootAtDown[iRow]);
+        arrPixel.push(row);
+      }
+
+    }else{
+      arrPixel = getFirstPixel();
     }
 
-    //let arrlootAtUp = lootAtUp(oldPixelBlack)
-    //let arrlootAtLeft = lootAtLeft(oldPixelBlack)
-    //let arrlootAtRight = lootAtRight(oldPixelBlack)
-    //let arrlootAtDown = lootAtDown(oldPixelBlack)
+    return arrPixel;
 
+    
   } catch (error) {
     throw new Error(`NextBlackToMove\n ${error}`);
   }
