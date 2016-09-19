@@ -3,6 +3,7 @@ import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
 import * as lwip  from 'lwip';
+import * as ProgressBar  from 'progress';
 var
   _gCode: imgToCode.Line[] = [],
   _img: imgToCode.Image = {
@@ -13,9 +14,9 @@ var
   _pixel = {
     toMm: 1, // 1 pixel es X mm
     diameter: 1
-  }
+  },
+  bar = new ProgressBar('[:bar] :percent :etas', {complete: '=',incomplete: ' ',width: 50,total: 100})
 ;
-
 /**
  * It is mm
  *@param {
@@ -32,7 +33,7 @@ var
 function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise }>{
   return new Promise(function (fulfill, reject) {
     try {
-      console.log("-> Imagen: ", config.dirImg);//, "\nconfig:", config);
+      console.log("-> Image: ", config.dirImg);//, "\nconfig:", config);
       let self = this;
       return new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
@@ -64,7 +65,7 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
 }
 
 function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) {
-    try {
+  try {
       let firstPixel: imgToCode.Pixel[][] = Analyze.getFirstPixel(_img,_pixel);
       addPixel({
         x: firstPixel[0][0].axes.x,
@@ -73,10 +74,10 @@ function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) 
 
       let w = 0;
       while (w <= config.errBlackPixel) {
-        console.log(w, "de", config.errBlackPixel, "=>", w * 100 / config.errBlackPixel);
-
+        bar.update( w  / config.errBlackPixel);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, _img, _pixel);
         if (!nexPixels) {
+          console.log("-> Accommodating gcode...");
           config.errBlackPixel = Utilities.round( Utilities.size(_img.pixels) * 100 / config.errBlackPixel);
           new File().save(_gCode, config).then((dirGCode:string) => {
             console.log("-> Sava As:", dirGCode);
