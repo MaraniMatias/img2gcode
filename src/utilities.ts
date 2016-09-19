@@ -78,7 +78,7 @@ function distanceIsOne(oldPixel:imgToCode.Pixel[][], newPixel:imgToCode.Pixel[][
   }
 }
 
-function appliedAllPixel(arr: imgToCode.Pixel[][], cb) {
+function appliedAllPixel(arr: imgToCode.Pixel[][], cb:( pixel: imgToCode.Pixel, iRow:number, iColumn?:number)=>void) {
   try{
     for (let iRow = 0; iRow < arr.length; iRow++) {
       if (arr[iRow].length === 1) {
