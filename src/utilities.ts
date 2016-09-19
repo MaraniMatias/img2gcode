@@ -1,8 +1,3 @@
-export default {
-  size, round,
-  allBlack, appliedAllPixel,
-  distanceIsOne
-}
 /**
  * Round(15.8877) => 15.88
  * 
@@ -111,4 +106,10 @@ function allBlack(oldPixelBlack: imgToCode.Pixel[]): boolean{
   } catch (error) {
     throw new Error(`AllBlack\n ${error}`);
   }
+}
+
+export default {
+  size, round,
+  allBlack, appliedAllPixel,
+  distanceIsOne
 }

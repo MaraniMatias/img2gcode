@@ -57,8 +57,8 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
       });
 
     } catch (err) {
-      throw new Error(err);
-      //reject(error);
+      //throw new Error(err);
+      reject(err);
     }
   })
 }

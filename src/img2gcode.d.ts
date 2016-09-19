@@ -12,6 +12,7 @@ declare namespace imgToCode {
     scaleAxes: number;
     deepStep: number;
     imgSize?: string;
+    //analyzeLevel:number;
     dirImg: string;
     whiteZ: number;
     blackZ: number;
