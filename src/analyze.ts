@@ -2,25 +2,25 @@
 // Y height
 import Utilities from "./utilities";
 
-function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): imgToCode.Pixel[][] {
-  /*let arr = [
-    [0, 1],
-    [2, 3],
-    [4, 5]
-  ];
-  for (let iColumn = 0; iColumn < arr.length; iColumn++) {
-    for (let iRow = 0; iRow < arr[iColumn].length; iRow++) {
-      console.log("for1", arr[iColumn][iRow])
-    }
-  };
-  for (let iRow = 0; iRow < arr[iRow].length; iRow++) {
-    for (let iColumn = 0; iColumn < arr.length; iColumn++) {
-      console.log("for2", arr[iColumn][iRow]);
-    }
-  }*/
-  //return getFirstPixelHeight(image, _pixel)
-  return getFirstPixelWidth(image, _pixel)
+/**
+ * Si esta definido oldPixelBlack devuelve el pixel mas cercano a este.
+ * 
+ * @param {imgToCode.Image} image
+ * @param {imgToCode.PixelToMM} _pixel
+ * @param {imgToCode.Pixel[][]} [oldPixelBlack]
+ * @returns {imgToCode.Pixel[][]}
+ */
+function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM, oldPixelBlack?: imgToCode.Pixel[][]): imgToCode.Pixel[][] {
+  if (oldPixelBlack) {
+    //return getFirstPixelWidth(image, _pixel);
+    //return getFirstPixelHeight(image, _pixel);
+    return Utilities.nearest(oldPixelBlack, getFirstPixelWidth(image, _pixel),getFirstPixelHeight(image, _pixel))
+  } else {
+    return getFirstPixelWidth(image, _pixel);
+    //return getFirstPixelHeight(image, _pixel);
+  }
 }
+
 /**
  * pixel negros debajo la her para bajar directamente
  * Width => Y
@@ -28,30 +28,30 @@ function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): img
  */
 function getFirstPixelWidth(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): imgToCode.Pixel[][] {
   try {
-    for (let iColumn = 0; iColumn < image.pixels.length; iColumn++) {
-      for (let iRow = 0; iRow < image.pixels[iColumn].length; iRow++) {
-        let pixels: imgToCode.Pixel[][] = [],
-          diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
-        if (iRow + _pixel.diameter <= image.width && iColumn + _pixel.diameter <= image.height && image.pixels[iRow][iColumn].intensity < 765) {
-          for (let x2 = 0; x2 < _pixel.diameter; x2++) {
-            let row: imgToCode.Pixel[] = [];
-            for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-              let countBlack = 0, p = image.pixels[iRow + x2 < image.height ? iRow + x2 : image.height][iColumn + y2 < image.width ? iColumn + y2 : image.width];
-              if (p.intensity < 765) {
-                countBlack++;
-                if ( /*countBlack > diameter ||*/ !p.be) {
-                  row.push(p);
-                }
-              }
+ for (let x = 0; x < image.pixels.length; x++) {
+  for (let y = 0; y < image.pixels[x].length; y++) {
+    let pixels:imgToCode.Pixel[][] = [],
+      diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
+    if (x + _pixel.diameter <= image.width && y + _pixel.diameter <= image.height && image.pixels[x][y].intensity < 765) {
+      for (let x2 = 0; x2 < _pixel.diameter; x2++) {
+        let row:imgToCode.Pixel[] = [];
+        for (let y2 = 0; y2 < _pixel.diameter; y2++) {
+          let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
+          if (p.intensity < 765) {
+            countBlack++;
+            if ( /*countBlack > diameter ||*/ !p.be){
+              row.push(p);
             }
-            pixels.push(row);
-          }
-          if (pixels[0].length === diameter && pixels[pixels.length - 1].length === diameter) {
-            return pixels;
           }
         }
-      }// for
-    }// for
+        pixels.push(row);
+      }
+      if ( pixels[0].length === diameter && pixels[pixels.length-1].length === diameter) {
+        return pixels;
+      }
+    }
+  }// for
+  }// for
   } catch (error) {
     throw new Error(`GetFirstPixelWidth\n ${error}`);
   }
@@ -63,8 +63,8 @@ function getFirstPixelWidth(image: imgToCode.Image, _pixel: imgToCode.PixelToMM)
  */
 function getFirstPixelHeight(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): imgToCode.Pixel[][] {
   try {
-    for (let iRow = 0; iRow < image.pixels[iRow].length-1; iRow++) {
-      for (let iColumn = 0; iColumn < image.pixels.length-1; iColumn++) {
+    for (let iRow = 0; iRow < image.pixels[iRow].length - 1; iRow++) {
+      for (let iColumn = 0; iColumn < image.pixels.length - 1; iColumn++) {
         let pixels: imgToCode.Pixel[][] = [],
           diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
         if (iRow + _pixel.diameter <= image.width && iColumn + _pixel.diameter <= image.height && image.pixels[iRow][iColumn].intensity < 765) {
@@ -201,7 +201,7 @@ function nextBlackToMove(oldPixelBlack: imgToCode.Pixel[][], image: imgToCode.Im
       }
 
     } else {
-      arrPixel = getFirstPixel(image, _pixel);
+      arrPixel = getFirstPixel(image, _pixel, oldPixelBlack);
     }
 
     return arrPixel;

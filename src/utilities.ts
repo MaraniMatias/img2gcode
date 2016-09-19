@@ -26,40 +26,26 @@ function size(arr: imgToCode.Pixel[][]): number {
   }
 }
 
+function pixelEnds(newPixel: imgToCode.Pixel[][]): imgToCode.Pixel[] {
+  let arrNewPixel: imgToCode.Pixel[] = [];
+  arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
+  arrNewPixel.push(newPixel[0][0]);
+  arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
+  arrNewPixel.push(newPixel[newPixel.length - 1][0]);
+  return arrNewPixel
+}
 
-function distanceIsOne(oldPixel:imgToCode.Pixel[][], newPixel:imgToCode.Pixel[][]): boolean{
+function distanceIsOne(oldPixel: imgToCode.Pixel[][], newPixel: imgToCode.Pixel[][]): boolean {
   try {
     // tener ecuenta el paso ??
     // diameter tener encuenta ???
-    let arrNewPixel: Array<imgToCode.Pixel> = Array();
-    arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
-    arrNewPixel.push(newPixel[0][0]);
-    arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
-    arrNewPixel.push(newPixel[newPixel.length - 1][0]);
-
-    let arrOldPixel: Array<imgToCode.Pixel> = Array();
-    arrOldPixel.push(oldPixel[oldPixel.length - 1][oldPixel[oldPixel.length - 1].length - 1]);
-    arrOldPixel.push(oldPixel[0][0]);
-    arrOldPixel.push(oldPixel[0][oldPixel[oldPixel.length - 1].length - 1]);
-    arrOldPixel.push(oldPixel[oldPixel.length - 1][0]);
+    let arrNewPixel = pixelEnds(newPixel);
+    let arrOldPixel = pixelEnds(oldPixel);
 
     for (let ix = 0; ix < arrNewPixel.length; ix++) {
-      let nPixel = arrNewPixel[ix];
       for (let iy = 0; iy < arrOldPixel.length; iy++) {
-        let oPixel = arrOldPixel[iy];
-        let disX = nPixel.axes.x - oPixel.axes.x;
-        let disY = nPixel.axes.y - oPixel.axes.y;
-        let sigX = 0; sigX = disX > 0 ? 1 : -1;
-        let sigY = 0; sigY = disY > 0 ? 1 : -1;
-
-/*if(  ((disY === 1 && disX === 1) ||(disY === -1 && disX === -1) ||
-  (disY === 1 && disX === -1) ||(disY === -1 && disX === 1) ||
-  (disY === 0 && disX === 1) ||(disX === 0 && disY === 1) ||
-  (disY === 0 && disX === -1) ||(disX === 0 && disY === -1) ||
-  (disX === 0 && disY === 0)) ){
-  console.log(_pixel.diameter,oPixel.axes, nPixel.axes,"disX", disX, "disY", disY, "sigX", sigX, "sigY", sigX,"dis 1, true");
-}*/
-
+        let disX = arrNewPixel[ix].axes.x - arrOldPixel[iy].axes.x;
+        let disY = arrNewPixel[ix].axes.y - arrOldPixel[iy].axes.y;
         return (disY === 1 && disX === 1) || (disY === 1 && disX === -1) ||
           (disY === -1 && disX === 1) || (disY === -1 && disX === -1) ||
           (disY === 0 && disX === 1) || (disX === 0 && disY === 1) ||
@@ -73,8 +59,8 @@ function distanceIsOne(oldPixel:imgToCode.Pixel[][], newPixel:imgToCode.Pixel[][
   }
 }
 
-function appliedAllPixel(arr: imgToCode.Pixel[][], cb:( pixel: imgToCode.Pixel, iRow:number, iColumn?:number)=>void) {
-  try{
+function appliedAllPixel(arr: imgToCode.Pixel[][], cb: (pixel: imgToCode.Pixel, iRow: number, iColumn?: number) => void) {
+  try {
     for (let iRow = 0; iRow < arr.length; iRow++) {
       if (arr[iRow].length === 1) {
         cb(arr[iRow][0], iRow);
@@ -94,7 +80,7 @@ function appliedAllPixel(arr: imgToCode.Pixel[][], cb:( pixel: imgToCode.Pixel, 
  * @param {Pixel[]} oldPixelBlack
  * @returns {boolean}
  */
-function allBlack(oldPixelBlack: imgToCode.Pixel[]): boolean{
+function allBlack(oldPixelBlack: imgToCode.Pixel[]): boolean {
   try {
     if (oldPixelBlack[0] === undefined) return false;
     for (let x = 0; x < oldPixelBlack.length; x++) {
@@ -108,8 +94,37 @@ function allBlack(oldPixelBlack: imgToCode.Pixel[]): boolean{
   }
 }
 
+function nearest(oldPixel: imgToCode.Pixel[][], newPixel1: imgToCode.Pixel[][], newPixel2: imgToCode.Pixel[][]): imgToCode.Pixel[][] {
+  try {
+    if (!newPixel2) return newPixel1;
+
+    let arrPixel1 = pixelEnds(newPixel1);
+    let arrPixel2 = pixelEnds(newPixel2);
+    let arrOldPixel = pixelEnds(oldPixel);
+
+    function nearestPoint(oldArr: imgToCode.Pixel[], newArr: imgToCode.Pixel[]): number {
+      let nearest = null;
+      for (let ix = 0; ix < arrPixel1.length; ix++) {
+        for (let iy = 0; iy < arrOldPixel.length; iy++) {
+          let disX = arrPixel1[ix].axes.x - arrOldPixel[iy].axes.x;
+          let disY = arrPixel1[ix].axes.y - arrOldPixel[iy].axes.y;
+          let dis = disX * (disX > 0 ? 1 : -1) + disY * (disY > 0 ? 1 : -1);
+          if (nearest === null || nearest > dis) nearest = dis;
+        }
+      }
+      return  nearest
+    }
+
+    return nearestPoint(arrOldPixel,arrPixel1) > nearestPoint(arrOldPixel,arrPixel2) ? newPixel1:newPixel2
+
+  } catch (error) {
+    throw new Error(`Nearest\n ${error}`);
+  }
+}
+
+
 export default {
-  size, round,
+  size, round, nearest,
   allBlack, appliedAllPixel,
   distanceIsOne
 }
