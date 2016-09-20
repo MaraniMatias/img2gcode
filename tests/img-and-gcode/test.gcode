@@ -4,7 +4,7 @@ G90 ; Absolute positioning
 ; /home/marani/node_js/img-to-GCode/tests/img-and-gcode/test.png
 ; /home/marani/node_js/img-to-GCode/tests/img-and-gcode/test.gcode
 ; Img Size: (700,700)pixel to (700,700)mm
-; Process Error: 36.02%
+; Process Error: 2596%
 ; Tool Diameter: 2
 ; Scale Axes: 700
 ; Deep Step: -1

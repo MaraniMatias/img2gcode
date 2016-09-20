@@ -60,7 +60,7 @@ class File {
           `; ${dirimg}`,
           `; ${dirgcode}`,
           `; Img Size: ${config.imgSize}`,
-          `; Process Error: ${config.errBlackPixel}%`,
+          `; Process Error: ${config.errBlackPixel*100}%`,
           `; Tool Diameter: ${config.toolDiameter}`,
           `; Scale Axes: ${config.scaleAxes}`,
           `; Deep Step: ${config.deepStep}`,
