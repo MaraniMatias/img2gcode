@@ -115,7 +115,7 @@ function nearest(oldPixel: imgToCode.Pixel[][], newPixel1: imgToCode.Pixel[][], 
       return  nearest
     }
 
-    return nearestPoint(arrOldPixel,arrPixel1) > nearestPoint(arrOldPixel,arrPixel2) ? newPixel1:newPixel2
+    return nearestPoint(arrOldPixel,arrPixel1) < nearestPoint(arrOldPixel,arrPixel2) ? newPixel1:newPixel2
 
   } catch (error) {
     throw new Error(`Nearest\n ${error}`);

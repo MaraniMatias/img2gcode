@@ -12,12 +12,9 @@ import Utilities from "./utilities";
  */
 function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM, oldPixelBlack?: imgToCode.Pixel[][]): imgToCode.Pixel[][] {
   if (oldPixelBlack) {
-    //return getFirstPixelWidth(image, _pixel);
-    //return getFirstPixelHeight(image, _pixel);
     return Utilities.nearest(oldPixelBlack, getFirstPixelWidth(image, _pixel), getFirstPixelHeight(image, _pixel))
   } else {
     return getFirstPixelWidth(image, _pixel);
-    //return getFirstPixelHeight(image, _pixel);
   }
 }
 
@@ -39,7 +36,7 @@ function getFirstPixelWidth(image: imgToCode.Image, _pixel: imgToCode.PixelToMM)
               let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
               if (p.intensity < 765) {
                 countBlack++;
-                if ( /*countBlack > diameter ||*/ !p.be) {
+                if ( countBlack > diameter || !p.be) {
                   row.push(p);
                 }
               }
@@ -74,7 +71,7 @@ function getFirstPixelHeight(image: imgToCode.Image, _pixel: imgToCode.PixelToMM
               let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
               if (p.intensity < 765) {
                 countBlack++;
-                if ( /*countBlack > diameter ||*/ !p.be) {
+                if ( countBlack > diameter || !p.be) {
                   row.push(p);
                 }
               }

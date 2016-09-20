@@ -34,8 +34,10 @@ class File {
           let e = gcode[index];
           this._gCodeInit.push(e.code(step));
         }
-        let e = gcode[gcode.length-1];
-        this._gCodeInit.push(`G01 X${e.axes.x} Y-${e.axes.y} Z${config.sevaZ}; With new deep step`);
+        let e = gcode[gcode.length - 1];
+        let x = e.axes.x ? ' X' + e.axes.x : '';
+        let y = e.axes.y ? ' Y' + e.axes.y : '';
+        this._gCodeInit.push(`G01${x}${y} Z${config.sevaZ}; With new deep step`);
       }
       this._gCodeInit.push(`G01 Z${config.sevaZ}; With Z max`);
       return this._gCodeInit;
@@ -60,7 +62,7 @@ class File {
           `; ${dirimg}`,
           `; ${dirgcode}`,
           `; Img Size: ${config.imgSize}`,
-          `; Process Error: ${config.errBlackPixel*100}%`,
+          `; Process Error: ${config.errBlackPixel}%`,
           `; Tool Diameter: ${config.toolDiameter}`,
           `; Scale Axes: ${config.scaleAxes}`,
           `; Deep Step: ${config.deepStep}`,
