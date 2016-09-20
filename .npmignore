@@ -1,3 +1,4 @@
 .vscode/
 .git/
 typings/
+tests/
