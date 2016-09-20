@@ -3,7 +3,13 @@ import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
 import * as lwip  from 'lwip';
-import * as ProgressBar  from 'progress';
+import {EventEmitter}  from 'events';
+
+class myEmitter extends EventEmitter { 
+
+};
+const Event = new myEmitter();
+
 var
   _gCode: imgToCode.Line[] = [],
   _img: imgToCode.Image = {
@@ -14,9 +20,8 @@ var
   _pixel = {
     toMm: 1, // 1 pixel es X mm
     diameter: 1
-  },
-  bar = new ProgressBar('-> Analyze: [:bar] :percent :etas', { complete: '=', incomplete: ' ', width: 50, total: 100 })
-  ;
+  }
+;
 /**
  * It is mm
  *@param {
@@ -30,12 +35,11 @@ var
  *  imgSize:''
  *} It is mm
  */
-function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise }> {
-  return new Promise(function (fulfill, reject) {
+function start(config: imgToCode.config) {
     try {
       console.log("-> Image: ", config.dirImg);//, "\nconfig:", config);
       let self = this;
-      return new Promise(function (fulfill, reject) {
+      new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
           if (err) throw new Error(err.message);
           console.log('-> Openping and reading...');
@@ -54,7 +58,7 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
       })
         .then((config: imgToCode.config) => {
           analyze(config, (dirgcode: string) => {
-            fulfill({ dirgcode, config });
+            Event.emit('complete',{ dirgcode, config });
           });
         });
 
@@ -62,7 +66,7 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
       throw new Error(err);
       //reject(err);
     }
-  })
+
 }
 
 function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) {
@@ -75,11 +79,11 @@ function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) 
 
     let w = 0;
     while (w <= config.errBlackPixel) {
-      bar.update(w / config.errBlackPixel);
+Event.emit('tick',w / config.errBlackPixel);
       let nexPixels = Analyze.nextBlackToMove(firstPixel, _img, _pixel);
       if (!nexPixels) {
         config.errBlackPixel = Utilities.round(Utilities.size(_img.pixels) * 100 / config.errBlackPixel);
-        if (!bar.complete) bar.update(1);
+Event.emit('tick',1);
         console.log(`-> ${config.errBlackPixel}% of black pixels unprocessed.`);
         console.log("-> Accommodating gcode...");
         new File().save(_gCode, config).then((dirGCode: string) => {

@@ -1,6 +1,6 @@
 {
   "name": "img2gcode",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "description": "convert jpg, png, gif to gcode with nodejs and lwip.",
   "main": "./src/index.js",
   "typess": "./src/img2gcode.d.ts",
@@ -17,13 +17,13 @@
   "license": "ISC",
   "dependencies": {
     "lwip": "^0.0.9",
-    "progress": "^1.1.8",
     "promise": "^7.1.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
     "gulp-tsb": "^1.10.4",
+    "progress": "^1.1.8",
     "typescript": "^1.8.10"
   },
   "keywords": [
@@ -41,7 +41,7 @@
     "image to cnc"
   ],
   "engines": {
-    "node": "6.5.0",
+    "node": "6.6.0",
     "npm": "3.10.7"
   },
   "jshintConfig": {
