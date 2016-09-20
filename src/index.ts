@@ -74,12 +74,13 @@ function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) 
 
       let w = 0;
       while (w <= config.errBlackPixel) {
-        bar.update( w  / config.errBlackPixel);
+        bar.update(w / (config.errBlackPixel / _pixel.diameter*2));
         let nexPixels = Analyze.nextBlackToMove(firstPixel, _img, _pixel);
         if (!nexPixels) {
+          config.errBlackPixel = Utilities.round( Utilities.size(_img.pixels) * 1000 / config.errBlackPixel);
+          console.log(bar.complete?'->':'\n->',`${config.errBlackPixel}% of black pixels unprocessed.`);
           console.log("-> Accommodating gcode...");
-          config.errBlackPixel = Utilities.round( Utilities.size(_img.pixels) * 100 / config.errBlackPixel);
-          new File().save(_gCode, config).then((dirGCode:string) => {
+          new File().save(_gCode, config).then((dirGCode: string) => {
             console.log("-> Sava As:", dirGCode);
             fulfill(dirGCode);
           });
