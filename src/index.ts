@@ -77,8 +77,7 @@ function analyze(config: imgToCode.config, fulfill: (dirGCode: string) => void) 
         bar.update(w / (config.errBlackPixel / _pixel.diameter*2));
         let nexPixels = Analyze.nextBlackToMove(firstPixel, _img, _pixel);
         if (!nexPixels) {
-          //config.errBlackPixel = Utilities.round( Utilities.size(_img.pixels) * 100 / config.errBlackPixel);
-          config.errBlackPixel = Utilities.round( (1-(w / (config.errBlackPixel / _pixel.diameter * 2)))*100);
+          config.errBlackPixel = Utilities.round( Utilities.size(_img.pixels) * 100 / config.errBlackPixel);
           console.log(bar.complete ? '->' : '\n->', `${config.errBlackPixel}% of black pixels unprocessed.`);
           console.log("-> Accommodating gcode...");
           new File().save(_gCode, config).then((dirGCode: string) => {

@@ -14,7 +14,7 @@ function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM, oldP
   if (oldPixelBlack) {
     //return getFirstPixelWidth(image, _pixel);
     //return getFirstPixelHeight(image, _pixel);
-    return Utilities.nearest(oldPixelBlack, getFirstPixelWidth(image, _pixel),getFirstPixelHeight(image, _pixel))
+    return Utilities.nearest(oldPixelBlack, getFirstPixelWidth(image, _pixel), getFirstPixelHeight(image, _pixel))
   } else {
     return getFirstPixelWidth(image, _pixel);
     //return getFirstPixelHeight(image, _pixel);
@@ -28,30 +28,30 @@ function getFirstPixel(image: imgToCode.Image, _pixel: imgToCode.PixelToMM, oldP
  */
 function getFirstPixelWidth(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): imgToCode.Pixel[][] {
   try {
- for (let x = 0; x < image.pixels.length; x++) {
-  for (let y = 0; y < image.pixels[x].length; y++) {
-    let pixels:imgToCode.Pixel[][] = [],
-      diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
-    if (x + _pixel.diameter <= image.width && y + _pixel.diameter <= image.height && image.pixels[x][y].intensity < 765) {
-      for (let x2 = 0; x2 < _pixel.diameter; x2++) {
-        let row:imgToCode.Pixel[] = [];
-        for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-          let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
-          if (p.intensity < 765) {
-            countBlack++;
-            if ( /*countBlack > diameter ||*/ !p.be){
-              row.push(p);
+    for (let x = 0; x < image.pixels.length; x++) {
+      for (let y = 0; y < image.pixels[x].length; y++) {
+        let pixels: imgToCode.Pixel[][] = [],
+          diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
+        if (x + _pixel.diameter <= image.width && y + _pixel.diameter <= image.height && image.pixels[x][y].intensity < 765) {
+          for (let x2 = 0; x2 < _pixel.diameter; x2++) {
+            let row: imgToCode.Pixel[] = [];
+            for (let y2 = 0; y2 < _pixel.diameter; y2++) {
+              let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
+              if (p.intensity < 765) {
+                countBlack++;
+                if ( /*countBlack > diameter ||*/ !p.be) {
+                  row.push(p);
+                }
+              }
             }
+            pixels.push(row);
+          }
+          if (pixels[0].length === diameter && pixels[pixels.length - 1].length === diameter) {
+            return pixels;
           }
         }
-        pixels.push(row);
-      }
-      if ( pixels[0].length === diameter && pixels[pixels.length-1].length === diameter) {
-        return pixels;
-      }
-    }
-  }// for
-  }// for
+      }// for
+    }// for
   } catch (error) {
     throw new Error(`GetFirstPixelWidth\n ${error}`);
   }
@@ -63,15 +63,15 @@ function getFirstPixelWidth(image: imgToCode.Image, _pixel: imgToCode.PixelToMM)
  */
 function getFirstPixelHeight(image: imgToCode.Image, _pixel: imgToCode.PixelToMM): imgToCode.Pixel[][] {
   try {
-    for (let iRow = 0; iRow < image.pixels[iRow].length - 1; iRow++) {
-      for (let iColumn = 0; iColumn < image.pixels.length - 1; iColumn++) {
+    for (let x = 0; x < image.pixels[x].length - 1; x++) {
+      for (let y = 0; y < image.pixels.length - 1; y++) {
         let pixels: imgToCode.Pixel[][] = [],
           diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
-        if (iRow + _pixel.diameter <= image.width && iColumn + _pixel.diameter <= image.height && image.pixels[iRow][iColumn].intensity < 765) {
+        if (x + _pixel.diameter <= image.width && y + _pixel.diameter <= image.height && image.pixels[x][y].intensity < 765) {
           for (let x2 = 0; x2 < _pixel.diameter; x2++) {
             let row: imgToCode.Pixel[] = [];
             for (let y2 = 0; y2 < _pixel.diameter; y2++) {
-              let countBlack = 0, p = image.pixels[iRow + x2 < image.height ? iRow + x2 : image.height][iColumn + y2 < image.width ? iColumn + y2 : image.width];
+              let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
               if (p.intensity < 765) {
                 countBlack++;
                 if ( /*countBlack > diameter ||*/ !p.be) {
