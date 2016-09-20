@@ -15,7 +15,7 @@ var
     toMm: 1, // 1 pixel es X mm
     diameter: 1
   },
-  bar = new ProgressBar('-> [:bar] :percent :etas', { complete: '=', incomplete: ' ', width: 50, total: 100 })
+  bar = new ProgressBar('-> Analyze: [:bar] :percent :etas', { complete: '=', incomplete: ' ', width: 50, total: 100 })
   ;
 /**
  * It is mm
@@ -38,6 +38,7 @@ function start(config: imgToCode.config): Promise<{ data: imgToCode.startPromise
       return new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
           if (err) throw new Error(err.message);
+          console.log('-> Openping and reading...');
 
           _img.height = image.height();
           _img.width = image.width();
