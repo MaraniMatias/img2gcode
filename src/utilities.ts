@@ -89,10 +89,11 @@ export default class Utilities {
       let countBlack = 0;
       if (oldPixelBlack[0] === undefined) return false;
       for (let x = 0; x < oldPixelBlack.length; x++) {
-        if (oldPixelBlack[x].intensity > 10 || oldPixelBlack[x].be) { countBlack++; }
-        //else { countBlack--; }
+        if (oldPixelBlack[x].be) {
+          return false;
+        }
       }
-      return countBlack > pixelDiameter;
+      return true;
     } catch (error) {
       throw new Error(`AllBlack\n ${error}`);
     }

@@ -165,7 +165,7 @@ export class Main extends EventEmitter {
         let row = []
         for (let y = 0; y < image.height(); y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          row.push({ axes: { x, y }, intensity, be: intensity !== 0 });
+          row.push({ axes: { x, y }, intensity, be: intensity === 765 });
         }
         newArray.push(row);
       }
