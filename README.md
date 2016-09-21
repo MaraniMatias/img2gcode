@@ -1,14 +1,16 @@
 # Image to gCode
 Convert jpg, png, gif to gcode  with NodeJS and [lwip](https://www.npmjs.com/package/lwip#installation).
+
 Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
+
 There may be mistakes, I am working to accommodate.
 
-## Installation
+### Installation
 ```bash
 $ npm install img2gcode
 ```
 
-##  Quick Start
+## Quick Start
 Depending on the configuration between tool and image height generates better code.
 
 ```Javascript
@@ -80,9 +82,7 @@ img2gcode
   });
 ```
 
-![ej img2gcode](https://github.com/MaraniMatias/img2gcode/blob/dev/ej-img2gcode.jpeg)
-
-## License.
+### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
 Author:
 Marani Matias Ezequiel.
