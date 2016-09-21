@@ -31,10 +31,10 @@ var img2gcode = require("img2gcode");
 ```
 
 ### Options
-- `toolDiameter` (number) Image height in mm.
-- `scaleAxes` (number)
+- `toolDiameter` (number)
+- `scaleAxes` (number)  Image height in mm.
 - `deepStep` (number) Depth per pass.
-- `dirImg` (string)
+- `dirImg` (string) Image path, accepts JPG PNG GIF formats.
 - `whiteZ` (number) White pixels.
 - `blackZ` (number) Maximum depth (Black pixels).
 - `sevaZ` (number) Safe distance.
@@ -68,7 +68,7 @@ img2gcode
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 1,
-    info: "emitter", // ["none" | "console" | "emitter"]
+    info: "emitter", // "none" or "console" or "emitter"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })
   .on('log', (str) => {
