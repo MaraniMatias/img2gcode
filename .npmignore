@@ -3,3 +3,6 @@
 typings/
 tests/
 ej-img2gcode.jpeg
+*.ts
+gulpfile.js
+jsconfig.json
