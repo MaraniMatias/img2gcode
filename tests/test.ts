@@ -12,10 +12,12 @@ img2gcode
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 1,
+    log: "none", // ["none" | "console" | "emitter"] default: "none"
     dirImg: __dirname + '/img-and-gcode/test.png'
-  });
-
-img2gcode
+  })
+  .on('log', (str) => {
+    console.log(str);
+  })
   .on('tick', (data) => {
     bar.update(data)
   })
@@ -25,6 +27,10 @@ img2gcode
   .on('complete', (data) => {
     //console.log(data.config);
     //console.log(data.dirgcode);
-    //console.log("eror:", data.config.errBlackPixel);
+    console.log('complete');
+  })
+  .then((data) => {
+    //console.log(data.config);
+    //console.log(data.dirgcode);
     console.timeEnd('img2gcode');
   });

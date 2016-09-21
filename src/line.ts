@@ -2,14 +2,14 @@
  * Line
 */
 export default class Line {
-  private _sign: string = '-';
+  private _sign: string = '-';//en file esta como Y-
   /**
    * @param  {x?:number; y?:number; z?:number;} axes 
    * @param  {string} comment? 
    */
   constructor(axes: ImgToGCode.Axes, comment?: string) {
     this._axes = axes;
-    //this._sign = '-';
+    //this._sign = '-';//en file esta como Y-
     if (comment) { this._comment = comment; }
   }
 

@@ -5,7 +5,6 @@
 // ${fileDirname}: the current opened file's dirname
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
-
 // A task runner that calls the Typescript compiler (tsc) and
 /*{
   "version": "0.1.0",
@@ -27,18 +26,24 @@
       "problemMatcher": "$gulp-tsc"
     },
     {
-      "taskName": "buildTests",
+      "taskName": "build-tests",
       "isBuildCommand": true,
       "problemMatcher": "$tsc"
     },
     {
-      "taskName": "test",
+      "taskName": "tests",
+      "args": [],
+      "isTestCommand": true
+    }{
+      "taskName": "run-tests",
       "args": [],
       "isTestCommand": true
     },
     {
       "taskName": "watch",
-      "problemMatcher": ["$tsc"]
+      "problemMatcher": [
+        "$tsc"
+      ]
     }
   ]
 }

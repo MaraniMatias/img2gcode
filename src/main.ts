@@ -6,57 +6,47 @@ import * as lwip  from 'lwip';
 import {EventEmitter}  from 'events';
 
 export class Main extends EventEmitter {
+  private _typeLog: string = "none"; // ["none" | "console" | "emitter"]
+  private _then: Function;
   private _gCode: ImgToGCode.Line[] = [];
-  private _img: ImgToGCode.Image = {};
-  private _pixel: ImgToGCode.PixelToMM = {}; // 1 pixel es X mm
-  /**
-  * @param {number} nro 0 to 1
-  */
-  private tick(nro: number) { this.emit('tick', nro); }
-  private log(str: string) { this.emit('log', str); }
+  private _img: ImgToGCode.Image = { height: 0, width: 0, pixels: [] };
+  private _pixel: ImgToGCode.PixelToMM = { diameter: 1, toMm: 1 }; // 1 pixel es X mm
+
+  private tick(nro: number) {
+    if (this._typeLog === "console") {console.log(`${Utilities.round(nro)}%`);}
+    else if (this._typeLog === "emitter") {this.emit('tick', nro);}
+  }
+  private log(str: string) {
+    if (this._typeLog === "console") {console.log(str);}
+    else if (this._typeLog === "emitter") {this.emit('log', str);}
+  }
   private error(err: Error | string) {
-    this.emit('error', typeof (err) === "string" ? new Error(<string>err) : err);
+    let srt = typeof (err) === "string" ? new Error(<string>err) : err;
+    if (this._typeLog === "emitter") {this.emit('error', srt);}
+    else { throw srt; }
   }
 
-  /**
-   *It is mm
-   *
-   *@param {
-   *  toolDiameter: 2,
-   *  scaleAxes: 40,
-   *  deepStep: -1,
-   *  whiteZ: 0,
-   *  blackZ: -2,
-   *  sevaZ: 2,
-   *  dirImg:'./img/test.png'
-   *}
-   * @memberOf main
-   */
-  public start(config: ImgToGCode.Config) {
-    try {
+  public then(cb: Function): this {
+    this._then = cb;
+    return this;
+  }
+
+  public start(config: ImgToGCode.Config): this {
       this.log(`-> Image: ${config.dirImg}`);
+      this._typeLog = config.log;
+      this.run(config);
+      return this;
+  }
+
+  private run(config: ImgToGCode.Config) {
+    try {
       let self = this;
-      new Promise(function (fulfill, reject) {
-        lwip.open(config.dirImg, function (err: Error, image) {
-          if (err) self.error(err.message);
-          self.log('-> Openping and reading...');
-
-          self._img.height = image.height();
-          self._img.width = image.width();
-          self._img.pixels = self.getAllPixel(image);
-          self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height);
-          self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
-
-          config.errBlackPixel = Utilities.size(self._img.pixels);
-          config.imgSize = `(${self._img.height},${self._img.width})pixel to (${Utilities.round(self._img.height * self._pixel.toMm)},${Utilities.round(self._img.width * self._pixel.toMm)})mm`
-          fulfill(config);
+      this.loading(config).then((config: ImgToGCode.Config) => {
+        self.analyze(config, (dirgcode: string) => {
+          if (typeof self._then === "function") { self._then({ config, dirgcode }); }
+          if (self._typeLog === "emitter") { self.emit('complete', { dirgcode, config }); }
         });
-      })
-        .then((config: ImgToGCode.Config) => {
-          self.analyze(config, (dirgcode: string) => {
-            self.emit('complete', { dirgcode, config });
-          });
-        });
+      });
     } catch (err) {
       this.error(err);
     }
@@ -64,6 +54,7 @@ export class Main extends EventEmitter {
 
   private analyze(config: ImgToGCode.Config, fulfill: (dirGCode: string) => void) {
     try {
+      this.tick(0);
       let firstPixel: ImgToGCode.Pixel[][] = Analyze.getFirstPixel(this._img, this._pixel);
       this.addPixel({
         x: firstPixel[0][0].axes.x,
@@ -75,8 +66,8 @@ export class Main extends EventEmitter {
         this.tick(w / config.errBlackPixel);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
         if (!nexPixels) {
+          if (w / config.errBlackPixel < 1) { this.tick(1); }
           config.errBlackPixel = Utilities.round(Utilities.size(this._img.pixels) * 100 / config.errBlackPixel);
-          this.tick(1);
           this.log(`-> ${config.errBlackPixel}% of black pixels unprocessed.`);
           this.log("-> Accommodating gcode...");
           File.save(this._gCode, config).then((dirGCode: string) => {
@@ -91,6 +82,29 @@ export class Main extends EventEmitter {
     } catch (error) {
       this.error('Error processing image gcode, may be for settings.');
       console.error(error);
+    }
+  }
+
+  private loading(config: ImgToGCode.Config) {
+    try {
+      let self = this;
+      return new Promise(function (fulfill, reject) {
+        lwip.open(config.dirImg, function (err: Error, image) {
+          if (err) self.error(err.message);
+          self.log('-> Openping and reading...');
+          self._img.height = image.height();
+          self._img.width = image.width();
+          self._img.pixels = self.getAllPixel(image);
+          self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height);
+          self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
+
+          config.errBlackPixel = Utilities.size(self._img.pixels);
+          config.imgSize = `(${self._img.height},${self._img.width})pixel to (${Utilities.round(self._img.height * self._pixel.toMm)},${Utilities.round(self._img.width * self._pixel.toMm)})mm`
+          fulfill(config);
+        });
+      })
+    } catch (err) {
+      this.error(err);
     }
   }
 
@@ -141,10 +155,6 @@ export class Main extends EventEmitter {
     }
   }
 
-  /**
-   * @param {lwip.Image} image
-   * @returns {Pixel[][]}
-   */
   private getAllPixel(image: lwip.Image): ImgToGCode.Pixel[][] {
     try {
       function intensityFix(colour: lwip.ColorObject) {
@@ -166,4 +176,4 @@ export class Main extends EventEmitter {
     }
   }
 
-}// class
+}//class

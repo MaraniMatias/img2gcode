@@ -1,6 +1,5 @@
 // 0 X width
 // Y height
-// self = this;
 declare namespace ImgToGCode {
   export type ColorObject = { r: number, g: number, b: number, a?: number };
   export type Color = string | [number, number, number, number] | ColorObject;
@@ -18,6 +17,7 @@ declare namespace ImgToGCode {
     whiteZ: number;
     blackZ: number;
     sevaZ: number;
+    log: string; // ["none" | "console" | "emitter"]
   }
 
   export interface Image {
@@ -25,10 +25,6 @@ declare namespace ImgToGCode {
     width: number;
     pixels: Pixel[][];
   }
-  /*export interface startPromise {
-    config: config;
-    dirgcode: string;
-  }*/
 
   export class Line {
     constructor(axes: Axes, comment?: string);
@@ -36,6 +32,50 @@ declare namespace ImgToGCode {
     public axes: Axes;
     public comment: string;
     public code(step?: number): string;
+  }
+
+  export class Main {
+    /**
+* @param 
+*/
+    /**
+     * @param {string} event
+     *  event "tick" returns {number} nro 0 (0%) to 1 (100%)
+     *  event "init" returns {string}
+     *  event "log" returns {string}
+     *  event "error" returns {Error}
+     *  event "complete" returns { config: ImgToGCode.Config, dirgcode: string }
+     * @param {Function} listener
+     * @returns {this}
+     * 
+     * @memberOf Main
+     */
+    on(event: string, listener: Function): this;
+    /**
+      *It is mm
+      *
+      *@param {
+      *  toolDiameter: 2,
+      *  scaleAxes: 40,
+      *  deepStep: -1,
+      *  whiteZ: 0,
+      *  blackZ: -2,
+      *  sevaZ: 2,
+      *  log: ["none" | "console" | "emitter"],
+      *  dirImg:'./img/test.png'
+      *}
+      * @memberOf main
+    */
+    start(config: ImgToGCode.Config): this;
+    /**
+     * 
+     * 
+     * @param {({ config: ImgToGCode.Config, dirgcode: string })} cb
+     * @returns {this}
+     * 
+     * @memberOf Main
+     */
+    then(cb: ({ config: ImgToGCode.Config, dirgcode: string })): this;
   }
 
 }
