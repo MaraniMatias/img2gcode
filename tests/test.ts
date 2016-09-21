@@ -1,6 +1,6 @@
 import * as img2gcode from '../src/index.js';
 import * as ProgressBar  from 'progress';
-var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { complete: '=', incomplete: ' ', width: 50, total: 100 })
+var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { width: 50, total: 100 });
 
 console.time('img2gcode');
 
@@ -12,7 +12,7 @@ img2gcode
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 1,
-    log: "emitter", // ["none" | "console" | "emitter"] default: "none"
+    info: "emitter", // ["none" | "console" | "emitter"] default: "none"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })
   .on('log', (str) => {
