@@ -1,12 +1,13 @@
 // 0 X width
 // Y height
-declare namespace imgToCode {
+// self = this;
+declare namespace ImgToGCode {
   export type ColorObject = { r: number, g: number, b: number, a?: number };
   export type Color = string | [number, number, number, number] | ColorObject;
   export type Axes = { x?: number, y?: number, z?: number | boolean };
   export type Pixel = { intensity: number, axes: Axes, be: boolean };
-  export type PixelToMM = { diameter: number; toMm: number; } // 1 pixel es X mm
-  export type config = {
+  export type PixelToMM = { diameter: number; toMm: number; }; // 1 pixel es X mm
+  export type Config = {
     errBlackPixel?: number; //unprocessedBlackPixel
     toolDiameter: number;
     scaleAxes: number;
@@ -22,13 +23,12 @@ declare namespace imgToCode {
   export interface Image {
     height: number;
     width: number;
-    pixels: imgToCode.Pixel[][];
+    pixels: Pixel[][];
   }
-  export interface startPromise {
+  /*export interface startPromise {
     config: config;
     dirgcode: string;
-  }
-
+  }*/
 
   export class Line {
     constructor(axes: Axes, comment?: string);
@@ -37,7 +37,5 @@ declare namespace imgToCode {
     public comment: string;
     public code(step?: number): string;
   }
-
-  export function start(config: imgToCode.config): Promise<{}>
 
 }

@@ -2,31 +2,17 @@ import * as path  from 'path';
 import * as fs from "fs";
 
 export default
- /**
- * File
- */
-class File {
-
   /**
-   * Creates an instance of File.
-   * 
-   * @param {string[]} [gCodeInit]
-   */
-  constructor( gCodeInit ?:string[] ) {
-    if(gCodeInit){
-      this._gCodeInit = gCodeInit;
-    }else{
-      this._gCodeInit = [
-        ";---> this code is for cnc-ino <---",
-        'G21 ; Set units to mm',
-        'G90 ; Absolute positioning'
-      ]
-    }
-  }
-  
-  private _gCodeInit: string[];
+  * File
+  */
+  class File {
+  private static _gCodeInit: string[] = [
+    ";---> this code is for cnc-ino <---",
+    'G21 ; Set units to mm',
+    'G90 ; Absolute positioning'
+  ]
 
-  private concat(gcode: imgToCode.Line[],config: imgToCode.config): string[] {
+  private static concat(gcode: ImgToGCode.Line[], config: ImgToGCode.Config): string[] {
     try {
       let totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
       for (let count = 0, step = config.deepStep; count < totalStep; count++ , step = step + config.deepStep) {
@@ -52,7 +38,7 @@ class File {
    * @param {string} dirGCode path the gCode file
    * @param {Line[]} gCode array de lineas para converti en gcode
    */
-  public save(gcode: imgToCode.Line[], config: imgToCode.config) {
+  public static save(gcode: ImgToGCode.Line[], config: ImgToGCode.Config) {
     var self = this;
     return new Promise(function (fulfill, reject) {
       try {
@@ -78,7 +64,7 @@ class File {
     });
   }
 
-  private writeFile(dirgcode: string, data: string ) {
+  private static writeFile(dirgcode: string, data: string) {
     return new Promise(function (fulfill, reject) {
       fs.unlink(dirgcode, (err) => {
         fs.writeFile(dirgcode, data, { encoding: "utf8" }, (err) => {
