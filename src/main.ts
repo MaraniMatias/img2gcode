@@ -6,23 +6,23 @@ import * as lwip  from 'lwip';
 import {EventEmitter}  from 'events';
 
 export class Main extends EventEmitter {
-  private _typeLog: string = "none"; // ["none" | "console" | "emitter"]
+  private _typeInfo: string = "none"; // ["none" | "console" | "emitter"]
   private _then: Function;
   private _gCode: ImgToGCode.Line[] = [];
   private _img: ImgToGCode.Image = { height: 0, width: 0, pixels: [] };
   private _pixel: ImgToGCode.PixelToMM = { diameter: 1, toMm: 1 }; // 1 pixel es X mm
 
   private tick(nro: number) {
-    if (this._typeLog === "console") {console.log(`${Utilities.round(nro)}%`);}
-    else if (this._typeLog === "emitter") {this.emit('tick', nro);}
+    if (this._typeInfo === "console") {console.log(`${Utilities.round(nro)}%`);}
+    else if (this._typeInfo === "emitter") {this.emit('tick', nro);}
   }
   private log(str: string) {
-    if (this._typeLog === "console") {console.log(str);}
-    else if (this._typeLog === "emitter") {this.emit('log', str);}
+    if (this._typeInfo === "console") {console.log(str);}
+    else if (this._typeInfo === "emitter") {this.emit('log', str);}
   }
   private error(err: Error | string) {
     let srt = typeof (err) === "string" ? new Error(<string>err) : err;
-    if (this._typeLog === "emitter") {this.emit('error', srt);}
+    if (this._typeInfo === "emitter") {this.emit('error', srt);}
     else { throw srt; }
   }
 
@@ -33,7 +33,7 @@ export class Main extends EventEmitter {
 
   public start(config: ImgToGCode.Config): this {
       this.log(`-> Image: ${config.dirImg}`);
-      this._typeLog = config.log;
+      this._typeInfo = config.info;
       this.run(config);
       return this;
   }
@@ -44,7 +44,7 @@ export class Main extends EventEmitter {
       this.loading(config).then((config: ImgToGCode.Config) => {
         self.analyze(config, (dirgcode: string) => {
           if (typeof self._then === "function") { self._then({ config, dirgcode }); }
-          if (self._typeLog === "emitter") { self.emit('complete', { dirgcode, config }); }
+          if (self._typeInfo === "emitter") { self.emit('complete', { dirgcode, config }); }
         });
       });
     } catch (err) {

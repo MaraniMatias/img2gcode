@@ -12,7 +12,7 @@ img2gcode
     whiteZ: 0,
     blackZ: -2,
     sevaZ: 1,
-    log: "none", // ["none" | "console" | "emitter"] default: "none"
+    log: "emitter", // ["none" | "console" | "emitter"] default: "none"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })
   .on('log', (str) => {

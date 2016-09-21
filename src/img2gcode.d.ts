@@ -17,7 +17,7 @@ declare namespace ImgToGCode {
     whiteZ: number;
     blackZ: number;
     sevaZ: number;
-    log: string; // ["none" | "console" | "emitter"]
+    info?: string; // ["none" | "console" | "emitter"]
   }
 
   export interface Image {
@@ -61,7 +61,7 @@ declare namespace ImgToGCode {
       *  whiteZ: 0,
       *  blackZ: -2,
       *  sevaZ: 2,
-      *  log: ["none" | "console" | "emitter"],
+      *  info: ["none" | "console" | "emitter"],
       *  dirImg:'./img/test.png'
       *}
       * @memberOf main
