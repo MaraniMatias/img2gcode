@@ -57,7 +57,6 @@ var img2gcode = require("img2gcode");
 ```Javascript
 var img2gcode = require("img2gcode");
 var ProgressBar = require("progress"); // npm install progress
-
 var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { total: 100 });
 
 img2gcode
