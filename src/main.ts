@@ -13,16 +13,16 @@ export class Main extends EventEmitter {
   private _pixel: ImgToGCode.PixelToMM = { diameter: 1, toMm: 1 }; // 1 pixel es X mm
 
   private tick(nro: number) {
-    if (this._typeInfo === "console") {console.log(`${Utilities.round(nro)}%`);}
-    else if (this._typeInfo === "emitter") {this.emit('tick', nro);}
+    if (this._typeInfo === "console") { console.log(`${Utilities.round(nro)}%`); }
+    else if (this._typeInfo === "emitter") { this.emit('tick', nro); }
   }
   private log(str: string) {
-    if (this._typeInfo === "console") {console.log(str);}
-    else if (this._typeInfo === "emitter") {this.emit('log', str);}
+    if (this._typeInfo === "console") { console.log(str); }
+    else if (this._typeInfo === "emitter") { this.emit('log', str); }
   }
   private error(err: Error | string) {
     let srt = typeof (err) === "string" ? new Error(<string>err) : err;
-    if (this._typeInfo === "emitter") {this.emit('error', srt);}
+    if (this._typeInfo === "emitter") { this.emit('error', srt); }
     else { throw srt; }
   }
 
@@ -32,10 +32,10 @@ export class Main extends EventEmitter {
   }
 
   public start(config: ImgToGCode.Config): this {
-      this.log(`-> Image: ${config.dirImg}`);
-      this._typeInfo = config.info;
-      this.run(config);
-      return this;
+    this.log(`-> Image: ${config.dirImg}`);
+    this._typeInfo = config.info || "none";
+    this.run(config);
+    return this;
   }
 
   private run(config: ImgToGCode.Config) {
