@@ -67,9 +67,9 @@ export default
   private static writeFile(dirgcode: string, data: string) {
     return new Promise(function (fulfill, reject) {
       fs.unlink(dirgcode, (err) => {
-        fs.writeFile(dirgcode, data, { encoding: "utf8" }, (err) => {
+        fs.writeFile(path.resolve(dirgcode), data, { encoding: "utf8" }, (err) => {
           if (err) reject(err);
-          else fulfill(dirgcode);
+          else fulfill(path.resolve(dirgcode));
         });
       });
     });
