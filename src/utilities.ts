@@ -16,8 +16,8 @@ export default class Utilities {
   public static size(arr: ImgToGCode.Pixel[][]): number {
     try {
       let size = 0;
-      for (let x = 0; x < arr.length; x++) {
-        for (let y = 0; y < arr[x].length; y++) {
+      for (let x = 0, xl = arr.length; x < xl; x++) {
+        for (let y = 0, yl = arr[x].length; y < yl; y++) {
           if (arr[x][y].intensity < 765 && !arr[x][y].be) size++;
         }
       }
@@ -46,8 +46,8 @@ export default class Utilities {
       // tener ecuenta el paso ??
       // diameter tener encuenta ???
       let arrNewPixel = this.pixelEnds(newPixel), arrOldPixel = this.pixelEnds(oldPixel);
-      for (let ix = 0; ix < arrNewPixel.length; ix++) {
-        for (let iy = 0; iy < arrOldPixel.length; iy++) {
+      for (let ix = 0, xl = arrNewPixel.length; ix < xl; ix++) {
+        for (let iy = 0, yl = arrOldPixel.length; iy < yl; iy++) {
           let disX = arrNewPixel[ix].axes.x - arrOldPixel[iy].axes.x;
           let disY = arrNewPixel[ix].axes.y - arrOldPixel[iy].axes.y;
           return (disY === 1 && disX === 1) || (disY === 1 && disX === -1) ||
@@ -64,11 +64,11 @@ export default class Utilities {
 
   public static appliedAllPixel(arr: ImgToGCode.Pixel[][], cb: (pixel: ImgToGCode.Pixel, iRow: number, iColumn?: number) => void) {
     try {
-      for (let iRow = 0; iRow < arr.length; iRow++) {
+      for (let iRow = 0, rl = arr.length; iRow < rl; iRow++) {
         if (arr[iRow].length === 1) {
           cb(arr[iRow][0], iRow);
         }
-        for (let iColumn = 0; iColumn < arr[iRow].length - 1; iColumn++) {
+        for (let iColumn = 0, cl = arr[iRow].length - 1; iColumn < cl; iColumn++) {
           cb(arr[iRow][iColumn], iRow, iColumn);
         }
       }
@@ -88,7 +88,7 @@ export default class Utilities {
     try {
       let countBlack = 0;
       if (oldPixelBlack[0] === undefined) return false;
-      for (let x = 0; x < oldPixelBlack.length; x++) {
+      for (let x = 0, l = oldPixelBlack.length; x < l; x++) {
         if (oldPixelBlack[x].be) {
           return false;
         }
@@ -108,8 +108,8 @@ public static nearest(oldPixel: ImgToGCode.Pixel[][], newPixel1: ImgToGCode.Pixe
 
     function nearestPoint(oldArr: ImgToGCode.Pixel[], newArr: ImgToGCode.Pixel[]): number {
       let nearest = null;
-      for (let ix = 0; ix < arrPixel1.length; ix++) {
-        for (let iy = 0; iy < arrOldPixel.length; iy++) {
+      for (let ix = 0, xl = arrPixel1.length; ix < xl; ix++) {
+        for (let iy = 0, yl = arrOldPixel.length; iy < yl; iy++) {
           let disX = arrPixel1[ix].axes.x - arrOldPixel[iy].axes.x;
           let disY = arrPixel1[ix].axes.y - arrOldPixel[iy].axes.y;
           let dis = disX * (disX > 0 ? 1 : -1) + disY * (disY > 0 ? 1 : -1);

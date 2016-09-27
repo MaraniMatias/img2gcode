@@ -35,4 +35,4 @@ img2gcode
     console.timeEnd('img2gcode');
   });
 
-// 46365,7246ms
+// 38837,9926ms

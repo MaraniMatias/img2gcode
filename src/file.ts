@@ -15,10 +15,9 @@ export default
   private static concat(gcode: ImgToGCode.Line[], config: ImgToGCode.Config): string[] {
     try {
       let totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
-      for (let count = 0, step = config.deepStep; count < totalStep; count++ , step = step + config.deepStep) {
-        for (let index = 0; index < gcode.length; index++) {
-          let e = gcode[index];
-          this._gCodeInit.push(e.code(step));
+      for (let count = 0, c = config.deepStep, step = c; count < totalStep; count++ , step = step + config.deepStep) {
+        for (let index = 0, x = gcode.length; index < x; index++) {
+          this._gCodeInit.push(gcode[index].code(step));
         }
         let e = gcode[gcode.length - 1];
         let x = e.axes.x ? ' X' + e.axes.x : '';

@@ -22,9 +22,9 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
-    "gulp-tsb": "^1.10.4",
+    "gulp-tsb": "^2.0.1",
     "progress": "^1.1.8",
-    "typescript": "^1.8.10"
+    "typescript": "^2.0.3"
   },
   "keywords": [
     "img",

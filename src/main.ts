@@ -161,9 +161,9 @@ export class Main extends EventEmitter {
         return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1) < 10 ? 0 : 765;
       }
       let newArray = [];
-      for (let x = 0; x < image.width(); x++) {
+      for (let x = 0, xl = image.width(); x < xl; x++) {
         let row = []
-        for (let y = 0; y < image.height(); y++) {
+        for (let y = 0, yl = image.height(); y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
           row.push({ axes: { x, y }, intensity, be: intensity === 765 });
         }
