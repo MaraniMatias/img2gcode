@@ -33,6 +33,12 @@ export class Main extends EventEmitter {
 
   public start(config: ImgToGCode.Config): this {
     this.log(`-> Image: ${config.dirImg}`);
+    config.toolDiameter || this.error('toolDiameter undefined');
+    config.blackZ || this.error('black distance z undefined');
+    config.safeZ || this.error('safe distance z undefined');
+    config.dirImg || this.error('Address undefined Image');
+    config.deepStep = config.deepStep || -1;
+    config.whiteZ = config.whiteZ || -0;
     this._typeInfo = config.info || "none";
     this.run(config);
     return this;
@@ -59,7 +65,7 @@ export class Main extends EventEmitter {
       this.addPixel({
         x: firstPixel[0][0].axes.x,
         y: firstPixel[0][0].axes.y
-      }, config.sevaZ);
+      }, config.safeZ);
 
       let w = 0;
       while (w <= config.errBlackPixel) {
@@ -76,7 +82,7 @@ export class Main extends EventEmitter {
           });
           break;
         }
-        firstPixel = this.toGCode(firstPixel, nexPixels, { sevaZ: config.sevaZ, whiteZ: config.whiteZ, blackZ: config.blackZ });
+        firstPixel = this.toGCode(firstPixel, nexPixels, { sevaZ: config.safeZ, whiteZ: config.whiteZ, blackZ: config.blackZ });
         w++;
       }
     } catch (error) {
@@ -95,7 +101,7 @@ export class Main extends EventEmitter {
           self._img.height = image.height();
           self._img.width = image.width();
           self._img.pixels = self.getAllPixel(image);
-          self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height);
+          self._pixel.toMm = config.scaleAxes ? 1 : Utilities.round(config.scaleAxes / self._img.height);
           self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
@@ -116,19 +122,19 @@ export class Main extends EventEmitter {
         this.addPixel({
           x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
           y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), save: false }
+          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
         });
       } else {
         this.addPixel({
-          z: { val: Z.sevaZ, save: true }
+          z: { val: Z.sevaZ, safe: true }
         });
         this.addPixel({
           x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
           y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-          z: { val: Z.sevaZ, save: true }
+          z: { val: Z.sevaZ, safe: true }
         });
         this.addPixel({
-          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), save: false }
+          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
         });
       }
 
@@ -146,8 +152,8 @@ export class Main extends EventEmitter {
       let X = axes.x ? (axes.x + sum) * this._pixel.toMm : undefined;
       let Y = axes.y ? (axes.y + sum) * this._pixel.toMm : undefined;
       if (this._gCode.length === 0) {
-        this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, save: true } }, `X0 Y0 Z${sevaZ} Line Init`));
-        this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, save: true } }, 'With Z max '));
+        this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, safe: true } }, `X0 Y0 Z${sevaZ} Line Init`));
+        this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, safe: true } }, 'With Z max '));
       }
       this._gCode.push(new Line({ x: X, y: Y, z: axes.z }));
     } catch (error) {

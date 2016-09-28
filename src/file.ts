@@ -22,9 +22,9 @@ export default
         let e = gcode[gcode.length - 1];
         let x = e.axes.x ? ' X' + e.axes.x : '';
         let y = e.axes.y ? ' Y-' + e.axes.y : '';
-        this._gCodeInit.push(`G01${x}${y} Z${config.sevaZ}; With new deep step`);
+        this._gCodeInit.push(`G01${x}${y} Z${config.safeZ}; With new deep step`);
       }
-      this._gCodeInit.push(`G01 Z${config.sevaZ}; With Z max`);
+      this._gCodeInit.push(`G01 Z${config.safeZ}; With Z max`);
       return this._gCodeInit;
     } catch (error) {
       throw error
@@ -51,7 +51,7 @@ export default
           `; Tool Diameter: ${config.toolDiameter}`,
           `; Scale Axes: ${config.scaleAxes}`,
           `; Deep Step: ${config.deepStep}`,
-          `; Z Save: ${config.sevaZ}`,
+          `; Z Save: ${config.safeZ}`,
           `; Z White: ${config.whiteZ}`,
           `; Z Black: ${config.blackZ}`
         );

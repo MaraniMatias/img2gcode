@@ -3,7 +3,7 @@
 declare namespace ImgToGCode {
   export type ColorObject = { r: number, g: number, b: number, a?: number };
   export type Color = string | [number, number, number, number] | ColorObject;
-  export type Axes = { x?: number, y?: number, z?: { val: number, save: boolean } };
+  export type Axes = { x?: number, y?: number, z?: { val: number, safe: boolean } };
   export type Pixel = { intensity: number, axes: Axes, be: boolean };
   export type PixelToMM = { diameter: number; toMm: number; }; // 1 pixel es X mm
   export type Config = {
@@ -16,7 +16,7 @@ declare namespace ImgToGCode {
     dirImg: string;
     whiteZ: number;
     blackZ: number;
-    sevaZ: number;
+    safeZ: number;
     info?: string; // ["none" | "console" | "emitter"]
   }
 
