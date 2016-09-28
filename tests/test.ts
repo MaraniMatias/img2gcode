@@ -34,5 +34,3 @@ img2gcode
     //console.log(data.dirgcode);
     console.timeEnd('img2gcode');
   });
-
-// 38837,9926ms

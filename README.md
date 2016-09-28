@@ -32,10 +32,10 @@ var img2gcode = require("img2gcode");
 
 ### Options
 - `toolDiameter` (number)
-- `scaleAxes` (number)  Image height in mm.
-- `deepStep` (number) Depth per pass.
+- `scaleAxes` (number)  Image height in mm. default: image.height equal mm
+- `deepStep` (number) Depth per pass. default: -1
 - `dirImg` (string) Image path, accepts JPG PNG GIF formats.
-- `whiteZ` (number) White pixels.
+- `whiteZ` (number) White pixels. default: 0
 - `blackZ` (number) Maximum depth (Black pixels).
 - `sevaZ` (number) Safe distance.
 - `info` (string) Displays information. ["none" | "console" | "emitter"] default: none

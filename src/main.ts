@@ -38,7 +38,7 @@ export class Main extends EventEmitter {
     config.safeZ || this.error('safe distance z undefined');
     config.dirImg || this.error('Address undefined Image');
     config.deepStep = config.deepStep || -1;
-    config.whiteZ = config.whiteZ || -0;
+    config.whiteZ = config.whiteZ || 0;
     this._typeInfo = config.info || "none";
     this.run(config);
     return this;
@@ -100,9 +100,10 @@ export class Main extends EventEmitter {
           self.log('-> Openping and reading...');
           self._img.height = image.height();
           self._img.width = image.width();
-          self._img.pixels = self.getAllPixel(image);
-          self._pixel.toMm = config.scaleAxes ? 1 : Utilities.round(config.scaleAxes / self._img.height);
+
+          self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
           self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
+          self._img.pixels = self.getAllPixel(image);
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
           config.imgSize = `(${self._img.height},${self._img.width})pixel to (${Utilities.round(self._img.height * self._pixel.toMm)},${Utilities.round(self._img.width * self._pixel.toMm)})mm`
@@ -172,7 +173,7 @@ export class Main extends EventEmitter {
         let row = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          row.push({ axes: { x, y }, intensity, be: intensity > 755 });
+          row.push({ axes: { x, y }, intensity, be: intensity >= 755 });
         }
         newArray.push(row);
       }
