@@ -30,12 +30,11 @@ export default class Line {
    * code
    * Arma code for that line with data
    */
-  public code(step?: number): string {
+  public code(percentage: number): string {
     let x = this._axes.x !== undefined ? ` X${this._axes.x}` : '';
     let y = this._axes.y !== undefined ? ` Y${this._sign}${this._axes.y}` : '';
-    let z = this._axes.z !== undefined ? ` Z${this._axes.z}` : '';
+    let z = this._axes.z !== undefined ? ` Z${this._axes.z.save ? this._axes.z.val : this._axes.z.val * percentage}` : '';
     let comment = this._comment ? `; ${this._comment}` : '';
-    let s = this._axes.z ? z : ` Z${step}`;
-    return "G01" + x + y + s + comment;
+    return "G01" + x + y + z + comment;
   }
 }

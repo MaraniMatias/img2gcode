@@ -76,11 +76,11 @@ export class Main extends EventEmitter {
           });
           break;
         }
-        firstPixel = this.toGCode(firstPixel, nexPixels, config.sevaZ);
+        firstPixel = this.toGCode(firstPixel, nexPixels, { sevaZ: config.sevaZ, whiteZ: config.whiteZ, blackZ: config.blackZ });
         w++;
       }
     } catch (error) {
-      this.error('Error processing image gcode, may be for settings.');
+      this.error('\nError processing image gcode, may be for settings.');
       console.error(error);
     }
   }
@@ -108,26 +108,27 @@ export class Main extends EventEmitter {
     }
   }
 
-  private toGCode(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][], sevaZ: number): ImgToGCode.Pixel[][] {
+
+  private toGCode(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][], Z: { sevaZ: number; blackZ: number; whiteZ: number; }): ImgToGCode.Pixel[][] {
     try {
       let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
       if (Utilities.distanceIsOne(oldPixel, newPixel)) {
         this.addPixel({
           x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
           y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-          z: false
+          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), save: false }
         });
       } else {
         this.addPixel({
-          z: sevaZ
+          z: { val: Z.sevaZ, save: true }
         });
         this.addPixel({
           x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
           y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
-          z: sevaZ
+          z: { val: Z.sevaZ, save: true }
         });
         this.addPixel({
-          z: false
+          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), save: false }
         });
       }
 
@@ -139,14 +140,14 @@ export class Main extends EventEmitter {
     }
   }
 
-  private addPixel(axes: ImgToGCode.Axes, sevaZ?: number | boolean) {
+  private addPixel(axes: ImgToGCode.Axes, sevaZ?: number) {
     try {
       let sum = this._pixel.diameter / 2;
       let X = axes.x ? (axes.x + sum) * this._pixel.toMm : undefined;
       let Y = axes.y ? (axes.y + sum) * this._pixel.toMm : undefined;
       if (this._gCode.length === 0) {
-        this._gCode.push(new Line({ x: 0, y: 0, z: sevaZ }, `X0 Y0 Z${sevaZ} Line Init`));
-        this._gCode.push(new Line({ x: X, y: Y, z: sevaZ }, 'With Z max '));
+        this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, save: true } }, `X0 Y0 Z${sevaZ} Line Init`));
+        this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, save: true } }, 'With Z max '));
       }
       this._gCode.push(new Line({ x: X, y: Y, z: axes.z }));
     } catch (error) {
@@ -158,6 +159,7 @@ export class Main extends EventEmitter {
   private getAllPixel(image: lwip.Image): ImgToGCode.Pixel[][] {
     try {
       function intensityFix(colour: lwip.ColorObject) {
+        //return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
         return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1) < 10 ? 0 : 765;
       }
       let newArray = [];
@@ -165,6 +167,7 @@ export class Main extends EventEmitter {
         let row = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
+          //row.push({ axes: { x, y }, intensity: inte>750?inte:765, be: inte>750?false:true });
           row.push({ axes: { x, y }, intensity, be: intensity === 765 });
         }
         newArray.push(row);

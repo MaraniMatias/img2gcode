@@ -135,6 +135,6 @@ public static resolveZ(pixels: ImgToGCode.Pixel[][], whiteZ: number, blackZ: num
     }
     return intensity / (l * l);
   }
-  return avgIntensity() * 0.1307189542 * (blackZ - whiteZ) / 100;
+  return -((avgIntensity() * blackZ / 765) - blackZ)
 }
 }// class
