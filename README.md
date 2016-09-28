@@ -22,7 +22,7 @@ var img2gcode = require("img2gcode");
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
-    sevaZ: 2,
+    safeZ: 2,
     dirImg:__dirname+'/img-and-gcode/test.jpeg'
   }).then((data) => {
     console.log(data.config);
@@ -37,7 +37,7 @@ var img2gcode = require("img2gcode");
 - `dirImg` (string) Image path, accepts JPG PNG GIF formats.
 - `whiteZ` (number) White pixels. default: 0
 - `blackZ` (number) Maximum depth (Black pixels).
-- `sevaZ` (number) Safe distance.
+- `safeZ` (number) Safe distance.
 - `info` (string) Displays information. ["none" | "console" | "emitter"] default: none
 
 ### Events
@@ -66,7 +66,7 @@ img2gcode
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
-    sevaZ: 1,
+    safeZ: 1,
     info: "emitter", // "none" or "console" or "emitter"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })

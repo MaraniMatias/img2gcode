@@ -11,7 +11,7 @@ img2gcode
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -2,
-    safeZ: 1, 
+    safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })
