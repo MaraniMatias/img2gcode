@@ -165,16 +165,14 @@ export class Main extends EventEmitter {
   private getAllPixel(image: lwip.Image): ImgToGCode.Pixel[][] {
     try {
       function intensityFix(colour: lwip.ColorObject) {
-        //return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
-        return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1) < 10 ? 0 : 765;
+        return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
       }
       let newArray = [];
       for (let x = 0, xl = this._img.width; x < xl; x++) {
         let row = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          //row.push({ axes: { x, y }, intensity: inte>750?inte:765, be: inte>750?false:true });
-          row.push({ axes: { x, y }, intensity, be: intensity === 765 });
+          row.push({ axes: { x, y }, intensity: intensity <= 750 ? intensity : 765, be: intensity > 750 });
         }
         newArray.push(row);
       }

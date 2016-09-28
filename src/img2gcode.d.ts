@@ -9,12 +9,12 @@ declare namespace ImgToGCode {
   export type Config = {
     errBlackPixel?: number; //unprocessedBlackPixel
     toolDiameter: number;
-    scaleAxes: number;
-    deepStep: number;
+    scaleAxes?: number;
+    deepStep?: number;
     imgSize?: string;
     //analyzeLevel:number;
     dirImg: string;
-    whiteZ: number;
+    whiteZ?: number;
     blackZ: number;
     safeZ: number;
     info?: string; // ["none" | "console" | "emitter"]
