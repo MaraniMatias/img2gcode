@@ -1,6 +1,14 @@
 import Utilities from "./utilities";
 export default class Analyze {
 
+  private static _progress: number;
+  public static get progress(): number {
+    return this._progress;
+  }
+  public static set progress(v: number) {
+    this._progress = v;
+  }
+
   /**
    * Si esta definido oldPixelBlack devuelve el pixel mas cercano a este.
    *
@@ -26,6 +34,7 @@ export default class Analyze {
     try {
       for (let x = 0, xl = image.pixels.length; x < xl; x++) {
         for (let y = 0, yl = image.pixels[x].length; y < yl; y++) {
+          if (this.progress < x * y) this.progress = x * y;
           let pixels: ImgToGCode.Pixel[][] = [],
             diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
           if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {
@@ -60,6 +69,7 @@ export default class Analyze {
     try {
       for (let x = 0; x < image.pixels[x].length - 1; x++) {
         for (let y = 0, yl = image.pixels.length - 1; y < yl; y++) {
+          if (this.progress < x * y) this.progress = x * y;
           let pixels: ImgToGCode.Pixel[][] = [],
             diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
           if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {

@@ -47,6 +47,7 @@ export class Main extends EventEmitter {
   private run(config: ImgToGCode.Config) {
     try {
       let self = this;
+      Analyze.progress = 0;
       this.loading(config).then((config: ImgToGCode.Config) => {
         self.analyze(config, (dirgcode: string) => {
           if (typeof self._then === "function") { self._then({ config, dirgcode }); }
@@ -67,12 +68,12 @@ export class Main extends EventEmitter {
         y: firstPixel[0][0].axes.y
       }, config.safeZ);
 
-      let w = 0;
+      let w = 0, size = this._img.height * this._img.width;
       while (w <= config.errBlackPixel) {
-        this.tick(w / config.errBlackPixel);
+        this.tick(Analyze.progress / size);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
         if (!nexPixels) {
-          if (w / config.errBlackPixel < 1) { this.tick(1); }
+          this.tick(1);
           config.errBlackPixel = Utilities.round(Utilities.size(this._img.pixels) * 100 / config.errBlackPixel);
           this.log(`-> ${config.errBlackPixel}% of black pixels unprocessed.`);
           this.log("-> Accommodating gcode...");

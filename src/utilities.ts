@@ -13,7 +13,7 @@ export default class Utilities {
    * @param {Array} arr
    * @returns {number} size of array
    */
-  public static size(arr: ImgToGCode.Pixel[][], all: boolean): number {
+  public static size(arr: ImgToGCode.Pixel[][], all?: boolean): number {
     try {
       let size = 0;
       for (let x = 0, xl = arr.length; x < xl; x++) {
