@@ -152,8 +152,8 @@ export class Main extends EventEmitter {
   private addPixel(axes: ImgToGCode.Axes, sevaZ?: number) {
     try {
       let sum = this._pixel.diameter / 2;
-      let X = axes.x ? (axes.x + sum) * this._pixel.toMm : undefined;
-      let Y = axes.y ? (axes.y + sum) * this._pixel.toMm : undefined;
+      let X = axes.x && (axes.x + sum) * this._pixel.toMm;
+      let Y = axes.y && (axes.y + sum) * this._pixel.toMm;
       if (this._gCode.length === 0) {
         this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, safe: true } }, `X0 Y0 Z${sevaZ} Line Init`));
         this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, safe: true } }, 'With Z max '));
