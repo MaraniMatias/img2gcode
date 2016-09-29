@@ -25,6 +25,7 @@ export default
         this._gCodeInit.push(`G01${x}${y} Z${config.safeZ}; With new deep step`);
       }
       this._gCodeInit.push(`G01 Z${config.safeZ}; With Z max`);
+      this._gCodeInit.push(`;Generated in ${ (+new Date() - config.time)/1000 } sec.`);
       return this._gCodeInit;
     } catch (error) {
       throw error

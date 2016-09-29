@@ -39,6 +39,7 @@ export class Main extends EventEmitter {
     config.dirImg || this.error('Address undefined Image');
     config.deepStep = config.deepStep || -1;
     config.whiteZ = config.whiteZ || 0;
+    config.time = +new Date();
     this._typeInfo = config.info || "none";
     this.run(config);
     return this;

@@ -18,6 +18,7 @@ declare namespace ImgToGCode {
     blackZ: number;
     safeZ: number;
     info?: string; // ["none" | "console" | "emitter"]
+    time?: number;
   }
 
   export interface Image {

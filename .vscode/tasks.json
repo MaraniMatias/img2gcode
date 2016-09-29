@@ -36,7 +36,8 @@
       "taskName": "tests",
       "args": [],
       "isTestCommand": true
-    },{
+    },
+    {
       "taskName": "run-tests",
       "args": [],
       "isTestCommand": true
