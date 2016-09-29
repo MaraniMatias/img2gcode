@@ -23,18 +23,20 @@
     {
       "taskName": "build",
       "isBuildCommand": true,
+      "showOutput": "never",
       "problemMatcher": "$gulp-tsc"
     },
     {
       "taskName": "build-tests",
       "isBuildCommand": true,
+      "showOutput": "never",
       "problemMatcher": "$tsc"
     },
     {
       "taskName": "tests",
       "args": [],
       "isTestCommand": true
-    }{
+    },{
       "taskName": "run-tests",
       "args": [],
       "isTestCommand": true

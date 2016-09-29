@@ -13,7 +13,7 @@ img2gcode
     blackZ: -2,
     safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/test.png'
+    dirImg: __dirname + '/img-and-gcode/test.jpeg'
   })
   .on('log', (str) => {
     console.log(str);
