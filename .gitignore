@@ -22,11 +22,10 @@ app/components/
 *.old.*
 old/
 docs/
-g-code/jscut_svg2gcode/
-g-code/jscut_svg2gcode/bower_components/
 build-serialport/
 *.html
 _sample/
 src/*.js
 tests/*.js
 *.map
+*.gcode
