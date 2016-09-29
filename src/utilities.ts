@@ -31,19 +31,45 @@ export default class Utilities {
   public static pixelEnds(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[] {
     try {
       let arrNewPixel: ImgToGCode.Pixel[] = [];
-      arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
       arrNewPixel.push(newPixel[0][0]);
       arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
       arrNewPixel.push(newPixel[newPixel.length - 1][0]);
+      arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
+
+console.log(
+  newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.x
+  , 'mx', newPixel[0][0].axes.x
+  , (newPixel[0][newPixel[newPixel.length - 1].length - 1].axes.x - newPixel[0][0].axes.x) / 2
+  , ';',
+  newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.y
+  , 'my', newPixel[0][0].axes.y
+  , (newPixel[0][newPixel[newPixel.length - 1].length - 1].axes.y - newPixel[0][0].axes.y) / 2
+);
+
       return arrNewPixel
     } catch (error) {
       throw error;
     }
-
   }
 
   public static distanceIsOne(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][]): boolean {
     try {
+/*
+            let sum = this._pixel.diameter / 2;
+            let X = axes.x && (axes.x + sum) * this._pixel.toMm;
+            let Y = axes.y && (axes.y + sum) * this._pixel.toMm;
+
+            let diameter = oldPixel.length / 2;
+            let oldPixelDis = {
+              x:
+              y:
+            };
+            let newPixelDis = {
+              x:
+              y:
+            };
+*/
+
       // tener ecuenta el paso ??
       // diameter tener encuenta ???
       let arrNewPixel = this.pixelEnds(newPixel), arrOldPixel = this.pixelEnds(oldPixel);
@@ -58,6 +84,7 @@ export default class Utilities {
             (disX === 0 && disY === 0)
         }
       }
+
     } catch (error) {
       throw new Error(`DistanceIsOne\n ${error}`);
     }
