@@ -41,7 +41,7 @@ export default class Analyze {
               }
               pixels.push(row);
             }
-            if (pixels[0].length === diameter && pixels[pixels.length - 1].length === diameter) {
+            if (Utilities.size(pixels, true) === diameter * diameter) {
               return pixels;
             }
           }
@@ -59,7 +59,7 @@ export default class Analyze {
   private static getFirstPixelHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     try {
       for (let x = 0; x < image.pixels[x].length - 1; x++) {
-        for (let y = 0,yl=image.pixels.length - 1; y < yl; y++) {
+        for (let y = 0, yl = image.pixels.length - 1; y < yl; y++) {
           let pixels: ImgToGCode.Pixel[][] = [],
             diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
           if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {
@@ -75,7 +75,7 @@ export default class Analyze {
               }
               pixels.push(row);
             }
-            if (pixels[0].length === diameter && pixels[pixels.length - 1].length === diameter) {
+            if (Utilities.size(pixels, true) === diameter * diameter) {
               return pixels;
             }
           }
@@ -116,7 +116,7 @@ export default class Analyze {
     function lootAtLeft(oldPixelBlack: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[] {
       try {
         let pixels: ImgToGCode.Pixel[] = [];
-        for (let iColumn = 0,l=oldPixelBlack[0].length; iColumn < l; iColumn++) {
+        for (let iColumn = 0, l = oldPixelBlack[0].length; iColumn < l; iColumn++) {
           let e = oldPixelBlack[0][iColumn];
           if (e === undefined || e.axes.x === 0) break;
           let pixel = image.pixels[e.axes.x - 1][e.axes.y];
@@ -130,7 +130,7 @@ export default class Analyze {
     function lootAtDown(oldPixelBlack: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[] {
       try {
         let pixels: ImgToGCode.Pixel[] = [];
-        for (let iY = 0,l=oldPixelBlack[0].length; iY < l; iY++) {
+        for (let iY = 0, l = oldPixelBlack[0].length; iY < l; iY++) {
           let e = oldPixelBlack[iY][l - 1];
           if (e === undefined || e.axes.y === image.width - 1) break;
           let pixel = image.pixels[e.axes.x][e.axes.y + 1];
