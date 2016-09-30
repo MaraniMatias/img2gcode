@@ -6,14 +6,14 @@ console.time('img2gcode');
 
 img2gcode
   .start({  // It is mm
-    toolDiameter: 4,
+    toolDiameter: 2,
     scaleAxes: 700, // default: image.height equal mm
     sensitivity: 1, //intensity sensitivity
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -1,
     safeZ: 2,
-    info: "none", // ["none" | "console" | "emitter"] default: "none"
+    info: "emitter", // ["none" | "console" | "emitter"] default: "none"
     dirImg: __dirname + '/img-and-gcode/test.png'
   })
   .on('log', (str) => {

@@ -82,7 +82,8 @@ img2gcode
 ```
 
 ### Version.
-- `0.1.4`: Improved search of black pixels nearby. Print time gcode.
+- `0.1.5`: improves evaluate distance between points with larger diameters tool 2.
+- `0.1.4`: Improved search of black pixels nearby. Print time GCode.
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
