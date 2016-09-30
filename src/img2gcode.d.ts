@@ -9,6 +9,7 @@ declare namespace ImgToGCode {
   export type Config = {
     errBlackPixel?: number; //unprocessedBlackPixel
     toolDiameter: number;
+    sensitivity?: number; //intensity sensitivity
     scaleAxes?: number;
     deepStep?: number;
     imgSize?: string;

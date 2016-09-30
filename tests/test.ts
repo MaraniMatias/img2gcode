@@ -8,6 +8,7 @@ img2gcode
   .start({  // It is mm
     toolDiameter: 1,
     scaleAxes: 700, // default: image.height equal mm
+    //sensitivity: 0.95, //intensity sensitivity
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -1,

@@ -37,6 +37,7 @@ export class Main extends EventEmitter {
     config.blackZ || this.error('black distance z undefined');
     config.safeZ || this.error('safe distance z undefined');
     config.dirImg || this.error('Address undefined Image');
+    config.sensitivity = config.sensitivity <= 1 || config.sensitivity >= 0 ? config.sensitivity : 0.95;
     config.deepStep = config.deepStep || -1;
     config.whiteZ = config.whiteZ || 0;
     config.time = +new Date();
@@ -106,7 +107,7 @@ export class Main extends EventEmitter {
 
           self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
           self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
-          self._img.pixels = self.getAllPixel(image);
+          self._img.pixels = self.getAllPixel(image,config);
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
           config.imgSize = `(${self._img.height},${self._img.width})pixel to (${Utilities.round(self._img.height * self._pixel.toMm)},${Utilities.round(self._img.width * self._pixel.toMm)})mm`
@@ -166,7 +167,7 @@ export class Main extends EventEmitter {
     }
   }
 
-  private getAllPixel(image: lwip.Image): ImgToGCode.Pixel[][] {
+  private getAllPixel(image: lwip.Image,config: ImgToGCode.Config): ImgToGCode.Pixel[][] {
     try {
       function intensityFix(colour: lwip.ColorObject) {
         return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
@@ -176,13 +177,13 @@ export class Main extends EventEmitter {
         let row = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          row.push({ axes: { x, y }, intensity, be: intensity >= 755 });
+          row.push({ axes: { x, y }, intensity, be: intensity >= (765*config.sensitivity) });
         }
         newArray.push(row);
       }
       return newArray;
     } catch (error) {
-      this.error('Error loading image.');
+      this.error('Error processing image.');
       console.error(error);
     }
   }
