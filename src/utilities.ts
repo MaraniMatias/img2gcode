@@ -28,19 +28,6 @@ export default class Utilities {
     }
   }
 
-  public static pixelEnds(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[] {
-    try {
-      let arrNewPixel: ImgToGCode.Pixel[] = [];
-      arrNewPixel.push(newPixel[0][0]);
-      arrNewPixel.push(newPixel[0][newPixel[newPixel.length - 1].length - 1]);
-      arrNewPixel.push(newPixel[newPixel.length - 1][0]);
-      arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
-      return arrNewPixel
-    } catch (error) {
-      throw error;
-    }
-  }
-
   public static centerDistance(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Axes {
     try {
       return {
@@ -115,25 +102,15 @@ export default class Utilities {
 
   public static nearest(oldPixel: ImgToGCode.Pixel[][], newPixel1: ImgToGCode.Pixel[][], newPixel2: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
     try {
-      if (!newPixel2) return newPixel1;
-      let arrPixel1 = this.pixelEnds(newPixel1);
-      let arrPixel2 = this.pixelEnds(newPixel2);
-      let arrOldPixel = this.pixelEnds(oldPixel);
-
-      function nearestPoint(oldArr: ImgToGCode.Pixel[], newArr: ImgToGCode.Pixel[]): number {
-        let nearest = null;
-        for (let ix = 0, xl = arrPixel1.length; ix < xl; ix++) {
-          for (let iy = 0, yl = arrOldPixel.length; iy < yl; iy++) {
-            let disX = arrPixel1[ix].axes.x - arrOldPixel[iy].axes.x;
-            let disY = arrPixel1[ix].axes.y - arrOldPixel[iy].axes.y;
-            let dis = disX * (disX > 0 ? 1 : -1) + disY * (disY > 0 ? 1 : -1);
-            if (nearest === null || nearest > dis) nearest = dis;
-          }
-        }
-        return nearest
+      function nearestPoint(oldPoint: ImgToGCode.Axes, newPoint: ImgToGCode.Axes): number {
+        return Math.sqrt(Math.pow(newPoint.x - oldPoint.x, 2) + Math.pow(newPoint.y - oldPoint.y, 2));
       }
-
-      return nearestPoint(arrOldPixel, arrPixel1) < nearestPoint(arrOldPixel, arrPixel2) ? newPixel1 : newPixel2
+      if (!newPixel2) {
+        return newPixel1;
+      } else {
+        let oldPixelDist = this.centerDistance(oldPixel);
+        return nearestPoint(oldPixelDist, this.centerDistance(newPixel1)) < nearestPoint(oldPixelDist, this.centerDistance(newPixel2)) ? newPixel1 : newPixel2
+      }
     } catch (error) {
       throw new Error(`Nearest\n ${error}`);
     }
