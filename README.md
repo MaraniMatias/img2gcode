@@ -81,6 +81,9 @@ img2gcode
   });
 ```
 
+### Version.
+- `0.1.4`: Improved search of black pixels near and gcode shorter.
+
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
 Author:
