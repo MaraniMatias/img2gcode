@@ -28,4 +28,4 @@ _sample/
 src/*.js
 tests/*.js
 *.map
-*.gcode
+*/**/*.gcode

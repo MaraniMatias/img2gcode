@@ -12,6 +12,7 @@ export class Main extends EventEmitter {
   private _img: ImgToGCode.Image = { height: 0, width: 0, pixels: [] };
   private _pixel: ImgToGCode.PixelToMM = { diameter: 1, toMm: 1 }; // 1 pixel es X mm
 
+  // private _log: {console: {tick: (nro: number) => {},error: (err: Error | string) => {},log: (str: string) => {}},emitter: {tick: (nro: number) => {},error: (err: Error | string) => {},log: (str: string) => {}}}
   private tick(nro: number) {
     if (this._typeInfo === "console") { console.log(`${Utilities.round(nro)}%`); }
     else if (this._typeInfo === "emitter") { this.emit('tick', nro); }
