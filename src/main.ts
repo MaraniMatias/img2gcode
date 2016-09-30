@@ -71,7 +71,8 @@ export class Main extends EventEmitter {
 
       let w = 0, size = this._img.height * this._img.width;
       while (w <= config.errBlackPixel) {
-        this.tick(Analyze.progress / size);
+        //this.tick(Analyze.progress / size);
+        this.tick(w / config.errBlackPixel);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
         if (!nexPixels) {
           this.tick(1);

@@ -36,6 +36,7 @@ export default class Utilities {
       arrNewPixel.push(newPixel[newPixel.length - 1][0]);
       arrNewPixel.push(newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1]);
 
+/*
 console.log(
   newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.x
   , 'mx', newPixel[0][0].axes.x
@@ -45,7 +46,7 @@ console.log(
   , 'my', newPixel[0][0].axes.y
   , (newPixel[0][newPixel[newPixel.length - 1].length - 1].axes.y - newPixel[0][0].axes.y) / 2
 );
-
+*/
       return arrNewPixel
     } catch (error) {
       throw error;
