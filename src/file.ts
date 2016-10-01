@@ -6,11 +6,7 @@ export default
   * File
   */
   class File {
-  private static _gCodeInit: string[] = [
-    ";---> this code is for cnc-ino <---",
-    'G21 ; Set units to mm',
-    'G90 ; Absolute positioning'
-  ]
+  private static _gCodeInit: string[] = [];
 
   private static concat(gcode: ImgToGCode.Line[], config: ImgToGCode.Config): string[] {
     try {
@@ -45,6 +41,7 @@ export default
         let dirimg = path.resolve(config.dirImg),
           dirgcode = dirimg.substring(0, dirimg.lastIndexOf(".")) + '.gcode';
         self._gCodeInit.push(
+          ";---> this code is for cnc-ino <---",
           `; ${dirimg}`,
           `; ${dirgcode}`,
           `; Img Size: ${config.imgSize}`,
@@ -54,7 +51,9 @@ export default
           `; Deep Step: ${config.deepStep}`,
           `; Z Save: ${config.safeZ}`,
           `; Z White: ${config.whiteZ}`,
-          `; Z Black: ${config.blackZ}`
+          `; Z Black: ${config.blackZ}`,
+          'G21 ; Set units to mm',
+          'G90 ; Absolute positioning'
         );
         self.writeFile(dirgcode, self.concat(gcode, config).join('\n'))
           .then((dirGCode) => { fulfill(dirGCode); });

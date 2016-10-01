@@ -147,7 +147,7 @@ export class Main extends EventEmitter {
       Utilities.appliedAllPixel(newPixel, (p: ImgToGCode.Pixel) => { p.be = true; });
       return newPixel;
     } catch (error) {
-      console.error("oldPixel", oldPixel, "\nnewPixel", newPixel, 'error:\n', error);
+      //console.error("oldPixel", oldPixel, "\nnewPixel", newPixel, 'error:\n', error);
       this.error("Pixels are not valid for this configuration.")
     }
   }
@@ -164,7 +164,7 @@ export class Main extends EventEmitter {
       this._gCode.push(new Line({ x: X, y: Y, z: axes.z }));
     } catch (error) {
       this.error('Failed to build a line.');
-      console.error('AddPixel > G01 ' + axes.x ? `X${axes.x ? (axes.x + this._pixel.diameter / 2) * this._pixel.toMm : undefined}` : '' + axes.y ? `Y${axes.x ? (axes.x + this._pixel.diameter / 2) * this._pixel.toMm : undefined}` : '' + axes.z !== undefined ? `Z${axes.z};` : ';' + `\n ${error}`);
+      //console.error('AddPixel > G01 ' + axes.x ? `X${axes.x ? (axes.x + this._pixel.diameter / 2) * this._pixel.toMm : undefined}` : '' + axes.y ? `Y${axes.x ? (axes.x + this._pixel.diameter / 2) * this._pixel.toMm : undefined}` : '' + axes.z !== undefined ? `Z${axes.z};` : ';' + `\n ${error}`);
     }
   }
 
@@ -185,7 +185,7 @@ export class Main extends EventEmitter {
       return newArray;
     } catch (error) {
       this.error('Error processing image.');
-      console.error(error);
+      //console.error(error);
     }
   }
 

@@ -20,17 +20,18 @@ export default class Analyze {
    * @returns {ImgToGCode.Pixel[][]}
    */
   public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-
+/*
+    console.log('--ø--\n' , Utilities.centerDistance(oldPixelBlack) );
     console.log( Utilities.centerDistance(this.getFirstPixelUpWidth(image, _pixel)) );
     console.log( Utilities.centerDistance(this.getFirstPixelUpHeight(image, _pixel)) );
     console.log( Utilities.centerDistance(this.getFirstPixelBottomWidth(image, _pixel)) );
     console.log( Utilities.centerDistance(this.getFirstPixelBottomHeight(image, _pixel)) );
-
+*/
     if (oldPixelBlack) {
       return Utilities.nearest(
         oldPixelBlack,
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomHeight(image, _pixel)),
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomWidth(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
+        Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomWidth(image, _pixel)),
+        Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomHeight(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
       )
     } else {
       return this.getFirstPixelUpWidth(image, _pixel);
@@ -47,7 +48,7 @@ export default class Analyze {
         }// for
       }// for
     } catch (error) {
-      throw new Error(`getFirstPixelUpWidth\n ${error}`);
+      throw new Error('getFirstPixelUpWidth');
     }
   }
   private static getFirstPixelUpHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
@@ -60,7 +61,7 @@ export default class Analyze {
         }// for
       }// for
     } catch (error) {
-      throw new Error(`getFirstPixelUpHeight\n ${error}`);
+      throw new Error('getFirstPixelUpHeight');
     }
   }
   private static getFirstPixelBottomWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
@@ -73,7 +74,7 @@ export default class Analyze {
         }// for
       }// for
     } catch (error) {
-      throw new Error(`getFirstPixelBottomWidth\n ${error}`);
+      throw new Error('getFirstPixelBottomWidth');
     }
   }
   private static getFirstPixelBottomHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
@@ -86,7 +87,7 @@ export default class Analyze {
         }// for
       }// for
     } catch (error) {
-      throw new Error(`getFirstPixelBottomHeight\n ${error}`);
+      throw new Error('getFirstPixelBottomHeight');
     }
   }
 
@@ -106,11 +107,7 @@ export default class Analyze {
         }
         pixels.push(row);
       }
-      if (Utilities.size(pixels, true) === diameter * diameter) {
-        return pixels;
-      } else {
-        return false;
-      }
+      return (Utilities.size(pixels, true) === diameter * diameter) ? pixels :  false;
     }
   }
 

@@ -24,7 +24,7 @@ export default class Utilities {
       }
       return size
     } catch (error) {
-      throw new Error(`Size ${arr.length * arr[arr.length - 1].length}\n ${error}`);
+      throw new Error('Size');
     }
   }
 
@@ -38,32 +38,34 @@ export default class Utilities {
       throw error;
     }
   }
-/**
- * Returns if the distance between points is less than or equal to the diameter
- * 
- * @static
- * @param {ImgToGCode.Pixel[][]} oldPixel
- * @param {ImgToGCode.Pixel[][]} newPixel
- * @returns {boolean}
- * 
- * @memberOf Utilities
- */
+  /**
+   * Returns if the distance between points is less than or equal to the diameter
+   * 
+   * @static
+   * @param {ImgToGCode.Pixel[][]} oldPixel
+   * @param {ImgToGCode.Pixel[][]} newPixel
+   * @returns {boolean}
+   * 
+   * @memberOf Utilities
+   */
   public static distanceIsOne(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][]): boolean {
     try {
-      let diameter = (oldPixel.length / 2) + 0.5,
+      let diameter = (oldPixel.length / 2) + 1.5,
         oldPixelDist = this.centerDistance(oldPixel),
         newPixelDist = this.centerDistance(newPixel),
         distX = newPixelDist.x - oldPixelDist.x,
         distY = newPixelDist.y - oldPixelDist.y;
-/*console.log(
-  oldPixelDist, newPixelDist,
-  (-diameter <= distY && distY <= diameter),
-  (-diameter <= distX && distX <= diameter),
-  'distY', distY, 'distX', distX 
-)*/
+/*
+      console.log(
+        oldPixelDist, newPixelDist,
+        (-diameter <= distY && distY <= diameter),
+        (-diameter <= distX && distX <= diameter),
+        'distY', distY, 'distX', distX 
+      )
+*/
       return (-diameter <= distY && distY <= diameter) && (-diameter <= distX && distX <= diameter)
     } catch (error) {
-      throw new Error(`DistanceIsOne\n ${error}`);
+      throw new Error('DistanceIsOne');
     }
   }
 
@@ -78,7 +80,7 @@ export default class Utilities {
         }
       }
     } catch (error) {
-      throw new Error(`AppliedAllPixel\n ${error}`);
+      throw new Error('AppliedAllPixel');
     }
   }
 
@@ -101,7 +103,7 @@ export default class Utilities {
       }
       return true;
     } catch (error) {
-      throw new Error(`AllBlack\n ${error}`);
+      throw new Error('AllBlack');
     }
   }
 
@@ -117,7 +119,7 @@ export default class Utilities {
         return nearestPoint(oldPixelDist, this.centerDistance(newPixel1)) < nearestPoint(oldPixelDist, this.centerDistance(newPixel2)) ? newPixel1 : newPixel2
       }
     } catch (error) {
-      throw new Error(`Nearest\n ${error}`);
+      throw new Error('Nearest');
     }
   }
 
