@@ -20,19 +20,13 @@ export default class Analyze {
    * @returns {ImgToGCode.Pixel[][]}
    */
   public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-    /*
-        console.log('--ø--\n' , Utilities.centerDistance(oldPixelBlack) );
-        console.log( Utilities.centerDistance(this.getFirstPixelUpWidth(image, _pixel)) );
-        console.log( Utilities.centerDistance(this.getFirstPixelUpHeight(image, _pixel)) );
-        console.log( Utilities.centerDistance(this.getFirstPixelBottomWidth(image, _pixel)) );
-        console.log( Utilities.centerDistance(this.getFirstPixelBottomHeight(image, _pixel)) );
-    */
     if (oldPixelBlack) {
       return Utilities.nearest(
         oldPixelBlack,
         Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomWidth(image, _pixel)),
         Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomHeight(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
       )
+      //return this.getFirstPixelUpWidth(image, _pixel);
     } else {
       return this.getFirstPixelUpWidth(image, _pixel);
     }
@@ -103,9 +97,11 @@ export default class Analyze {
               row.push(p);
             } //else { countBlack--; }
           } else {
+            /*
             if (countBlack > diameterX2) {
               row.push(p);
             }
+            */
           }
         }
         pixels.push(row);

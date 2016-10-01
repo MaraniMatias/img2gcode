@@ -31,8 +31,8 @@ export default class Utilities {
   public static centerDistance(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Axes {
     try {
       return {
-        x: newPixel[0][0].axes.x - ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.x - newPixel[0][0].axes.x) / 2),
-        y: newPixel[0][0].axes.y - ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.y - newPixel[0][0].axes.y) / 2)
+        x: newPixel[0][0].axes.x + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.x - newPixel[0][0].axes.x) / 2),
+        y: newPixel[0][0].axes.y + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.y - newPixel[0][0].axes.y) / 2)
       }
     } catch (error) {
       throw error;
