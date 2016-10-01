@@ -20,13 +20,13 @@ export default class Analyze {
    * @returns {ImgToGCode.Pixel[][]}
    */
   public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-/*
-    console.log('--ø--\n' , Utilities.centerDistance(oldPixelBlack) );
-    console.log( Utilities.centerDistance(this.getFirstPixelUpWidth(image, _pixel)) );
-    console.log( Utilities.centerDistance(this.getFirstPixelUpHeight(image, _pixel)) );
-    console.log( Utilities.centerDistance(this.getFirstPixelBottomWidth(image, _pixel)) );
-    console.log( Utilities.centerDistance(this.getFirstPixelBottomHeight(image, _pixel)) );
-*/
+    /*
+        console.log('--ø--\n' , Utilities.centerDistance(oldPixelBlack) );
+        console.log( Utilities.centerDistance(this.getFirstPixelUpWidth(image, _pixel)) );
+        console.log( Utilities.centerDistance(this.getFirstPixelUpHeight(image, _pixel)) );
+        console.log( Utilities.centerDistance(this.getFirstPixelBottomWidth(image, _pixel)) );
+        console.log( Utilities.centerDistance(this.getFirstPixelBottomHeight(image, _pixel)) );
+    */
     if (oldPixelBlack) {
       return Utilities.nearest(
         oldPixelBlack,
@@ -40,10 +40,9 @@ export default class Analyze {
 
   private static getFirstPixelUpWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     try {
-      let diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
       for (let x = 0, xl = image.pixels.length; x < xl; x++) {
         for (let y = 0, yl = image.pixels[x].length; y < yl; y++) {
-          let lFor = this.lootFor(image, diameter, x, y);
+          let lFor = this.lootFor(image, _pixel, x, y);
           if (lFor) return <ImgToGCode.Pixel[][]>lFor
         }// for
       }// for
@@ -53,10 +52,9 @@ export default class Analyze {
   }
   private static getFirstPixelUpHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     try {
-      let diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
       for (let y = 0; y < image.pixels[y].length - 1; y++) {
         for (let x = 0, xl = image.pixels.length - 1; x < xl; x++) {
-          let lFor = this.lootFor(image, diameter, x, y);
+          let lFor = this.lootFor(image, _pixel, x, y);
           if (lFor) return <ImgToGCode.Pixel[][]>lFor
         }// for
       }// for
@@ -66,10 +64,9 @@ export default class Analyze {
   }
   private static getFirstPixelBottomWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     try {
-      let diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
       for (let x = image.pixels.length - 1; x >= 0; x--) {
         for (let y = image.pixels[x].length - 1; y >= 0; y--) {
-          let lFor = this.lootFor(image, diameter, x, y);
+          let lFor = this.lootFor(image, _pixel, x, y);
           if (lFor) return <ImgToGCode.Pixel[][]>lFor
         }// for
       }// for
@@ -79,10 +76,9 @@ export default class Analyze {
   }
   private static getFirstPixelBottomHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     try {
-      let diameter = _pixel.diameter < 1 ? 1 : Math.floor(_pixel.diameter);
       for (let y = image.pixels[image.pixels.length - 1].length - 1; y >= 0; y--) {
         for (let x = image.pixels.length - 1; x >= 0; x--) {
-          let lFor = this.lootFor(image, diameter, x, y);
+          let lFor = this.lootFor(image, _pixel, x, y);
           if (lFor) return <ImgToGCode.Pixel[][]>lFor
         }// for
       }// for
@@ -91,23 +87,30 @@ export default class Analyze {
     }
   }
 
-  private static lootFor(image: ImgToGCode.Image, diameter: number, x: number, y: number): ImgToGCode.Pixel[][] | boolean {
+  private static lootFor(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, x: number, y: number): ImgToGCode.Pixel[][] | boolean {
     //if (this.progress < x * y) this.progress = x * y;
-    let pixels: ImgToGCode.Pixel[][] = [];
+    let pixels: ImgToGCode.Pixel[][] = [],
+      diameter = _pixel.diameter < 1 ? 1 : Math.round(_pixel.diameter),
+      diameterX2 = diameter + diameter / 2;
     if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {
       for (let x2 = 0, pd = diameter; x2 < pd; x2++) {
         let row: ImgToGCode.Pixel[] = [];
         for (let y2 = 0; y2 < pd; y2++) {
           let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
           if (p.intensity < 765) {
-            countBlack++;
-            if (countBlack > diameter || !p.be) { row.push(p); }
-            //else { countBlack--; }
+            if (countBlack > diameterX2 || !p.be) {
+              countBlack++;
+              row.push(p);
+            } //else { countBlack--; }
+          } else {
+            if (countBlack > diameterX2) {
+              row.push(p);
+            }
           }
         }
         pixels.push(row);
       }
-      return (Utilities.size(pixels, true) === diameter * diameter) ? pixels :  false;
+      return (Utilities.size(pixels, true) === diameter * diameter) ? pixels : false;
     }
   }
 
