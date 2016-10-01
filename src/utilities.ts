@@ -55,7 +55,12 @@ export default class Utilities {
         newPixelDist = this.centerDistance(newPixel),
         distX = newPixelDist.x - oldPixelDist.x,
         distY = newPixelDist.y - oldPixelDist.y;
-        //console.log(oldPixelDist, newPixelDist,(-diameter <= distY && distY <= diameter),(-diameter <= distX && distX <= diameter),'distY', distY, 'distX', distX ,'diameter',diameter)
+/*console.log(
+  oldPixelDist, newPixelDist,
+  (-diameter <= distY && distY <= diameter),
+  (-diameter <= distX && distX <= diameter),
+  'distY', distY, 'distX', distX 
+)*/
       return (-diameter <= distY && distY <= diameter) && (-diameter <= distX && distX <= diameter)
     } catch (error) {
       throw new Error(`DistanceIsOne\n ${error}`);

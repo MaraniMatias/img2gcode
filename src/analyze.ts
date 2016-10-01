@@ -1,13 +1,15 @@
 import Utilities from "./utilities";
 export default class Analyze {
 
-  private static _progress: number;
+  /*
+  Bprivate static _progress: number;
   public static get progress(): number {
     return this._progress;
   }
   public static set progress(v: number) {
     this._progress = v;
   }
+  */
 
   /**
    * Si esta definido oldPixelBlack devuelve el pixel mas cercano a este.
@@ -19,18 +21,16 @@ export default class Analyze {
    */
   public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
 
-      /*
-      console.log( this.getFirstPixelUpWidth(image, _pixel));
-      console.log( this.getFirstPixelUpHeight(image, _pixel));
-      console.log( this.getFirstPixelBottomWidth(image, _pixel));
-      console.log( this.getFirstPixelBottomHeight(image, _pixel));
-      */
+    console.log( Utilities.centerDistance(this.getFirstPixelUpWidth(image, _pixel)) );
+    console.log( Utilities.centerDistance(this.getFirstPixelUpHeight(image, _pixel)) );
+    console.log( Utilities.centerDistance(this.getFirstPixelBottomWidth(image, _pixel)) );
+    console.log( Utilities.centerDistance(this.getFirstPixelBottomHeight(image, _pixel)) );
 
     if (oldPixelBlack) {
       return Utilities.nearest(
         oldPixelBlack,
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelUpHeight(image, _pixel)),
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomWidth(image, _pixel), this.getFirstPixelBottomHeight(image, _pixel))
+        Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomHeight(image, _pixel)),
+        Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomWidth(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
       )
     } else {
       return this.getFirstPixelUpWidth(image, _pixel);
@@ -90,30 +90,29 @@ export default class Analyze {
     }
   }
 
-private static lootFor(image: ImgToGCode.Image, diameter: number,x: number,y:number): ImgToGCode.Pixel[][] | boolean {
-  //if (this.progress < x * y) this.progress = x * y;
-  let pixels: ImgToGCode.Pixel[][] = [];
-  if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {
-    for (let x2 = 0, pd = diameter; x2 < pd; x2++) {
-      let row: ImgToGCode.Pixel[] = [];
-      for (let y2 = 0; y2 < pd; y2++) {
-        let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
-        if (p.intensity < 765) {
-          countBlack++;
-          if (countBlack > diameter || !p.be) { row.push(p); }
-          //else { countBlack--; }
+  private static lootFor(image: ImgToGCode.Image, diameter: number, x: number, y: number): ImgToGCode.Pixel[][] | boolean {
+    //if (this.progress < x * y) this.progress = x * y;
+    let pixels: ImgToGCode.Pixel[][] = [];
+    if (x + diameter <= image.width && y + diameter <= image.height && image.pixels[x][y].intensity < 765) {
+      for (let x2 = 0, pd = diameter; x2 < pd; x2++) {
+        let row: ImgToGCode.Pixel[] = [];
+        for (let y2 = 0; y2 < pd; y2++) {
+          let countBlack = 0, p = image.pixels[x + x2 < image.height ? x + x2 : image.height][y + y2 < image.width ? y + y2 : image.width];
+          if (p.intensity < 765) {
+            countBlack++;
+            if (countBlack > diameter || !p.be) { row.push(p); }
+            //else { countBlack--; }
+          }
         }
+        pixels.push(row);
       }
-      pixels.push(row);
-    }
-    if (Utilities.size(pixels, true) === diameter * diameter) {
-      return pixels;
-    } else {
-      return false;
+      if (Utilities.size(pixels, true) === diameter * diameter) {
+        return pixels;
+      } else {
+        return false;
+      }
     }
   }
-}
-
 
   /**
    * Black pixel under and / or around the tool to directly download.

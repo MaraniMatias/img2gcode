@@ -6,15 +6,15 @@ console.time('img2gcode');
 
 img2gcode
   .start({  // It is mm
-    toolDiameter: 2,
+    toolDiameter: 4,
     scaleAxes: 700, // default: image.height equal mm
-    sensitivity: 1, //intensity sensitivity
+    //sensitivity: 1, //intensity sensitivity
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
-    blackZ: -1,
-    safeZ: 2,
-    info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/test.png'
+    blackZ: -2,
+    safeZ: 1,
+    info: "none", // ["none" | "console" | "emitter"] default: "none"
+    dirImg: __dirname + '/img-and-gcode/test.jpeg'
   })
   .on('log', (str) => {
     console.log(str);
@@ -26,9 +26,9 @@ img2gcode
     console.error(err);
   })
   .on('complete', (data) => {
-    //console.log(data.config);
+    console.log(data.config);
     //console.log(data.dirgcode);
-    console.log('complete');
+    //console.log('complete');
   })
   .then((data) => {
     //console.log(data.config);
