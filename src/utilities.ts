@@ -15,6 +15,7 @@ export default class Utilities {
    */
   public static size(arr: ImgToGCode.Pixel[][], all?: boolean): number {
     try {
+      if(!arr) return NaN
       let size = 0;
       for (let x = 0, xl = arr.length; x < xl; x++) {
         for (let y = 0, yl = arr[x].length; y < yl; y++) {
