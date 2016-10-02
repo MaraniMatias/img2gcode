@@ -110,7 +110,8 @@ export default class Analyze {
 
   /**
    * Black pixel under and / or around the tool to directly download.
-   * 
+   *       return (Utilities.size(pixels, true) === diameter * diameter) ? pixels : false;
+
    * @static
    * @param {ImgToGCode.Pixel[][]} oldPixelBlack.
    * @param {ImgToGCode.Image} image It is pixel array.
@@ -120,34 +121,32 @@ export default class Analyze {
    * @memberOf Analyze
    */
   public static nextBlackToMove(oldPixelBlack: ImgToGCode.Pixel[][], image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
-
     let arrLootAt = this.lootAtBlackPixel(oldPixelBlack, image, _pixel.diameter),
       diameter = _pixel.diameter < 1 ? 1 : Math.round(_pixel.diameter),
       diameterX2 = diameter + diameter / 2;
+
     for (let x = 0, l = arrLootAt.length; x < l; x++) {
       for (let y = 0; y < l; y++) {
-        if (arrLootAt[x][y].intensity < 765) {
-          let pixels: ImgToGCode.Pixel[][] = [];
-          for (let x2 = 0, pd = diameter; x2 < pd; x2++) {
-            let row: ImgToGCode.Pixel[] = [];
-            for (let y2 = 0, countBlack = 0; y2 < pd; y2++) {
+        if (arrLootAt[x][y] && arrLootAt[x][y].intensity < 765) {
+          // encontre el primer pixel negro , ahora buscar pixeles debajo de la nrocha
+          let pixelBir: ImgToGCode.Pixel[][] = [];
+          for (let x2 = 0; x2 < diameter; x2++) {
+            let rowBit: ImgToGCode.Pixel[] = [];
+            for (let y2 = 0; y2 < diameter; y2++) {
+              // si no es negro o lo quequiero para y buscar más adelante
               let p = arrLootAt[x + x2][y + y2];
-              if (!p) break;
-              if (p.intensity < 765) {
-                if (countBlack > diameterX2 || !p.be) {
-                  countBlack++;
-                  row.push(p);
-                } //else { countBlack--; }
-              }// else { if (countBlack > diameterX2) {row.push(p);}
-              pixels.push(row);
-            }
-            if ((Utilities.size(pixels, true) === diameter * diameter)) return pixels;
-          }
+              if (!p || p.intensity === 765 || p.be){
+                x2 = diameter; y2 = diameter; break;
+              } else {
+                rowBit.push(p);
+              }
+            }// for
+            pixelBir.push(rowBit);
+          }// for
         }
       }// for
     }// for
-
-    return this.getFirstPixel(image, _pixel, oldPixelBlack);
+    return this.getFirstPixel(image, _pixel, oldPixelBlack)
   }
 
   /**
@@ -168,17 +167,20 @@ export default class Analyze {
 
         for (let x2 = -diameter, d = diameter + diameter; x2 <= d; x2++) {
           let val_x = oldPixelBlack[x][y].axes.x + x2;
-          if (val_x < 0 || val_x > image.height) break;
           let row: ImgToGCode.Pixel[] = [];
           for (let y2 = -diameter, d = diameter + diameter; y2 <= d; y2++) {
             let val_y = oldPixelBlack[x][y].axes.y + y2;
-            if (val_y < 0 || val_y > image.width) break;
-            row.push(image.pixels[val_x][val_y]);
+            if (val_x < 0 || val_x > image.height || val_y < 0 || val_y > image.width) {
+              row.push(undefined);
+            } else {
+              row.push(image.pixels[val_x][val_y]);
+            }
           }
           arr.push(row);
         }
 
         return arr;
+
       }// for
     }// for
   }
