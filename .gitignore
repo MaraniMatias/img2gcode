@@ -16,7 +16,6 @@ build/
 node_modules/
 #typings/
 app/components/
-*.png
 *.svg
 *.tap
 *.old.*

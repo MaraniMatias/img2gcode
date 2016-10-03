@@ -1,5 +1,5 @@
 # Image to gCode
-Convert jpg, png, gif to gcode  with NodeJS and [lwip](https://www.npmjs.com/package/lwip#installation).
+Convert jpg, jpeg, png, gif to gcode with NodeJS.
 
 - Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
 - This version is faster previous versions.
@@ -82,7 +82,7 @@ img2gcode
   });
 ```
 
-![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.jpeg)
+![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
 - `0.1.8`: Solving some errors when changing scale.
