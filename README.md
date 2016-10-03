@@ -35,7 +35,7 @@ var img2gcode = require("img2gcode");
 - `sensitivity` (number) Intensity sensitivity. 0 to 1. **default:** 0.95
 - `scaleAxes` (number)  Image height in mm. **default:** image.height equal mm
 - `deepStep` (number) Depth per pass. **default:** -1
-- `dirImg` (string) Image path, accepts JPG PNG GIF formats.
+- `dirImg` (string) Image path, accepts JPEG JPG PNG GIF formats.
 - `whiteZ` (number) White pixels. **default:** 0
 - `blackZ` (number) Maximum depth (Black pixels).
 - `safeZ` (number) Safe distance.
