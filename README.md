@@ -3,7 +3,6 @@ Convert jpg, png, gif to gcode  with NodeJS and [lwip](https://www.npmjs.com/pac
 
 - Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
 - This version is faster previous versions.
-- There may be mistakes, I am working to accommodate.
 
 ### Installation
 ```bash
