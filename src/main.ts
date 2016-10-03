@@ -92,7 +92,6 @@ export class Main extends EventEmitter {
       }
     } catch (error) {
       this.error('\nError processing image gcode, may be for settings.');
-      console.error(error);
     }
   }
 
@@ -130,6 +129,7 @@ export class Main extends EventEmitter {
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
         });
+        console.log(Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ));
       } else {
         this.addPixel({
           z: { val: Z.sevaZ, safe: true }
@@ -178,7 +178,10 @@ export class Main extends EventEmitter {
         let row: ImgToGCode.Pixel[] = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          row.push({  x, y , intensity: intensity < (765 * config.sensitivity)? intensity : 765, be: intensity >= (765 * config.sensitivity) });
+          row.push({
+            x, y, be: intensity >= (765 * config.sensitivity),
+            intensity: intensity < (765 * config.sensitivity) ? intensity : 765
+          });
         }
         newArray.push(row);
       }

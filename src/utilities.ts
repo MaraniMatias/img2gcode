@@ -118,14 +118,14 @@ export default class Utilities {
 
   public static resolveZ(pixels: ImgToGCode.Pixel[][], whiteZ: number, blackZ: number): number {
     function avgIntensity(): number {
-      let l = pixels.length, intensity = 0;
+      let l = pixels.length - 1, intensity = 0;
       for (let r = 0; r < l; r++) {
         for (let c = 0; c < l; c++) {
-          intensity = pixels[r][c].intensity;
+          intensity += pixels[r][c].intensity;
         }
       }
       return intensity / (l * l);
     }
-    return -((avgIntensity() * blackZ / 765) - blackZ)
+    return (avgIntensity() * blackZ / -765) + blackZ
   }
 }// class
