@@ -125,7 +125,7 @@ export default class Analyze {
       diameter = _pixel.diameter < 1 ? 1 : Math.round(_pixel.diameter),
       diameterX2 = diameter + diameter / 2;
 
-    for (let x = 0, l = arrLootAt.length; x < l; x++) {
+    for (let x = 0, l = arrLootAt.length-1; x < l; x++) {
       for (let y = 0; y < l; y++) {
         if (arrLootAt[x][y] && arrLootAt[x][y].intensity < 765) {
           // encontre el primer pixel negro , ahora buscar pixeles debajo de la nrocha
@@ -134,15 +134,18 @@ export default class Analyze {
             let rowBit: ImgToGCode.Pixel[] = [];
             for (let y2 = 0; y2 < diameter; y2++) {
               // si no es negro o lo quequiero para y buscar más adelante
-              let p = arrLootAt[x + x2][y + y2];
-              if (!p || p.intensity === 765 || p.be){
-                x2 = diameter; y2 = diameter; break;
-              } else {
-                rowBit.push(p);
+              if (x + x2 <= l && y + y2 <= l) {
+                let p = arrLootAt[x + x2][y + y2];
+                if (!p || p.intensity === 765 || p.be) {
+                  x2 = diameter; y2 = diameter; break;
+                } else {
+                  rowBit.push(p);
+                }
               }
             }// for
             pixelBir.push(rowBit);
           }// for
+          if (Utilities.size(pixelBir, true) === diameter * diameter) { return pixelBir; }
         }
       }// for
     }// for
@@ -166,10 +169,10 @@ export default class Analyze {
       for (let y = 0, yl = oldPixelBlack[x].length; y < yl; y++) {
 
         for (let x2 = -diameter, d = diameter + diameter; x2 <= d; x2++) {
-          let val_x = oldPixelBlack[x][y].axes.x + x2;
+          let val_x = oldPixelBlack[x][y].x + x2;
           let row: ImgToGCode.Pixel[] = [];
           for (let y2 = -diameter, d = diameter + diameter; y2 <= d; y2++) {
-            let val_y = oldPixelBlack[x][y].axes.y + y2;
+            let val_y = oldPixelBlack[x][y].y + y2;
             if (val_x < 0 || val_x > image.height || val_y < 0 || val_y > image.width) {
               row.push(undefined);
             } else {

@@ -67,8 +67,8 @@ export class Main extends EventEmitter {
       this.tick(0);
       let firstPixel: ImgToGCode.Pixel[][] = Analyze.getFirstPixel(this._img, this._pixel);
       this.addPixel({
-        x: firstPixel[0][0].axes.x,
-        y: firstPixel[0][0].axes.y
+        x: firstPixel[0][0].x,
+        y: firstPixel[0][0].y
       }, config.safeZ);
 
       let w = 0, size = this._img.height * this._img.width;
@@ -126,8 +126,8 @@ export class Main extends EventEmitter {
       let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
       if (Utilities.distanceIsOne(oldPixel, newPixel)) {
         this.addPixel({
-          x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-          y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+          x: pixelFist.x + (pixelLast.x - pixelFist.x),
+          y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
         });
       } else {
@@ -135,8 +135,8 @@ export class Main extends EventEmitter {
           z: { val: Z.sevaZ, safe: true }
         });
         this.addPixel({
-          x: pixelFist.axes.x + (pixelLast.axes.x - pixelFist.axes.x),
-          y: pixelFist.axes.y + (pixelLast.axes.y - pixelFist.axes.y),
+          x: pixelFist.x + (pixelLast.x - pixelFist.x),
+          y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: Z.sevaZ, safe: true }
         });
         this.addPixel({
@@ -173,12 +173,12 @@ export class Main extends EventEmitter {
       function intensityFix(colour: lwip.ColorObject) {
         return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
       }
-      let newArray = [];
+      let newArray: ImgToGCode.Pixel[][] = [];
       for (let x = 0, xl = this._img.width; x < xl; x++) {
-        let row = []
+        let row: ImgToGCode.Pixel[] = []
         for (let y = 0, yl = this._img.height; y < yl; y++) {
           let intensity = intensityFix(image.getPixel(x, y));
-          row.push({ axes: { x, y }, intensity: intensity < (765 * config.sensitivity)? intensity : 765, be: intensity >= (765 * config.sensitivity) });
+          row.push({  x, y , intensity: intensity < (765 * config.sensitivity)? intensity : 765, be: intensity >= (765 * config.sensitivity) });
         }
         newArray.push(row);
       }

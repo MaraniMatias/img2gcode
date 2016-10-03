@@ -82,7 +82,8 @@ img2gcode
 ```
 
 ### Version.
-- `0.1.5`: improves evaluate distance between points with larger diameters tool 2.
+- `0.1.6`: Improvement in the way of how to follow the trail of black pixels.
+- `0.1.5`: Improves evaluate distance between points with larger diameters tool 2.
 - `0.1.4`: Improved search of black pixels nearby. Print time GCode.
 
 ### License.

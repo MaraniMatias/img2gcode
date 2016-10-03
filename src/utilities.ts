@@ -15,7 +15,6 @@ export default class Utilities {
    */
   public static size(arr: ImgToGCode.Pixel[][], all?: boolean): number {
     try {
-      if(!arr) return NaN
       let size = 0;
       for (let x = 0, xl = arr.length; x < xl; x++) {
         for (let y = 0, yl = arr[x].length; y < yl; y++) {
@@ -32,8 +31,8 @@ export default class Utilities {
   public static centerDistance(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Axes {
     try {
       return {
-        x: newPixel[0][0].axes.x + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.x - newPixel[0][0].axes.x) / 2),
-        y: newPixel[0][0].axes.y + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].axes.y - newPixel[0][0].axes.y) / 2)
+        x: newPixel[0][0].x + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].x - newPixel[0][0].x) / 2),
+        y: newPixel[0][0].y + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].y - newPixel[0][0].y) / 2)
       }
     } catch (error) {
       throw error;
@@ -51,19 +50,12 @@ export default class Utilities {
    */
   public static distanceIsOne(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][]): boolean {
     try {
-      let diameter = (oldPixel.length / 2) + 1.5,
+      let diameter = oldPixel.length + 1,
         oldPixelDist = this.centerDistance(oldPixel),
         newPixelDist = this.centerDistance(newPixel),
         distX = newPixelDist.x - oldPixelDist.x,
         distY = newPixelDist.y - oldPixelDist.y;
-/*
-      console.log(
-        oldPixelDist, newPixelDist,
-        (-diameter <= distY && distY <= diameter),
-        (-diameter <= distX && distX <= diameter),
-        'distY', distY, 'distX', distX 
-      )
-*/
+      //console.log(oldPixelDist, newPixelDist,(-diameter <= distY && distY <= diameter),(-diameter <= distX && distX <= diameter),'distY', distY, 'distX', distX)
       return (-diameter <= distY && distY <= diameter) && (-diameter <= distX && distX <= diameter)
     } catch (error) {
       throw new Error('DistanceIsOne');
