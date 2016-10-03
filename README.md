@@ -2,7 +2,7 @@
 Convert jpg, png, gif to gcode  with NodeJS and [lwip](https://www.npmjs.com/package/lwip#installation).
 
 Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
-
+This version is faster previous versions.
 There may be mistakes, I am working to accommodate.
 
 ### Installation
@@ -32,6 +32,7 @@ var img2gcode = require("img2gcode");
 
 ### Options
 - `toolDiameter` (number)
+- `sensitivity` (number) Intensity sensitivity. 0 to 1. **default:** 0.95
 - `scaleAxes` (number)  Image height in mm. **default:** image.height equal mm
 - `deepStep` (number) Depth per pass. **default:** -1
 - `dirImg` (string) Image path, accepts JPG PNG GIF formats.
