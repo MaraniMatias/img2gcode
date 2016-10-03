@@ -7,14 +7,14 @@ console.time('img2gcode');
 img2gcode
   .start({  // It is mm
     toolDiameter: 4,
-    sensitivity: 0.98, // intensity sensitivity
-    scaleAxes: 700, // default: image.height equal mm
+    sensitivity: 0.95, // intensity sensitivity
+    scaleAxes: 525, // default: image.height equal mm
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -2,
     safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/test.jpeg'
+    dirImg: __dirname + '/img-and-gcode/qr.jpeg'
   })
   .on('log', (str) => {
     console.log(str);
