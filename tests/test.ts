@@ -26,9 +26,9 @@ img2gcode
     console.error(err);
   })
   .on('complete', (data) => {
-    console.log(data.config);
+    //console.log(data.config);
     //console.log(data.dirgcode);
-    //console.log('complete');
+    console.log('complete');
   })
   .then((data) => {
     //console.log(data.config);

@@ -77,29 +77,6 @@ export default class Utilities {
     }
   }
 
-  /**
-   * Tengo encuenta que si hay más pixel negros que blancos.
-   * 
-   * @param {Pixel[]} oldPixelBlack
-   * @param {number} pixelDiameter tamaño de la herramienta en pixel.
-   * @returns {boolean}
-   */
-  public static allBlack(oldPixelBlack: ImgToGCode.Pixel[], pixelDiameter: number): boolean {
-    try {
-      let countBlack = 0;
-      if (oldPixelBlack.length !== pixelDiameter) { return false; }
-      if (oldPixelBlack[0] === undefined) return false;
-      for (let x = 0, l = oldPixelBlack.length; x < l; x++) {
-        if (oldPixelBlack[x].be) {
-          return false;
-        }
-      }
-      return true;
-    } catch (error) {
-      throw new Error('AllBlack');
-    }
-  }
-
   public static nearest(oldPixel: ImgToGCode.Pixel[][], newPixel1: ImgToGCode.Pixel[][], newPixel2: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
     try {
       function nearestPoint(oldPoint: ImgToGCode.Axes, newPoint: ImgToGCode.Axes): number {
@@ -118,7 +95,7 @@ export default class Utilities {
 
   public static resolveZ(pixels: ImgToGCode.Pixel[][], whiteZ: number, blackZ: number): number {
     function avgIntensity(): number {
-      let l = pixels.length - 1, intensity = 0;
+      let l = pixels.length , intensity = 0;
       for (let r = 0; r < l; r++) {
         for (let c = 0; c < l; c++) {
           intensity += pixels[r][c].intensity;

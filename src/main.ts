@@ -11,6 +11,7 @@ export class Main extends EventEmitter {
   private _gCode: ImgToGCode.Line[] = [];
   private _img: ImgToGCode.Image = { height: 0, width: 0, pixels: [] };
   private _pixel: ImgToGCode.PixelToMM = { diameter: 1, toMm: 1 }; // 1 pixel es X mm
+  private _progress: number = 0;
 
   // private _log: {console: {tick: (nro: number) => {},error: (err: Error | string) => {},log: (str: string) => {}},emitter: {tick: (nro: number) => {},error: (err: Error | string) => {},log: (str: string) => {}}}
   private tick(nro: number) {
@@ -50,7 +51,7 @@ export class Main extends EventEmitter {
   private run(config: ImgToGCode.Config) {
     try {
       let self = this;
-      //Analyze.progress = 0;
+      this._progress = 0;
       this.loading(config).then((config: ImgToGCode.Config) => {
         self.analyze(config, (dirgcode: string) => {
           if (typeof self._then === "function") { self._then({ config, dirgcode }); }
@@ -73,8 +74,7 @@ export class Main extends EventEmitter {
 
       let w = 0, size = this._img.height * this._img.width;
       while (w <= config.errBlackPixel) {
-        //this.tick(Analyze.progress / size);
-        this.tick(w / config.errBlackPixel);
+        this.tick(this._progress / config.errBlackPixel);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
         if (!nexPixels) {
           this.tick(1);
@@ -129,7 +129,6 @@ export class Main extends EventEmitter {
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
         });
-        console.log(Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ));
       } else {
         this.addPixel({
           z: { val: Z.sevaZ, safe: true }
@@ -144,7 +143,10 @@ export class Main extends EventEmitter {
         });
       }
 
-      Utilities.appliedAllPixel(newPixel, (p: ImgToGCode.Pixel) => { p.be = true; });
+      Utilities.appliedAllPixel(newPixel, (p: ImgToGCode.Pixel) => {
+        this._progress++;
+        p.be = true;
+      });
       return newPixel;
     } catch (error) {
       //console.error("oldPixel", oldPixel, "\nnewPixel", newPixel, 'error:\n', error);

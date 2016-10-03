@@ -1,16 +1,6 @@
 import Utilities from "./utilities";
 export default class Analyze {
 
-  /*
-  Bprivate static _progress: number;
-  public static get progress(): number {
-    return this._progress;
-  }
-  public static set progress(v: number) {
-    this._progress = v;
-  }
-  */
-
   /**
    * Si esta definido oldPixelBlack devuelve el pixel mas cercano a este.
    *
@@ -26,7 +16,6 @@ export default class Analyze {
         Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomWidth(image, _pixel)),
         Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomHeight(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
       )
-      //return this.getFirstPixelUpWidth(image, _pixel);
     } else {
       return this.getFirstPixelUpWidth(image, _pixel);
     }
@@ -128,12 +117,12 @@ export default class Analyze {
     for (let x = 0, l = arrLootAt.length-1; x < l; x++) {
       for (let y = 0; y < l; y++) {
         if (arrLootAt[x][y] && arrLootAt[x][y].intensity < 765) {
-          // encontre el primer pixel negro , ahora buscar pixeles debajo de la nrocha
+          // encontre el primer pixel negro , ahora buscar pixeles debajo de la brocha.
           let pixelBir: ImgToGCode.Pixel[][] = [];
           for (let x2 = 0; x2 < diameter; x2++) {
             let rowBit: ImgToGCode.Pixel[] = [];
             for (let y2 = 0; y2 < diameter; y2++) {
-              // si no es negro o lo quequiero para y buscar más adelante
+              // si no es negro o lo quequiero para y buscar más adelante.
               if (x + x2 <= l && y + y2 <= l) {
                 let p = arrLootAt[x + x2][y + y2];
                 if (!p || p.intensity === 765 || p.be) {
