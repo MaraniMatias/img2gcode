@@ -8,13 +8,13 @@ img2gcode
   .start({  // It is mm
     toolDiameter: 4,
     sensitivity: 0.95, // intensity sensitivity
-    scaleAxes: 525, // default: image.height equal mm
+    scaleAxes: 500, // default: image.height equal mm
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -2,
     safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/qr.jpeg'
+    dirImg: __dirname + '/img-and-gcode/pingui.png'
   })
   .on('log', (str) => {
     console.log(str);

@@ -30,7 +30,7 @@
       "taskName": "build-tests",
       "isBuildCommand": true,
       "showOutput": "never",
-      "problemMatcher": "$tsc"
+      "problemMatcher": "$gulp-tsc"
     },
     {
       "taskName": "tests",

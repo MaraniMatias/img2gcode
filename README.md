@@ -83,6 +83,7 @@ img2gcode
 ```
 
 ### Version.
+- `0.1.8`: .
 - `0.1.7`: Solution for images with black border.
 - `0.1.6`: Improvement in the way of how to follow the trail of black pixels.
 - `0.1.5`: Improves evaluate distance between points with larger diameters tool 2.
