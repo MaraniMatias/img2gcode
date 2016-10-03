@@ -10,68 +10,57 @@ export default class Analyze {
    * @returns {ImgToGCode.Pixel[][]}
    */
   public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-    if (oldPixelBlack) {
-      return Utilities.nearest(
-        oldPixelBlack,
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomWidth(image, _pixel)),
-        Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomHeight(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
-      )
-    } else {
-      return this.getFirstPixelUpWidth(image, _pixel);
+    try {
+      if (oldPixelBlack) {
+        return Utilities.nearest(
+          oldPixelBlack,
+          Utilities.nearest(oldPixelBlack, this.getFirstPixelUpWidth(image, _pixel), this.getFirstPixelBottomWidth(image, _pixel)),
+          Utilities.nearest(oldPixelBlack, this.getFirstPixelBottomHeight(image, _pixel), this.getFirstPixelUpHeight(image, _pixel))
+        )
+      } else {
+        return this.getFirstPixelUpWidth(image, _pixel);
+      }
+    } catch (error) {
+      throw new Error("Something went wrong :(. \nPlease try other measures to 'tool Diameter' or 'scaleAxes'.")
     }
   }
 
   private static getFirstPixelUpWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
-    try {
-      for (let x = 0, xl = image.pixels.length; x < xl; x++) {
-        for (let y = 0, yl = image.pixels[x].length; y < yl; y++) {
-          let lFor = this.lootFor(image, _pixel, x, y);
-          if (lFor) return <ImgToGCode.Pixel[][]>lFor
-        }// for
+    for (let x = 0, xl = image.pixels.length; x < xl; x++) {
+      for (let y = 0, yl = image.pixels[x].length; y < yl; y++) {
+        let lFor = this.lootFor(image, _pixel, x, y);
+        if (lFor) return <ImgToGCode.Pixel[][]>lFor
       }// for
-    } catch (error) {
-      throw new Error('getFirstPixelUpWidth');
-    }
+    }// for
+
   }
   private static getFirstPixelUpHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
-    try {
-      for (let y = 0; y < image.pixels[y].length - 1; y++) {
-        for (let x = 0, xl = image.pixels.length - 1; x < xl; x++) {
-          let lFor = this.lootFor(image, _pixel, x, y);
-          if (lFor) return <ImgToGCode.Pixel[][]>lFor
-        }// for
+    for (let y = 0; y < image.pixels[y].length - 1; y++) {
+      for (let x = 0, xl = image.pixels.length - 1; x < xl; x++) {
+        let lFor = this.lootFor(image, _pixel, x, y);
+        if (lFor) return <ImgToGCode.Pixel[][]>lFor
       }// for
-    } catch (error) {
-      throw new Error('getFirstPixelUpHeight');
-    }
+    }// for
+
   }
   private static getFirstPixelBottomWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
-    try {
-      for (let x = image.pixels.length - 1; x >= 0; x--) {
-        for (let y = image.pixels[x].length - 1; y >= 0; y--) {
-          let lFor = this.lootFor(image, _pixel, x, y);
-          if (lFor) return <ImgToGCode.Pixel[][]>lFor
-        }// for
+    for (let x = image.pixels.length - 1; x >= 0; x--) {
+      for (let y = image.pixels[x].length - 1; y >= 0; y--) {
+        let lFor = this.lootFor(image, _pixel, x, y);
+        if (lFor) return <ImgToGCode.Pixel[][]>lFor
       }// for
-    } catch (error) {
-      throw new Error('getFirstPixelBottomWidth');
-    }
+    }// for
   }
   private static getFirstPixelBottomHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
-    try {
-      for (let y = image.pixels[image.pixels.length - 1].length - 1; y >= 0; y--) {
-        for (let x = image.pixels.length - 1; x >= 0; x--) {
-          let lFor = this.lootFor(image, _pixel, x, y);
-          if (lFor) return <ImgToGCode.Pixel[][]>lFor
-        }// for
+    for (let y = image.pixels[image.pixels.length - 1].length - 1; y >= 0; y--) {
+      for (let x = image.pixels.length - 1; x >= 0; x--) {
+        let lFor = this.lootFor(image, _pixel, x, y);
+        if (lFor) return <ImgToGCode.Pixel[][]>lFor
       }// for
-    } catch (error) {
-      throw new Error('getFirstPixelBottomHeight');
-    }
+    }// for
   }
 
   private static lootFor(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, x: number, y: number): ImgToGCode.Pixel[][] | boolean {
-    //if (this.progress < x * y) this.progress = x * y;
     let pixels: ImgToGCode.Pixel[][] = [],
       diameter = _pixel.diameter < 1 ? 1 : Math.round(_pixel.diameter),
       diameterX2 = diameter + diameter / 2;
@@ -99,8 +88,7 @@ export default class Analyze {
 
   /**
    * Black pixel under and / or around the tool to directly download.
-   *       return (Utilities.size(pixels, true) === diameter * diameter) ? pixels : false;
-
+   * 
    * @static
    * @param {ImgToGCode.Pixel[][]} oldPixelBlack.
    * @param {ImgToGCode.Image} image It is pixel array.
@@ -177,7 +165,7 @@ export default class Analyze {
         }// for
       }// for
     } catch (error) {
-      console.error(error)
+      throw new Error("Something went wrong :(. \nPlease try other measures to 'tool Diameter' or 'scaleAxes'.")
     }
   }
 

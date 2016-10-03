@@ -14,28 +14,20 @@ export default class Utilities {
    * @returns {number} size of array
    */
   public static size(arr: ImgToGCode.Pixel[][], all?: boolean): number {
-    try {
-      let size = 0;
-      for (let x = 0, xl = arr.length; x < xl; x++) {
-        for (let y = 0, yl = arr[x].length; y < yl; y++) {
-          if (all) size++;
-          else if (arr[x][y].intensity < 765 && !arr[x][y].be) size++;
-        }
+    let size = 0;
+    for (let x = 0, xl = arr.length; x < xl; x++) {
+      for (let y = 0, yl = arr[x].length; y < yl; y++) {
+        if (all) size++;
+        else if (arr[x][y].intensity < 765 && !arr[x][y].be) size++;
       }
-      return size
-    } catch (error) {
-      throw new Error('Size');
     }
+    return size
   }
 
   public static centerDistance(newPixel: ImgToGCode.Pixel[][]): ImgToGCode.Axes {
-    try {
-      return {
-        x: newPixel[0][0].x + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].x - newPixel[0][0].x) / 2),
-        y: newPixel[0][0].y + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].y - newPixel[0][0].y) / 2)
-      }
-    } catch (error) {
-      throw error;
+    return {
+      x: newPixel[0][0].x + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].x - newPixel[0][0].x) / 2),
+      y: newPixel[0][0].y + ((newPixel[newPixel.length - 1][newPixel[newPixel.length - 1].length - 1].y - newPixel[0][0].y) / 2)
     }
   }
   /**
@@ -49,17 +41,13 @@ export default class Utilities {
    * @memberOf Utilities
    */
   public static distanceIsOne(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][]): boolean {
-    try {
-      let diameter = oldPixel.length + 1,
-        oldPixelDist = this.centerDistance(oldPixel),
-        newPixelDist = this.centerDistance(newPixel),
-        distX = newPixelDist.x - oldPixelDist.x,
-        distY = newPixelDist.y - oldPixelDist.y;
-      //console.log(oldPixelDist, newPixelDist,(-diameter <= distY && distY <= diameter),(-diameter <= distX && distX <= diameter),'distY', distY, 'distX', distX)
-      return (-diameter <= distY && distY <= diameter) && (-diameter <= distX && distX <= diameter)
-    } catch (error) {
-      throw new Error('DistanceIsOne');
-    }
+    let diameter = oldPixel.length + 1,
+      oldPixelDist = this.centerDistance(oldPixel),
+      newPixelDist = this.centerDistance(newPixel),
+      distX = newPixelDist.x - oldPixelDist.x,
+      distY = newPixelDist.y - oldPixelDist.y;
+    //console.log(oldPixelDist, newPixelDist,(-diameter <= distY && distY <= diameter),(-diameter <= distX && distX <= diameter),'distY', distY, 'distX', distX)
+    return (-diameter <= distY && distY <= diameter) && (-diameter <= distX && distX <= diameter)
   }
 
   public static appliedAllPixel(arr: ImgToGCode.Pixel[][], cb: (pixel: ImgToGCode.Pixel, iRow: number, iColumn?: number) => void) {
@@ -73,7 +61,7 @@ export default class Utilities {
         }
       }
     } catch (error) {
-      throw new Error('AppliedAllPixel');
+      throw new Error('Something went wrong. :(');
     }
   }
 
@@ -95,7 +83,7 @@ export default class Utilities {
 
   public static resolveZ(pixels: ImgToGCode.Pixel[][], whiteZ: number, blackZ: number): number {
     function avgIntensity(): number {
-      let l = pixels.length , intensity = 0;
+      let l = pixels.length, intensity = 0;
       for (let r = 0; r < l; r++) {
         for (let c = 0; c < l; c++) {
           intensity += pixels[r][c].intensity;
@@ -105,4 +93,5 @@ export default class Utilities {
     }
     return (avgIntensity() * blackZ / -765) + blackZ
   }
+
 }// class

@@ -31,7 +31,7 @@ var img2gcode = require("img2gcode");
 ```
 
 ### Options
-- `toolDiameter` (number)
+- `toolDiameter` (number) Tool diameter.
 - `sensitivity` (number) Intensity sensitivity. 0 to 1. **default:** 0.95
 - `scaleAxes` (number)  Image height in mm. **default:** image.height equal mm
 - `deepStep` (number) Depth per pass. **default:** -1
@@ -83,7 +83,7 @@ img2gcode
 ```
 
 ### Version.
-- `0.1.8`: .
+- `0.1.8`: Solving some errors when changing scale.
 - `0.1.7`: Solution for images with black border.
 - `0.1.6`: Improvement in the way of how to follow the trail of black pixels.
 - `0.1.5`: Improves evaluate distance between points with larger diameters tool 2.

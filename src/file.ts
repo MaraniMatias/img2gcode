@@ -24,7 +24,7 @@ export default
       this._gCodeInit.push(`;Generated in ${ (+new Date() - config.time)/1000 } sec.`);
       return this._gCodeInit;
     } catch (error) {
-      throw error
+      throw new Error('Something went wrong. :(');
     }
   }
 
@@ -58,7 +58,7 @@ export default
         self.writeFile(dirgcode, self.concat(gcode, config).join('\n'))
           .then((dirGCode) => { fulfill(dirGCode); });
       } catch (error) {
-        fulfill(error);
+        reject( new Error('Something went wrong. :(.\n'+error) );
       }
     });
   }
