@@ -86,12 +86,12 @@ img2gcode
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
+- `0.1.10`: Fix feedrate is undefined.
 - `0.1.9`: Add feedrate in config.
 - `0.1.8`: Solving some errors when changing scale.
 - `0.1.7`: Solution for images with black border.
 - `0.1.6`: Improvement in the way of how to follow the trail of black pixels.
 - `0.1.5`: Improves evaluate distance between points with larger diameters tool 2.
-- `0.1.4`: Improved search of black pixels nearby. Print time GCode.
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).

@@ -42,8 +42,12 @@ export class Main extends EventEmitter {
       config.deepStep = (typeof (config.deepStep) === 'number' && config.deepStep) || -1;
       config.whiteZ = (typeof (config.whiteZ) === 'number' && config.whiteZ) || 0;
       config.time = +new Date();
-      if (config.feedrate) config.feedrate.work = (typeof (config.feedrate.work) === 'number' && config.feedrate.work) || 0;
-      if (config.feedrate) config.feedrate.idle = (typeof (config.feedrate.idle) === 'number' && config.feedrate.idle) || 0;
+      if (config.feedrate) {
+        config.feedrate.work = (typeof (config.feedrate.work) === 'number' && config.feedrate.work) || 0;
+        config.feedrate.idle = (typeof (config.feedrate.idle) === 'number' && config.feedrate.idle) || 0;
+      } else {
+        config.feedrate = { work: NaN, idle: NaN };
+      }
       this._typeInfo = (typeof (config.info) === 'string' && config.info) || "none";
       this.log(`-> Image: ${config.dirImg}`);
       this.run(config);
