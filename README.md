@@ -40,6 +40,7 @@ var img2gcode = require("img2gcode");
 - `blackZ` (number) Maximum depth (Black pixels).
 - `safeZ` (number) Safe distance.
 - `info` (string) Displays information. ["none" | "console" | "emitter"] **default:** none
+- `feedrate` { work (number), idle (number) } Only the corresponding line is added. **default:** '' 
 
 ### Events
   Only if Options.info it is "emitter"
@@ -85,6 +86,7 @@ img2gcode
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
+- `0.1.9`: Add feedrate in config.
 - `0.1.8`: Solving some errors when changing scale.
 - `0.1.7`: Solution for images with black border.
 - `0.1.6`: Improvement in the way of how to follow the trail of black pixels.

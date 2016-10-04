@@ -9,6 +9,7 @@ img2gcode
     toolDiameter: 4,
     sensitivity: 0.95, // intensity sensitivity
     scaleAxes: 500, // default: image.height equal mm
+    feedrate: { work: 1200, idle: 3000 }, // Only the corresponding line is added.
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -2,
@@ -35,3 +36,4 @@ img2gcode
     //console.log(data.dirgcode);
     console.timeEnd('img2gcode');
   });
+  // 3227,8

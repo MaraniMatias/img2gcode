@@ -3,7 +3,7 @@
 declare namespace ImgToGCode {
   export type ColorObject = { r: number, g: number, b: number, a?: number };
   export type Color = string | [number, number, number, number] | ColorObject;
-  export type Axes = { x?: number, y?: number, z?: { val: number, safe: boolean } };
+  export type Axes = { x?: number, y?: number, z?: { val: number, safe: boolean }, f?: number };
   export type Pixel = { intensity: number, x?: number, y?: number, z?: { val: number, safe: boolean } , be: boolean };
   export type PixelToMM = { diameter: number; toMm: number; }; // 1 pixel es X mm
   export type Config = {
@@ -11,9 +11,12 @@ declare namespace ImgToGCode {
     toolDiameter: number;
     sensitivity?: number; //intensity sensitivity
     scaleAxes?: number;
+    feedrate?: { // Only the corresponding line is added.
+      work: number;
+      idle: number;
+    };
     deepStep?: number;
     imgSize?: string;
-    //analyzeLevel:number;
     dirImg: string;
     whiteZ?: number;
     blackZ: number;

@@ -3,7 +3,6 @@ import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
 import * as lwip from 'lwip';
-import * as fs from 'fs';
 import { EventEmitter } from 'events';
 
 export class Main extends EventEmitter {
@@ -35,16 +34,18 @@ export class Main extends EventEmitter {
 
   public start(config: ImgToGCode.Config): this {
     try {
-      this.log(`-> Image: ${config.dirImg}`);
-      config.toolDiameter || this.error('toolDiameter undefined');
-      config.blackZ || this.error('black distance z undefined');
-      config.safeZ || this.error('safe distance z undefined');
-      config.dirImg || this.error('Address undefined Image');
+      (config.toolDiameter && typeof (config.toolDiameter) === 'number') || this.error("ToolDiameter undefined or is't number.");
+      (config.blackZ && typeof (config.blackZ) === 'number') || this.error("Black distance z undefined or is't number.");
+      (config.safeZ && typeof (config.safeZ) === 'number') || this.error("Safe distance z undefined or is't number.");
+      (config.dirImg && typeof (config.dirImg) === 'string') || this.error("Address undefined Image or is't string.");
       config.sensitivity = config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
-      config.deepStep = config.deepStep || -1;
-      config.whiteZ = config.whiteZ || 0;
+      config.deepStep = (typeof (config.deepStep) === 'number' && config.deepStep) || -1;
+      config.whiteZ = (typeof (config.whiteZ) === 'number' && config.whiteZ) || 0;
       config.time = +new Date();
-      this._typeInfo = config.info || "none";
+      if (config.feedrate) config.feedrate.work = (typeof (config.feedrate.work) === 'number' && config.feedrate.work) || 0;
+      if (config.feedrate) config.feedrate.idle = (typeof (config.feedrate.idle) === 'number' && config.feedrate.idle) || 0;
+      this._typeInfo = (typeof (config.info) === 'string' && config.info) || "none";
+      this.log(`-> Image: ${config.dirImg}`);
       this.run(config);
       return this;
     } catch (error) {
@@ -73,7 +74,8 @@ export class Main extends EventEmitter {
       let firstPixel: ImgToGCode.Pixel[][] = Analyze.getFirstPixel(this._img, this._pixel);
       this.addPixel({
         x: firstPixel[0][0].x,
-        y: firstPixel[0][0].y
+        y: firstPixel[0][0].y,
+        f: config.feedrate.idle
       }, config.safeZ);
 
       let w = 0, size = this._img.height * this._img.width;
@@ -91,7 +93,7 @@ export class Main extends EventEmitter {
           });
           break;
         }
-        firstPixel = this.toGCode(firstPixel, nexPixels, { sevaZ: config.safeZ, whiteZ: config.whiteZ, blackZ: config.blackZ });
+        firstPixel = this.toGCode(firstPixel, nexPixels, config);
         w++;
       }
     } catch (error) {
@@ -104,7 +106,7 @@ export class Main extends EventEmitter {
       let self = this;
       return new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
-          if (err)  throw new Error('File not found.\n'+err.message);
+          if (err) throw new Error('File not found.\n' + err.message);
           self.log('-> Openping and reading...');
           self._img.height = image.height();
           self._img.width = image.width();
@@ -124,26 +126,29 @@ export class Main extends EventEmitter {
   }
 
 
-  private toGCode(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][], Z: { sevaZ: number; blackZ: number; whiteZ: number; }): ImgToGCode.Pixel[][] {
+  private toGCode(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][], config: ImgToGCode.Config): ImgToGCode.Pixel[][] {
     try {
       let pixelLast = newPixel[0][0], pixelFist = oldPixel[0][0];
       if (Utilities.distanceIsOne(oldPixel, newPixel)) {
         this.addPixel({
           x: pixelFist.x + (pixelLast.x - pixelFist.x),
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
-          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
+          z: { val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ), safe: false }
         });
       } else {
         this.addPixel({
-          z: { val: Z.sevaZ, safe: true }
+          z: { val: config.safeZ, safe: true },
+          f: config.feedrate.idle
         });
         this.addPixel({
           x: pixelFist.x + (pixelLast.x - pixelFist.x),
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
-          z: { val: Z.sevaZ, safe: true }
+          z: { val: config.safeZ, safe: true },
+          f: config.feedrate.idle
         });
         this.addPixel({
-          z: { val: Utilities.resolveZ(newPixel, Z.whiteZ, Z.blackZ), safe: false }
+          z: { val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ), safe: false },
+          f: config.feedrate.work
         });
       }
 
@@ -166,7 +171,7 @@ export class Main extends EventEmitter {
         this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, safe: true } }, `X0 Y0 Z${sevaZ} Line Init`));
         this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, safe: true } }, 'With Z max '));
       }
-      this._gCode.push(new Line({ x: X, y: Y, z: axes.z }));
+      this._gCode.push(new Line({ x: X, y: Y, z: axes.z, f: axes.f }));
     } catch (error) {
       this.error('Failed to build a line.');
     }
