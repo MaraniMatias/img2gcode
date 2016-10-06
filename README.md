@@ -14,7 +14,7 @@ $ npm install img2gcode
 Depending on the configuration between tool and image height generates better code.
 
 ```Javascript
-var img2gcode = require("img2gcode");
+import * as img2gcode from 'img2gcode';
 
   img2gcode({  // It is mm
     toolDiameter: 2,
@@ -57,8 +57,8 @@ var img2gcode = require("img2gcode");
 ### Examples
 
 ```Javascript
-var img2gcode = require("img2gcode");
-var ProgressBar = require("progress"); // npm install progress
+import * as img2gcode from 'img2gcode';
+import * as ProgressBar  from 'progress'; // npm install progress
 var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { total: 100 });
 
 img2gcode

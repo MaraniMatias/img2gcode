@@ -1,5 +1,5 @@
 {
-  "name": "imgtocnc",
+  "name": "img2gcode",
   "dependencies": {},
   "globalDependencies": {
     "async": "registry:dt/async#2.0.1+20160804113311",
