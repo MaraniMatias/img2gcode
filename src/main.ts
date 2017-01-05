@@ -49,7 +49,7 @@ export class Main extends EventEmitter {
         config.feedrate = { work: NaN, idle: NaN };
       }
       this._typeInfo = (typeof (config.info) === "string" && config.info) || "none";
-      this.log("-> Image:",config.dirImg);
+      this.log("-> Image: "+config.dirImg);
       this.run(config);
       return this;
     } catch (error) {
@@ -111,17 +111,17 @@ export class Main extends EventEmitter {
       return new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
           if (err) throw new Error("File not found.\n" + err.message);
-          self.log("-> Openping and reading...);
-                   self._img.height = image.height();
-                   self._img.width = image.width();
+          self.log("-> Openping and reading...");
+          self._img.height = image.height();
+          self._img.width = image.width();
 
-                   self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
-                   self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
-                   self._img.pixels = self.getAllPixel(image, config);
+          self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
+          self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
+          self._img.pixels = self.getAllPixel(image, config);
 
-                   config.errBlackPixel = Utilities.size(self._img.pixels);
-                   config.imgSize = "("+self._img.height+","+self._img.width+")pixel to ("+Utilities.round(self._img.height * self._pixel.toMm)+","+Utilities.round(self._img.width * self._pixel.toMm)+")mm";
-                   fulfill(config);
+          config.errBlackPixel = Utilities.size(self._img.pixels);
+          config.imgSize = "("+self._img.height+","+self._img.width+")pixel to ("+Utilities.round(self._img.height * self._pixel.toMm)+","+Utilities.round(self._img.width * self._pixel.toMm)+")mm";
+          fulfill(config);
         });
       })
     } catch (err) {
@@ -204,8 +204,28 @@ export class Main extends EventEmitter {
     }
   }
 
-  private normalyzer(img:ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-
+  private normalize(img:ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
+    let row = img.length, column =  img[img.length - 1].length;
+    // x -> w column
+    // y -> h row
+    function addRow(){
+      for(let y = row; y <= column ; y++ ){
+        let newRow : ImgToGCode.Pixel[] = [];
+        for(let x = 0; x < column ; x++ ){
+          newRow.push({ x, y, be: true, intensity: 765 });
+        }
+        img.push(newRow);
+      }
+    }
+    function addColumn(){
+      for( let x = column; x < row; x++ ){
+        for( let y = 0;  y <= row; y++ ){
+          img[y].push({ x, y, be: true, intensity: 765 });
+        }
+      }
+    }
+    row < column ? addRow() : addColumn();
+    return img
   }
 
 }//class
