@@ -75,10 +75,10 @@ export default class Analyze {
               row.push(p);
             } //else { countBlack--; }
           }/* else {
-            if (countBlack > diameterX2) {
+              if (countBlack > diameterX2) {
               row.push(p);
-            }
-          }*/
+              }
+              }*/
         }
         pixels.push(row);
       }
@@ -88,13 +88,13 @@ export default class Analyze {
 
   /**
    * Black pixel under and / or around the tool to directly download.
-   * 
+   *
    * @static
    * @param {ImgToGCode.Pixel[][]} oldPixelBlack.
    * @param {ImgToGCode.Image} image It is pixel array.
    * @param {ImgToGCode.PixelToMM} _pixel
    * @returns {ImgToGCode.Pixel[][]}
-   * 
+   *
    * @memberOf Analyze
    */
   public static nextBlackToMove(oldPixelBlack: ImgToGCode.Pixel[][], image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
@@ -131,13 +131,13 @@ export default class Analyze {
 
   /**
    * Para obtener pixeles de oldPixelBlack
-   * 
+   *
    * @static
    * @param {ImgToGCode.Pixel[][]} oldPixelBlack
    * @param {ImgToGCode.Image} image
    * @param {number} diameter
    * @returns {ImgToGCode.Pixel[][]}
-   * 
+   *
    * @memberOf Analyze
    */
   public static lootAtBlackPixel(oldPixelBlack: ImgToGCode.Pixel[][], image: ImgToGCode.Image, diameter: number): ImgToGCode.Pixel[][] {

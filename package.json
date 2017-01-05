@@ -14,7 +14,7 @@
   },
   "author": "Marani Matias Ezequiel",
   "email": "maranimatias@gmail.com",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "lwip": "^0.0.9",
     "promise": "^7.1.1"
@@ -41,7 +41,7 @@
     "image to cnc"
   ],
   "engines": {
-    "node": "6.7.0",
+    "node": "6.8.0",
     "npm": "3.10.7"
   },
   "jshintConfig": {
