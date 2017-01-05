@@ -2,8 +2,8 @@ import Utilities from "./utilities";
 import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
-import * as lwip from 'lwip';
-import { EventEmitter } from 'events';
+import * as lwip from "lwip";
+import { EventEmitter } from "events";
 
 export class Main extends EventEmitter {
   private _typeInfo: string = "none"; // ["none" | "console" | "emitter"]
@@ -14,16 +14,16 @@ export class Main extends EventEmitter {
   private _progress: number = 0;
 
   private tick(nro: number) {
-    if (this._typeInfo === "console") { console.log(`${Utilities.round(nro)}%`); }
-    else if (this._typeInfo === "emitter") { this.emit('tick', nro); }
+    if (this._typeInfo === "console") { console.log(Utilities.round(nro)+"%"); }
+    else if (this._typeInfo === "emitter") { this.emit("tick", nro); }
   }
   private log(str: string) {
     if (this._typeInfo === "console") { console.log(str); }
-    else if (this._typeInfo === "emitter") { this.emit('log', str); }
+    else if (this._typeInfo === "emitter") { this.emit("log", str); }
   }
   private error(err: Error | string) {
     let srt = typeof (err) === "string" ? new Error(<string>err) : err;
-    if (this._typeInfo === "emitter") { this.emit('error', srt); }
+    if (this._typeInfo === "emitter") { this.emit("error", srt); }
     else { throw srt; }
   }
 
@@ -35,21 +35,21 @@ export class Main extends EventEmitter {
   public start(config: ImgToGCode.Config): this {
     try {
       (config.toolDiameter && typeof (config.toolDiameter) === 'number') || this.error("ToolDiameter undefined or is't number.");
-      (config.blackZ && typeof (config.blackZ) === 'number') || this.error("Black distance z undefined or is't number.");
-      (config.safeZ && typeof (config.safeZ) === 'number') || this.error("Safe distance z undefined or is't number.");
-      (config.dirImg && typeof (config.dirImg) === 'string') || this.error("Address undefined Image or is't string.");
+      (config.blackZ && typeof (config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
+      (config.safeZ && typeof (config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
+      (config.dirImg && typeof (config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
       config.sensitivity = config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
-      config.deepStep = (typeof (config.deepStep) === 'number' && config.deepStep) || -1;
-      config.whiteZ = (typeof (config.whiteZ) === 'number' && config.whiteZ) || 0;
+      config.deepStep = (typeof (config.deepStep) === "number" && config.deepStep) || -1;
+      config.whiteZ = (typeof (config.whiteZ) === "number" && config.whiteZ) || 0;
       config.time = +new Date();
       if (config.feedrate) {
-        config.feedrate.work = (typeof (config.feedrate.work) === 'number' && config.feedrate.work) || 0;
-        config.feedrate.idle = (typeof (config.feedrate.idle) === 'number' && config.feedrate.idle) || 0;
+        config.feedrate.work = (typeof (config.feedrate.work) === "number" && config.feedrate.work) || 0;
+        config.feedrate.idle = (typeof (config.feedrate.idle) === "number" && config.feedrate.idle) || 0;
       } else {
         config.feedrate = { work: NaN, idle: NaN };
       }
-      this._typeInfo = (typeof (config.info) === 'string' && config.info) || "none";
-      this.log(`-> Image: ${config.dirImg}`);
+      this._typeInfo = (typeof (config.info) === "string" && config.info) || "none";
+      this.log("-> Image:",config.dirImg);
       this.run(config);
       return this;
     } catch (error) {
@@ -64,7 +64,7 @@ export class Main extends EventEmitter {
       this.loading(config).then((config: ImgToGCode.Config) => {
         self.analyze(config, (dirgcode: string) => {
           if (typeof self._then === "function") { self._then({ config, dirgcode }); }
-          if (self._typeInfo === "emitter") { self.emit('complete', { dirgcode, config }); }
+          if (self._typeInfo === "emitter") { self.emit("complete", { dirgcode, config }); }
         });
       });
     } catch (error) {
@@ -89,7 +89,7 @@ export class Main extends EventEmitter {
         if (!nexPixels) {
           this.tick(1);
           config.errBlackPixel = Utilities.round(Utilities.size(this._img.pixels) * 100 / config.errBlackPixel);
-          this.log(`-> ${config.errBlackPixel}% of black pixels unprocessed.`);
+          this.log("-> " + config.errBlackPixel + "% of black pixels unprocessed.");
           this.log("-> Accommodating gcode...");
           File.save(this._gCode, config).then((dirGCode: string) => {
             this.log(`-> Sava As: ${dirGCode}`);
@@ -101,7 +101,7 @@ export class Main extends EventEmitter {
         w++;
       }
     } catch (error) {
-      this.error('\nError processing image gcode, may be for settings.');
+      this.error("\nError processing image gcode, may be for settings.");
     }
   }
 
@@ -110,18 +110,18 @@ export class Main extends EventEmitter {
       let self = this;
       return new Promise(function (fulfill, reject) {
         lwip.open(config.dirImg, function (err: Error, image) {
-          if (err) throw new Error('File not found.\n' + err.message);
-          self.log('-> Openping and reading...');
-          self._img.height = image.height();
-          self._img.width = image.width();
+          if (err) throw new Error("File not found.\n" + err.message);
+          self.log("-> Openping and reading...);
+                   self._img.height = image.height();
+                   self._img.width = image.width();
 
-          self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
-          self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
-          self._img.pixels = self.getAllPixel(image, config);
+                   self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
+                   self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
+                   self._img.pixels = self.getAllPixel(image, config);
 
-          config.errBlackPixel = Utilities.size(self._img.pixels);
-          config.imgSize = `(${self._img.height},${self._img.width})pixel to (${Utilities.round(self._img.height * self._pixel.toMm)},${Utilities.round(self._img.width * self._pixel.toMm)})mm`
-          fulfill(config);
+                   config.errBlackPixel = Utilities.size(self._img.pixels);
+                   config.imgSize = "("+self._img.height+","+self._img.width+")pixel to ("+Utilities.round(self._img.height * self._pixel.toMm)+","+Utilities.round(self._img.width * self._pixel.toMm)+")mm";
+                   fulfill(config);
         });
       })
     } catch (err) {
@@ -177,7 +177,7 @@ export class Main extends EventEmitter {
       }
       this._gCode.push(new Line({ x: X, y: Y, z: axes.z, f: axes.f }));
     } catch (error) {
-      this.error('Failed to build a line.');
+      this.error("Failed to build a line.");
     }
   }
 
@@ -193,15 +193,19 @@ export class Main extends EventEmitter {
           let intensity = intensityFix(image.getPixel(x, y));
           row.push({
             x, y, be: intensity >= (765 * config.sensitivity),
-            intensity: intensity < (765 * config.sensitivity) ? intensity : 765
+              intensity: intensity < (765 * config.sensitivity) ? intensity : 765
           });
         }
         newArray.push(row);
       }
       return newArray;
     } catch (error) {
-      this.error('Error processing image.');
+      this.error("Error processing image.");
     }
+  }
+
+  private normalyzer(img:ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
+
   }
 
 }//class

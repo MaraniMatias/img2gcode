@@ -1,12 +1,13 @@
 {
   "name": "img2gcode",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "convert jpg, png, gif to gcode with nodejs and lwip.",
   "main": "./src/index.js",
   "typess": "./src/img2gcode.d.ts",
   "scripts": {
     "test": "node ./tests/test.js",
-    "tsc": "tsc ./src/index.ts --target es6 ; tsc ./tests/test.ts --target es6"
+    "buld": "tsc ./src/index.ts --target es6 ; tsc ./tests/test.ts --target es6",
+    "start":"npm buld ; npm test"
   },
   "repository": {
     "type": "git",
