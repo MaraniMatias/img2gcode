@@ -1,6 +1,3 @@
-/**
- * Line
-*/
 export default class Line {
   private _sign: string = '-'; //en file esta como Y-
   /**

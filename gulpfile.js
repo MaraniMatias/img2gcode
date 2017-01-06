@@ -12,14 +12,14 @@ gulp.task("default", function () {
 // TypeScript build for /src folder, pipes in .d.ts files from typings folder 
 const tsConfigSrc = tsb.create('./src/tsconfig.json');
 gulp.task("build", function () {
-  return gulp.src(['./typings/**/*.ts', './src/**/*.ts'])
+  return gulp.src(['./typings/**/*.ts', './src/*.ts'])
     .pipe(tsConfigSrc())
-    .pipe(gulp.dest('src'));
+    .pipe(gulp.dest('./src'));
 });
 gulp.task("build-tests", function () {
-  return gulp.src(['typings/**/*.ts', 'tests/**/*.ts'])
+  return gulp.src(['./typings/**/*.ts', './tests/test.ts'])
     .pipe(tsConfigSrc())
-    .pipe(gulp.dest('tests'));
+    .pipe(gulp.dest('./tests'));
 });
 
 gulp.task('run-tests', shell.task('node ./tests/test.js'));

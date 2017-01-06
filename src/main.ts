@@ -35,21 +35,13 @@ export class Main extends EventEmitter {
   }
 
   private isImg(extension:string) : boolean {
-    if ( ! ( /\.(png|jpe{0,1}g|gif)/i.test(extension) ) ) {
-      this.error("Only GIF, JPG, JPEG or PNG file." );
-   // } else if (/\.bmp/i.test(extension)) {
-   //   this.error("Only GIF, JPG, JPEG or PNG. The BMP files belong to the microsoft corporation.");
-    } else if ( /\.png/i.test(extension) && os.platform() === 'linux') {
-      this.error("With linux only GIF, JPEG or JPG. Lwip on linux doesn't work. :P.");
-    } else {
-      return true;
-    }
+    return /\.(png|jpe{0,1}g|gif)/i.test(extension)
   }
 
   public start(config: ImgToGCode.Config): this {
     try {
       if( this.isImg(path.extname(config.dirImg)) ){
-      (config.toolDiameter && typeof (config.toolDiameter) === 'number') || this.error("ToolDiameter undefined or is't number.");
+      (config.toolDiameter && typeof (config.toolDiameter) === "number") || this.error("ToolDiameter undefined or is't number.");
       (config.blackZ && typeof (config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
       (config.safeZ && typeof (config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
       (config.dirImg && typeof (config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
