@@ -77,8 +77,8 @@ export default class Analyze {
           }/* else {
               if (countBlack > diameterX2) {
               row.push(p);
-            }
-          }*/
+              }
+              }*/
         }
         pixels.push(row);
       }

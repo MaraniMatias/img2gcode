@@ -1,6 +1,11 @@
 import * as img2gcode from '../src/index.js';
 import * as ProgressBar  from 'progress';
-var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { width: 50, total: 100 });
+var bar = new ProgressBar('Analyze: [:bar] :percent :etas', {
+  complete: '#',
+  incomplete: '.',
+  width: 60,
+  total: 100
+});
 
 console.time('img2gcode');
 

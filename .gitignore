@@ -29,3 +29,4 @@ tests/*.js
 *.map
 */**/*.gcode
 *.swp
+*.directory
