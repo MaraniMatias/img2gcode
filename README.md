@@ -3,6 +3,7 @@ Convert jpg, jpeg, png, gif to gcode with NodeJS.
 
 - Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
 - This version is faster previous versions.
+- Find the shortest path to the next black pixel.
 
 ### Installation
 ```bash
