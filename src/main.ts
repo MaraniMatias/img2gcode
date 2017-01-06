@@ -82,7 +82,7 @@ export class Main extends EventEmitter {
         f: config.feedrate.idle
       }, config.safeZ);
 
-      let w = 0, size = this._img.height * this._img.width;
+      let w = 0;
       while (w <= config.errBlackPixel) {
         this.tick(this._progress / config.errBlackPixel);
         let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
@@ -92,7 +92,7 @@ export class Main extends EventEmitter {
           this.log("-> " + config.errBlackPixel + "% of black pixels unprocessed.");
           this.log("-> Accommodating gcode...");
           File.save(this._gCode, config).then((dirGCode: string) => {
-            this.log(`-> Sava As: ${dirGCode}`);
+            this.log("-> Sava As: "+dirGCode);
             fulfill(dirGCode);
           });
           break;
@@ -117,10 +117,13 @@ export class Main extends EventEmitter {
 
           self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
           self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
-          self._img.pixels = self.getAllPixel(image, config);
+          let squareImg =self.getAllPixel(image, config);
+          self._img.pixels = squareImg;
+          self._img.height = squareImg.length;
+          self._img.width = squareImg.length;
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
-          config.imgSize = "("+self._img.height+","+self._img.width+")pixel to ("+Utilities.round(self._img.height * self._pixel.toMm)+","+Utilities.round(self._img.width * self._pixel.toMm)+")mm";
+          config.imgSize = "("+image.height()+","+image.width()+")pixel to ("+Utilities.round(image.height() * self._pixel.toMm)+","+Utilities.round(image.width() * self._pixel.toMm)+")mm";
           fulfill(config);
         });
       })
@@ -183,6 +186,7 @@ export class Main extends EventEmitter {
 
   private getAllPixel(image: lwip.Image, config: ImgToGCode.Config): ImgToGCode.Pixel[][] {
     try {
+      let self = this;
       function intensityFix(colour: lwip.ColorObject) {
         return (colour.r + colour.g + colour.b) * ((colour.a > 1) ? colour.a / 100 : 1);
       }
@@ -198,34 +202,39 @@ export class Main extends EventEmitter {
         }
         newArray.push(row);
       }
-      return newArray;
+      return self.normalizeImg(newArray);
     } catch (error) {
       this.error("Error processing image.");
     }
   }
 
-  private normalize(img:ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
-    let row = img.length, column =  img[img.length - 1].length;
-    // x -> w column
-    // y -> h row
-    function addRow(){
-      for(let y = row; y <= column ; y++ ){
-        let newRow : ImgToGCode.Pixel[] = [];
-        for(let x = 0; x < column ; x++ ){
-          newRow.push({ x, y, be: true, intensity: 765 });
+  private normalizeImg(img:ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
+    try{
+      let row = img.length -1 , column =  img[img.length - 1].length -1;
+      // x -> w column
+      // y -> h row
+      function addRow(image : ImgToGCode.Pixel[][]){
+        for(let y = row ; y < column ; y++ ){
+          let newRow : ImgToGCode.Pixel[] = [];
+          for(let x = 0; x < column  ; x++ ){
+            newRow.push({ x, y, be: true, intensity: 765 });
+          }
+          image.push(newRow);
         }
-        img.push(newRow);
+        return image;
       }
-    }
-    function addColumn(){
-      for( let x = column; x < row; x++ ){
-        for( let y = 0;  y <= row; y++ ){
-          img[y].push({ x, y, be: true, intensity: 765 });
+      function addColumn(image :ImgToGCode.Pixel[][] ){
+        for( let x = column; x < row ; x++ ){
+          for( let y = 0;  y <= row; y++ ){
+            image[y].push({ x, y, be: true, intensity: 765 });
+          }
         }
+        return image;
       }
+      return row < column ? addRow(img) : addColumn(img);
+    } catch (error) {
+      this.error("Error processing image.");
     }
-    row < column ? addRow() : addColumn();
-    return img
   }
 
 }//class

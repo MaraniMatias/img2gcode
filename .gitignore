@@ -28,3 +28,4 @@ src/*.js
 tests/*.js
 *.map
 */**/*.gcode
+*.swp

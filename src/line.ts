@@ -32,7 +32,7 @@ export default class Line {
   public code(percentage: number): string {
     let x = (this._axes.x!==undefined && ` X${this._axes.x.toFixed(4)}`) || '';
     let y = (this._axes.y!==undefined && ` Y${this._sign}${this._axes.y.toFixed(4)}`) || '';
-    let z = (this._axes.z!==undefined && ` Z${this._axes.z.safe ? this._axes.z.val : (this._axes.z.val * percentage).toFixed(4)}` || '';
+    let z = (this._axes.z!==undefined && ` Z${this._axes.z.safe ? this._axes.z.val : (this._axes.z.val * percentage).toFixed(4)}`) || '';
     let f = (this._axes.f && ` F${this._axes.f}`) || '';
     let comment = (this._comment && ` ;${this._comment}`) || '';
     return "G01" + x + y + z + f + comment;

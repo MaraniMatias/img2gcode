@@ -6,8 +6,8 @@
   "typess": "./src/img2gcode.d.ts",
   "scripts": {
     "test": "node ./tests/test.js",
-    "buld": "tsc ./src/index.ts --target es6 ; tsc ./tests/test.ts --target es6",
-    "start":"npm buld ; npm test"
+    "build": "tsc ./src/**/*.ts --target es6 ; tsc ./tests/test.ts --target es6",
+    "start":"npm build ; npm test"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "jpeg",
     "gcode",
     "img2gcode",
+    "imgtogcode",
     "img to gcode",
     "png2gcode",
     "png to gcode",

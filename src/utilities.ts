@@ -61,7 +61,7 @@ export default class Utilities {
         }
       }
     } catch (error) {
-      throw new Error('Something went wrong. :(');
+      throw new Error("Something went wrong. :(");
     }
   }
 
@@ -77,7 +77,7 @@ export default class Utilities {
         return nearestPoint(oldPixelDist, this.centerDistance(newPixel1)) < nearestPoint(oldPixelDist, this.centerDistance(newPixel2)) ? newPixel1 : newPixel2
       }
     } catch (error) {
-      throw new Error('Nearest');
+      throw new Error("Nearest");
     }
   }
 

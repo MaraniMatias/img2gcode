@@ -6,16 +6,17 @@ console.time('img2gcode');
 
 img2gcode
   .start({  // It is mm
-    toolDiameter: 4,
+    toolDiameter: 3,
     sensitivity: 0.95, // intensity sensitivity
-    scaleAxes: 500, // default: image.height equal mm
+    //scaleAxes: 500, // default: image.height equal mm
     //feedrate: { work: 1200, idle: 3000 }, // Only the corresponding line is added.
     deepStep: -1, // default: -1
     whiteZ: 0, // default: 0
     blackZ: -2,
     safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/pingui.png'
+    //dirImg: __dirname + '/img-and-gcode/pingui.png'
+    dirImg: __dirname + "/img-and-gcode/kity.gif"
   })
   .on('log', (str) => {
     console.log(str);
