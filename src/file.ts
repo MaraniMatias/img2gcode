@@ -16,7 +16,6 @@ export default
           this._gCodeInit.push(gcode[index].code(-step / totalStep));
         }
         let e = gcode[gcode.length - 1];
-        console.log(config.invest);
         let x = e.axes.x ? " X" + (config.invest.x && '-') || '' + e.axes.x : '';
         let y = e.axes.y ? " Y" + (config.invest.y && '-') || '' + e.axes.y : '';
         this._gCodeInit.push(`G01${x}${y} Z${config.safeZ}; With new deep step`);
