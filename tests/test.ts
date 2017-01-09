@@ -13,9 +13,10 @@ img2gcode
   .start({  // It is mm
     toolDiameter: 3,
     sensitivity: 0.95, // intensity sensitivity
-    //scaleAxes: 500, // default: image.height equal mm
+    scaleAxes: 80, // default: image.height equal mm
     //feedrate: { work: 1200, idle: 3000 }, // Only the corresponding line is added.
     deepStep: -1, // default: -1
+    //invest: {x:true, y: false},
     whiteZ: 0, // default: 0
     blackZ: -2,
     safeZ: 1,

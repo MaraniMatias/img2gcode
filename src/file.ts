@@ -16,8 +16,9 @@ export default
           this._gCodeInit.push(gcode[index].code(-step / totalStep));
         }
         let e = gcode[gcode.length - 1];
-        let x = e.axes.x ? ' X' + e.axes.x : '';
-        let y = e.axes.y ? ' Y-' + e.axes.y : '';
+        console.log(config.invest);
+        let x = e.axes.x ? " X" + (config.invest.x && '-') || '' + e.axes.x : '';
+        let y = e.axes.y ? " Y" + (config.invest.y && '-') || '' + e.axes.y : '';
         this._gCodeInit.push(`G01${x}${y} Z${config.safeZ}; With new deep step`);
       }
       this._gCodeInit.push(`G01 Z${config.safeZ}; With Z max`);

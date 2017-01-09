@@ -1,4 +1,4 @@
-# Image to gCode
+# Image to GCode
 Convert jpg, jpeg, png, gif to gcode with NodeJS.
 
 - Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
@@ -36,12 +36,13 @@ img2gcode
 - `sensitivity` (number) Intensity sensitivity. 0 to 1. **default:** 0.95
 - `scaleAxes` (number)  Image height in mm. **default:** image.height equal mm
 - `deepStep` (number) Depth per pass. **default:** -1
+- `invest` { x: (boolean), y: (boolean) } **default:** {x: false, y: true}.
 - `dirImg` (string) Image path, accepts JPEG JPG PNG GIF formats.
 - `whiteZ` (number) White pixels. **default:** 0
 - `blackZ` (number) Maximum depth (Black pixels).
 - `safeZ` (number) Safe distance.
 - `info` (string) Displays information. ["none" | "console" | "emitter"] **default:** none
-- `feedrate` { work (number), idle (number) } Only the corresponding line is added. **default:** '' 
+- `feedrate` { work: (number), idle: (number) } Only the corresponding line is added. **default:** '' 
 
 ### Events
   Only if Options.info it is "emitter"
@@ -88,11 +89,11 @@ img2gcode
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
+- `0.2.0`: Allows you to invert X or Y to accommodate image when going to GCode.
 - `0.1.13`: Find the shortest path to the next black pixel.
 - `0.1.12`: Only GIF, JPG, JPEG or PNG file.
 - `0.1.11`: Work with non-square images.
 - `0.1.10`: Fix feedrate is undefined.
-- `0.1.9`: Add feedrate in config.
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).

@@ -41,23 +41,29 @@ export class Main extends EventEmitter {
   public start(config: ImgToGCode.Config): this {
     try {
       if( this.isImg(path.extname(config.dirImg)) ){
-      (config.toolDiameter && typeof (config.toolDiameter) === "number") || this.error("ToolDiameter undefined or is't number.");
-      (config.blackZ && typeof (config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
-      (config.safeZ && typeof (config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
-      (config.dirImg && typeof (config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
-      config.sensitivity = config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
-      config.deepStep = (typeof (config.deepStep) === "number" && config.deepStep) || -1;
-      config.whiteZ = (typeof (config.whiteZ) === "number" && config.whiteZ) || 0;
-      config.time = +new Date();
-      if (config.feedrate) {
-        config.feedrate.work = (typeof (config.feedrate.work) === "number" && config.feedrate.work) || 0;
-        config.feedrate.idle = (typeof (config.feedrate.idle) === "number" && config.feedrate.idle) || 0;
-      } else {
-        config.feedrate = { work: NaN, idle: NaN };
-      }
-      this._typeInfo = (typeof (config.info) === "string" && config.info) || "none";
-      this.log("-> Image: "+config.dirImg);
-      this.run(config);
+        (config.toolDiameter && typeof (config.toolDiameter) === "number") || this.error("ToolDiameter undefined or is't number.");
+        (config.blackZ && typeof (config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
+        (config.safeZ && typeof (config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
+        (config.dirImg && typeof (config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
+        config.sensitivity = config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
+        config.deepStep = (typeof (config.deepStep) === "number" && config.deepStep) || -1;
+        config.whiteZ = (typeof (config.whiteZ) === "number" && config.whiteZ) || 0;
+        config.time = +new Date();
+        if (config.invest) {
+          config.invest.x = typeof (config.invest.x) === "boolean" ? config.invest.x : true;
+          config.invest.y = typeof (config.invest.y) === "boolean" ? config.invest.y : true;
+        } else {
+          config.invest = { x: false, y: true };
+        }
+        if (config.feedrate) {
+          config.feedrate.work = (typeof (config.feedrate.work) === "number" && config.feedrate.work) || 0;
+          config.feedrate.idle = (typeof (config.feedrate.idle) === "number" && config.feedrate.idle) || 0;
+        } else {
+          config.feedrate = { work: NaN, idle: NaN };
+        }
+        this._typeInfo = (typeof (config.info) === "string" && config.info) || "none";
+        this.log("-> Image: "+config.dirImg);
+        this.run(config);
       }
       return this;
     } catch (error) {
@@ -88,7 +94,7 @@ export class Main extends EventEmitter {
         x: firstPixel[0][0].x,
         y: firstPixel[0][0].y,
         f: config.feedrate.idle
-      }, config.safeZ);
+      }, config);
 
       let w = 0;
       while (w <= config.errBlackPixel) {
@@ -149,22 +155,22 @@ export class Main extends EventEmitter {
           x: pixelFist.x + (pixelLast.x - pixelFist.x),
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ), safe: false }
-        });
+        },config);
       } else {
         this.addPixel({
           z: { val: config.safeZ, safe: true },
           f: config.feedrate.idle
-        });
+        },config);
         this.addPixel({
           x: pixelFist.x + (pixelLast.x - pixelFist.x),
           y: pixelFist.y + (pixelLast.y - pixelFist.y),
           z: { val: config.safeZ, safe: true },
           f: config.feedrate.idle
-        });
+        },config);
         this.addPixel({
           z: { val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ), safe: false },
           f: config.feedrate.work
-        });
+        },config);
       }
 
       Utilities.appliedAllPixel(newPixel, (p: ImgToGCode.Pixel) => {
@@ -177,16 +183,16 @@ export class Main extends EventEmitter {
     }
   }
 
-  private addPixel(axes: ImgToGCode.Axes, sevaZ?: number) {
+  private addPixel(axes: ImgToGCode.Axes, config: ImgToGCode.Config) {
     try {
       let sum = this._pixel.diameter / 2;
       let X = axes.x && (axes.x + sum) * this._pixel.toMm;
       let Y = axes.y && (axes.y + sum) * this._pixel.toMm;
       if (this._gCode.length === 0) {
-        this._gCode.push(new Line({ x: 0, y: 0, z: { val: sevaZ, safe: true } }, `X0 Y0 Z${sevaZ} Line Init`));
-        this._gCode.push(new Line({ x: X, y: Y, z: { val: sevaZ, safe: true } }, 'With Z max '));
+        this._gCode.push(new Line({ x: 0, y: 0, z: { val: config.safeZ, safe: true } }, config.invest, `X0 Y0 Z${config.safeZ} Line Init`));
+        this._gCode.push(new Line({ x: X, y: Y, z: { val: config.safeZ, safe: true } }, config.invest, 'With Z max '));
       }
-      this._gCode.push(new Line({ x: X, y: Y, z: axes.z, f: axes.f }));
+      this._gCode.push(new Line({ x: X, y: Y, z: axes.z, f: axes.f }, config.invest));
     } catch (error) {
       this.error("Failed to build a line.");
     }

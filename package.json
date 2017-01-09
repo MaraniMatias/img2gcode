@@ -1,6 +1,6 @@
 {
   "name": "img2gcode",
-  "version": "0.1.13",
+  "version": "0.2.0",
   "description": "convert jpg, png, gif to gcode with nodejs and lwip.",
   "main": "./src/index.js",
   "typess": "./src/img2gcode.d.ts",

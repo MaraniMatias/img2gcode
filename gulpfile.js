@@ -24,7 +24,7 @@ gulp.task("build-tests", function () {
 
 gulp.task('run-tests', shell.task('node ./tests/test.js'));
 
-gulp.task("default", ["build","build-tests"]);
+gulp.task("default", ["build"]);
 gulp.task("tests", ["build-tests","run-tests"]);
 
 //gulp.task('watch', function () {

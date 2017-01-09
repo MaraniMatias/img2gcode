@@ -15,6 +15,10 @@ declare namespace ImgToGCode {
       work: number;
       idle: number;
     };
+    invest?:{
+      x: boolean;
+      y: boolean;
+    };
     deepStep?: number;
     imgSize?: string;
     dirImg: string;
