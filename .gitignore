@@ -11,7 +11,7 @@ coverage
 .lock-wscript
 build/Release
 build/
-#.vscode/
+.vscode/
 #app/node_modules/
 node_modules/
 #typings/

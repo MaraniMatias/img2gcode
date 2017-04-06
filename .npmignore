@@ -7,3 +7,5 @@ gulpfile.js
 jsconfig.json
 typings.d.ts
 *.png
+*.jpeg
+*.gif

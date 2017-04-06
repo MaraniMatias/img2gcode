@@ -15,6 +15,6 @@
   "**/*.jpeg"       :  true,
   "**/*.xcf"        :  true,
   "**/node_modules" :  true
-}
-
+},
+"tslint.enable": false
 }

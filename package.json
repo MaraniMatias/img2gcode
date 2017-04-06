@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node ./tests/test.js",
     "build": "tsc ./src/**/*.ts --target es6 ; tsc ./tests/test.ts --target es6",
-    "start":"npm build ; npm test"
+    "start": "npm build ; npm test"
   },
   "repository": {
     "type": "git",
@@ -17,15 +17,16 @@
   "email": "maranimatias@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "jimp": "^0.2.27",
     "lwip": "^0.0.9",
     "promise": "^7.1.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
-    "gulp-tsb": "^2.0.1",
+    "gulp-tsb": "^2.0.3",
     "progress": "^1.1.8",
-    "typescript": "^2.0.3"
+    "typescript": "^2.2.2"
   },
   "keywords": [
     "img",
@@ -43,10 +44,7 @@
     "image to cnc"
   ],
   "engines": {
-    "node": "6.8.0",
-    "npm": "3.10.7"
-  },
-  "jshintConfig": {
-    "esversion": 6
+    "node": "6.10.2",
+    "npm": "4.4.4"
   }
 }
