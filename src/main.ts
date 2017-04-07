@@ -3,7 +3,7 @@ import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
 import * as path from "path";
-import * as lwip from "lwip";
+import * as jimp from "jimp";
 import * as os from "os";
 import { EventEmitter } from "events";
 
