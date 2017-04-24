@@ -16,5 +16,6 @@
   "**/*.xcf"        :  true,
   "**/node_modules" :  true
 },
-"tslint.enable": false
+"tslint.enable": false,
+"jshint.enable": false
 }

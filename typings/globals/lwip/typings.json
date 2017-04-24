@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/3cceead6e0d735be723b61273374a4fa1fba47f1/lwip/lwip.d.ts",
-    "raw": "registry:dt/lwip#0.0.8+20151229195328",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/3cceead6e0d735be723b61273374a4fa1fba47f1/lwip/lwip.d.ts"
-  }
-}
