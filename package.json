@@ -17,15 +17,14 @@
   "email": "maranimatias@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "jimp": "^0.2.27",
-    "promise": "^7.1.1"
+    "jimp": "^0.2.27"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-shell": "^0.5.2",
     "gulp-tsb": "^2.0.3",
     "progress": "^1.1.8",
-    "typescript": "^2.2.2"
+    "typescript": "^2.3.0"
   },
   "keywords": [
     "img",
