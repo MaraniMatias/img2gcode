@@ -24,7 +24,7 @@
     "gulp-shell": "^0.5.2",
     "gulp-tsb": "^2.0.3",
     "progress": "^1.1.8",
-    "typescript": "^2.3.0"
+    "typescript": "^2.3.1"
   },
   "keywords": [
     "img",
