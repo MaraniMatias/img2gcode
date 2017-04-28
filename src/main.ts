@@ -161,7 +161,7 @@ export class Main extends EventEmitter {
       Jimp.read(config.dirImg)
         .then(function(image) {
           self.log("-> Openping and reading...");
-          self._img.height = image.bitmap.height
+          self._img.height = image.bitmap.height;
           self._img.width = image.bitmap.width;
 
           self._pixel.toMm = (config.scaleAxes !== undefined && config.scaleAxes !== self._img.height) ? self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height) : 1;
@@ -172,7 +172,7 @@ export class Main extends EventEmitter {
           self._img.width = squareImg.length;
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
-          config.imgSize = "(" + image.height + "," + image.width + ")pixel to (" + Utilities.round(image.height * self._pixel.toMm) + "," + Utilities.round(image.width * self._pixel.toMm) + ")mm";
+          config.imgSize = "(" + image.bitmap.height+ "," + image.bitmap.width + ")pixel to (" + Utilities.round(image.bitmap.height * self._pixel.toMm) + "," + Utilities.round(image.bitmap.width * self._pixel.toMm) + ")mm";
           fulfill(config);
         }).catch(function(err) {
           throw new Error("File not found.\n" + err.message);
