@@ -5,3 +5,4 @@
 /// <reference path="globals/npm/index.d.ts" />
 /// <reference path="globals/progress/index.d.ts" />
 /// <reference path="globals/typescript/index.d.ts" />
+/// <reference path="modules/jimp/index.d.ts" />

@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/cd05e828527ff4b24d1356d8e99563e92d6b8bdb/jimp/index.d.ts",
+    "raw": "registry:dt/jimp#0.2.0+20170219013645",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/cd05e828527ff4b24d1356d8e99563e92d6b8bdb/jimp/index.d.ts"
+  }
+}
