@@ -94,7 +94,6 @@ img2gcode
 - `0.2.0`: Allows you to invert X or Y to accommodate image when going to GCode.
 - `0.1.13`: Find the shortest path to the next black pixel.
 - `0.1.12`: Only GIF, JPG, JPEG or PNG file.
-- `0.1.11`: Work with non-square images.
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
