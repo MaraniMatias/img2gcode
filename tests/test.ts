@@ -21,7 +21,7 @@ img2gcode
     blackZ: -3,
     safeZ: 1,
     info: "emitter", // ["none" | "console" | "emitter"] default: "none"
-    dirImg: __dirname + '/img-and-gcode/pingui.png'
+    dirImg: __dirname + '/img-and-gcode/m.png'
   })
   .on('log', (str) => {
     console.log(str);

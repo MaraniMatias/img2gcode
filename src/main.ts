@@ -177,11 +177,8 @@ export class Main extends EventEmitter {
         }).catch(function(err) {
           throw new Error("File not found.\n" + err.message);
         });
-
-
     })
   }
-
 
   private toGCode(oldPixel: ImgToGCode.Pixel[][], newPixel: ImgToGCode.Pixel[][], config: ImgToGCode.Config): ImgToGCode.Pixel[][] {
     try {
