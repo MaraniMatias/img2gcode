@@ -89,12 +89,12 @@ img2gcode
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
+- `1.0.1`: Solved for the last line is false.
 - `1.0.0`: Replaced lwip by jump.
 - `0.2.0`: Allows you to invert X or Y to accommodate image when going to GCode.
 - `0.1.13`: Find the shortest path to the next black pixel.
 - `0.1.12`: Only GIF, JPG, JPEG or PNG file.
 - `0.1.11`: Work with non-square images.
-- `0.1.10`: Fix feedrate is undefined.
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
