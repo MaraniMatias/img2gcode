@@ -89,6 +89,7 @@ img2gcode
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### Version.
+- `1.0.2`: Update jimp v0.2.27 -> v0.2.28.
 - `1.0.1`: Solved for the last line is false.
 - `1.0.0`: Replaced lwip by jimp.
 - `0.2.0`: Allows you to invert X or Y to accommodate image when going to GCode.
