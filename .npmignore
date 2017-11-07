@@ -1,6 +1,7 @@
 .vscode/
 .git/
 typings/
+*.map
 *.png
 *.jpeg
 *.gif
