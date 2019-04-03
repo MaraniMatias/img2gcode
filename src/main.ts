@@ -96,28 +96,26 @@ export class Main extends EventEmitter {
   }
 
   private run(config: ImgToGCode.Config) {
-    try {
-      let self = this;
-      this._progress = 0;
-      this.loading(config).then((config: ImgToGCode.Config) => {
-        self.analyze(config, (dirgcode: string) => {
-          if (typeof self._then === "function") {
-            self._then({
-              config,
-              dirgcode
-            });
-          }
-          if (self._typeInfo === "emitter") {
-            self.emit("complete", {
-              dirgcode,
-              config
-            });
-          }
-        });
+    let self = this;
+    this._progress = 0;
+    this.loading(config).then((config: ImgToGCode.Config) => {
+      self.analyze(config, (dirgcode: string) => {
+        if (typeof self._then === "function") {
+          self._then({
+            config,
+            dirgcode
+          });
+        }
+        if (self._typeInfo === "emitter") {
+          self.emit("complete", {
+            dirgcode,
+            config
+          });
+        }
       });
-    } catch (error) {
-      this.error(error);
-    }
+    }).catch(function (error) {
+      self.error(error);
+    })
   }
 
   private analyze(config: ImgToGCode.Config, fulfill: (dirGCode: string) => void) {
@@ -173,7 +171,8 @@ export class Main extends EventEmitter {
           config.errBlackPixel = Utilities.size(self._img.pixels);
           config.imgSize = "(" + image.bitmap.height + "," + image.bitmap.width + ")pixel to (" + Utilities.round(image.bitmap.height * self._pixel.toMm) + "," + Utilities.round(image.bitmap.width * self._pixel.toMm) + ")mm";
           fulfill(config);
-        }).catch(function (err: any) {
+        })
+        .catch(function (err: any) {
           reject(
             new Error("File not found.\n" + err.message)
           )
