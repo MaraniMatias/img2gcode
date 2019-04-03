@@ -3,9 +3,8 @@ import Analyze from "./analyze";
 import Line from "./line";
 import File from "./file";
 import * as path from "path";
-//import * as jimp from "jimp";
+// import * as Jimp from "jimp";
 const Jimp = require("jimp");
-import * as os from "os";
 import {
   EventEmitter
 } from "events";
@@ -40,7 +39,7 @@ export class Main extends EventEmitter {
     }
   }
   private error(err: Error | string) {
-    let srt = typeof(err) === "string" ? new Error( < string > err) : err;
+    let srt = typeof (err) === "string" ? new Error( < string > err) : err;
     if (this._typeInfo === "emitter") {
       this.emit("error", srt);
     } else {
@@ -60,17 +59,17 @@ export class Main extends EventEmitter {
   public start(config: ImgToGCode.Config): this {
     try {
       if (this.isImg(path.extname(config.dirImg))) {
-        (config.toolDiameter && typeof(config.toolDiameter) === "number") || this.error("ToolDiameter undefined or is't number.");
-        (config.blackZ && typeof(config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
-        (config.safeZ && typeof(config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
-        (config.dirImg && typeof(config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
+        (config.toolDiameter && typeof (config.toolDiameter) === "number") || this.error("ToolDiameter undefined or is't number.");
+        (config.blackZ && typeof (config.blackZ) === "number") || this.error("Black distance z undefined or is't number.");
+        (config.safeZ && typeof (config.safeZ) === "number") || this.error("Safe distance z undefined or is't number.");
+        (config.dirImg && typeof (config.dirImg) === "string") || this.error("Address undefined Image or is't string.");
         config.sensitivity = config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
-        config.deepStep = (typeof(config.deepStep) === "number" && config.deepStep) || -1;
-        config.whiteZ = (typeof(config.whiteZ) === "number" && config.whiteZ) || 0;
+        config.deepStep = (typeof (config.deepStep) === "number" && config.deepStep) || -1;
+        config.whiteZ = (typeof (config.whiteZ) === "number" && config.whiteZ) || 0;
         config.time = +new Date();
         if (config.invest) {
-          config.invest.x = typeof(config.invest.x) === "boolean" ? config.invest.x : true;
-          config.invest.y = typeof(config.invest.y) === "boolean" ? config.invest.y : true;
+          config.invest.x = typeof (config.invest.x) === "boolean" ? config.invest.x : true;
+          config.invest.y = typeof (config.invest.y) === "boolean" ? config.invest.y : true;
         } else {
           config.invest = {
             x: false,
@@ -78,15 +77,15 @@ export class Main extends EventEmitter {
           };
         }
         if (config.feedrate) {
-          config.feedrate.work = (typeof(config.feedrate.work) === "number" && config.feedrate.work) || 0;
-          config.feedrate.idle = (typeof(config.feedrate.idle) === "number" && config.feedrate.idle) || 0;
+          config.feedrate.work = (typeof (config.feedrate.work) === "number" && config.feedrate.work) || 0;
+          config.feedrate.idle = (typeof (config.feedrate.idle) === "number" && config.feedrate.idle) || 0;
         } else {
           config.feedrate = {
             work: NaN,
             idle: NaN
           };
         }
-        this._typeInfo = (typeof(config.info) === "string" && config.info) || "none";
+        this._typeInfo = (typeof (config.info) === "string" && config.info) || "none";
         this.log("-> Image: " + config.dirImg);
         this.run(config);
       }
@@ -157,9 +156,9 @@ export class Main extends EventEmitter {
   private loading(config: ImgToGCode.Config) {
     let self = this;
 
-    return new Promise(function(fulfill, reject) {
+    return new Promise(function (fulfill, reject) {
       Jimp.read(config.dirImg)
-        .then(function(image) {
+        .then(function (image) {
           self.log("-> Openping and reading...");
           self._img.height = image.bitmap.height;
           self._img.width = image.bitmap.width;
@@ -172,10 +171,12 @@ export class Main extends EventEmitter {
           self._img.width = squareImg.length;
 
           config.errBlackPixel = Utilities.size(self._img.pixels);
-          config.imgSize = "(" + image.bitmap.height+ "," + image.bitmap.width + ")pixel to (" + Utilities.round(image.bitmap.height * self._pixel.toMm) + "," + Utilities.round(image.bitmap.width * self._pixel.toMm) + ")mm";
+          config.imgSize = "(" + image.bitmap.height + "," + image.bitmap.width + ")pixel to (" + Utilities.round(image.bitmap.height * self._pixel.toMm) + "," + Utilities.round(image.bitmap.width * self._pixel.toMm) + ")mm";
           fulfill(config);
-        }).catch(function(err) {
-          throw new Error("File not found.\n" + err.message);
+        }).catch(function (err: any) {
+          reject(
+            new Error("File not found.\n" + err.message)
+          )
         });
     })
   }

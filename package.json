@@ -5,9 +5,9 @@
   "main": "./src/index.js",
   "typess": "./src/img2gcode.d.ts",
   "scripts": {
-    "test": "node ./tests/test.js",
-    "build": "tsc ./src/**/*.ts --target es6 ; tsc ./tests/test.ts --target es6",
-    "start": "npm build ; npm test"
+    "build": "tsc --project ./src",
+    "start": "npm run-script build; npm run-script test",
+    "test": "node ./tests/test.js"
   },
   "repository": {
     "type": "git",
@@ -17,14 +17,13 @@
   "email": "maranimatias@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "jimp": "^0.2.28"
+    "jimp": "^0.6.1"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-shell": "^0.5.2",
-    "gulp-tsb": "^2.0.3",
-    "progress": "^1.1.8",
-    "typescript": "^2.3.1"
+    "@types/node": "^11.13.0",
+    "@jimp/types": "^0.6.0",
+    "progress": "^2.0.3",
+    "typescript": "^3.4.1"
   },
   "keywords": [
     "img",
@@ -42,7 +41,6 @@
     "image to cnc"
   ],
   "engines": {
-    "node": "6.10.2",
-    "npm": "4.4.4"
+    "node": "^10.15.3"
   }
 }
