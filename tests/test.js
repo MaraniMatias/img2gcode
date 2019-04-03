@@ -53,6 +53,12 @@ function imgToGCode(options) {
   });
 }
 console.time("img2gcode");
+options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
+imgToGCode(options).then(() => {
+  console.timeEnd("img2gcode");
+});
+
+console.time("img2gcode");
 options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.jpeg");
 imgToGCode(options).then(() => {
   options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
