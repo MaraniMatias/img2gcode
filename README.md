@@ -101,7 +101,7 @@ const options = {
     commandPowerOn:"M04",
     commandPowerOff: "M05"
   },
-  whiteZ: 0, // default: 0
+  whiteZ: 0,
   blackZ: -3,
   safeZ: 1,
   info: "emitter",
