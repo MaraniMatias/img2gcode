@@ -43,13 +43,7 @@ img2gcode
 - `safeZ` (number) Safe distance.
 - `info` (string) Displays information. ["none" | "console" | "emitter"] **default:** none
 - `feedrate` { work: (number), idle: (number) } Only the corresponding line is added. **default:** ''
-- `laser` (object) Is you set this options, Z command is will be ignore
-```Javascript
-  laser: {
-    commandPowerOn:"M04",
-    commandPowerOff: "M05"
-  },
-```
+- `laser` { commandPowerOn: (string), commandPowerOff: (string) } Is you set this options, Z command is will be ignore
 
 ### Events
   Only if Options.info it is "emitter"
@@ -91,6 +85,26 @@ img2gcode
   .then((data) => {
     console.log(data.dirgcode);
   });
+```
+__Config for laser options__
+```Javascript
+const options = {
+  // It is mm
+  toolDiameter: 3,
+  sensitivity: 0.9,
+  scaleAxes: 128,
+  feedrate: { work: 1200, idle: 3000 },
+  deepStep: -1,
+  laser: {
+    commandPowerOn:"M04",
+    commandPowerOff: "M05"
+  },
+  whiteZ: 0, // default: 0
+  blackZ: -3,
+  safeZ: 1,
+  info: "emitter",
+  dirImg: path.normalize(__dirname + imgFile)
+};
 ```
 
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
