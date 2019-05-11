@@ -1,11 +1,7 @@
 .vscode/
 .git/
 typings/
-tests/
-*.ts
-gulpfile.js
-jsconfig.json
-typings.d.ts
+*.map
 *.png
 *.jpeg
 *.gif

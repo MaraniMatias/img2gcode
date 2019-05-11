@@ -25,7 +25,7 @@ build-serialport/
 *.html
 _sample/
 src/*.js
-tests/*.js
+!tests/*.js
 *.map
 */**/*.gcode
 *.swp

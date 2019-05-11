@@ -9,7 +9,7 @@ export default class Analyze {
    * @param {ImgToGCode.Pixel[][]} [oldPixelBlack]
    * @returns {ImgToGCode.Pixel[][]}
    */
-  public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack?: ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
+  public static getFirstPixel(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, oldPixelBlack ? : ImgToGCode.Pixel[][]): ImgToGCode.Pixel[][] {
     try {
       if (oldPixelBlack) {
         return Utilities.nearest(
@@ -29,35 +29,35 @@ export default class Analyze {
     for (let x = 0, xl = image.pixels.length; x < xl; x++) {
       for (let y = 0, yl = image.pixels[x].length; y < yl; y++) {
         let lFor = this.lootFor(image, _pixel, x, y);
-        if (lFor) return <ImgToGCode.Pixel[][]>lFor
-      }// for
-    }// for
+        if (lFor) return <ImgToGCode.Pixel[][] > lFor
+      } // for
+    } // for
 
   }
   private static getFirstPixelUpHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     for (let y = 0; y < image.pixels[y].length - 1; y++) {
       for (let x = 0, xl = image.pixels.length - 1; x < xl; x++) {
         let lFor = this.lootFor(image, _pixel, x, y);
-        if (lFor) return <ImgToGCode.Pixel[][]>lFor
-      }// for
-    }// for
+        if (lFor) return <ImgToGCode.Pixel[][] > lFor
+      } // for
+    } // for
 
   }
   private static getFirstPixelBottomWidth(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     for (let x = image.pixels.length - 1; x >= 0; x--) {
       for (let y = image.pixels[x].length - 1; y >= 0; y--) {
         let lFor = this.lootFor(image, _pixel, x, y);
-        if (lFor) return <ImgToGCode.Pixel[][]>lFor
-      }// for
-    }// for
+        if (lFor) return <ImgToGCode.Pixel[][] > lFor
+      } // for
+    } // for
   }
   private static getFirstPixelBottomHeight(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM): ImgToGCode.Pixel[][] {
     for (let y = image.pixels[image.pixels.length - 1].length - 1; y >= 0; y--) {
       for (let x = image.pixels.length - 1; x >= 0; x--) {
         let lFor = this.lootFor(image, _pixel, x, y);
-        if (lFor) return <ImgToGCode.Pixel[][]>lFor
-      }// for
-    }// for
+        if (lFor) return <ImgToGCode.Pixel[][] > lFor
+      } // for
+    } // for
   }
 
   private static lootFor(image: ImgToGCode.Image, _pixel: ImgToGCode.PixelToMM, x: number, y: number): ImgToGCode.Pixel[][] | boolean {
@@ -74,11 +74,12 @@ export default class Analyze {
               countBlack++;
               row.push(p);
             } //else { countBlack--; }
-          }/* else {
-              if (countBlack > diameterX2) {
-              row.push(p);
-              }
-              }*/
+          }
+          /* else {
+                        if (countBlack > diameterX2) {
+                        row.push(p);
+                        }
+                        }*/
         }
         pixels.push(row);
       }
@@ -114,18 +115,22 @@ export default class Analyze {
               if (x + x2 <= l && y + y2 <= l) {
                 let p = arrLootAt[x + x2][y + y2];
                 if (!p || p.intensity === 765 || p.be) {
-                  x2 = diameter; y2 = diameter; break;
+                  x2 = diameter;
+                  y2 = diameter;
+                  break;
                 } else {
                   rowBit.push(p);
                 }
               }
-            }// for
+            } // for
             pixelBir.push(rowBit);
-          }// for
-          if (Utilities.size(pixelBir, true) === diameter * diameter) { return pixelBir; }
+          } // for
+          if (Utilities.size(pixelBir, true) === diameter * diameter) {
+            return pixelBir;
+          }
         }
-      }// for
-    }// for
+      } // for
+    } // for
     return this.getFirstPixel(image, _pixel, oldPixelBlack)
   }
 
@@ -162,11 +167,11 @@ export default class Analyze {
 
           return arr;
 
-        }// for
-      }// for
+        } // for
+      } // for
     } catch (error) {
       throw new Error("Something went wrong :(. \nPlease try other measures to 'tool Diameter' or 'scaleAxes'.")
     }
   }
 
-}// class
+} // class
