@@ -44,6 +44,15 @@ img2gcode
 - `info` (string) Displays information. ["none" | "console" | "emitter"] **default:** none
 - `feedrate` { work: (number), idle: (number) } Only the corresponding line is added. **default:** ''
 
+- `laser` (object) Is you set this options, Z command is will be ignore
+
+```Javascript
+  laser: {
+    commandPowerOn:"M04",
+    commandPowerOff: "M05"
+  },
+```
+
 ### Events
   Only if Options.info it is "emitter"
 - `log` Displays information.

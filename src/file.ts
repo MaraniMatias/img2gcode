@@ -7,10 +7,7 @@ export default /**
 class File {
   private static _gCodeInit: string[] = [];
 
-  private static concat(
-    gcode: ImgToGCode.Line[],
-    config: ImgToGCode.Config
-  ): string[] {
+  private static concat(gcode: ImgToGCode.Line[], config: ImgToGCode.Config): string[] {
     try {
       let totalStep = (config.blackZ - config.whiteZ) / config.deepStep;
       for (
@@ -22,20 +19,20 @@ class File {
           this._gCodeInit.push(gcode[index].code(-step / totalStep));
         }
         let e = gcode[gcode.length - 1];
-        let x = e.axes.x
-          ? " X" + ((config.invest.x && "-") || "") + e.axes.x.toFixed(4)
-          : "";
-        let y = e.axes.y
-          ? " Y" + ((config.invest.y && "-") || "") + e.axes.y.toFixed(4)
-          : "";
-        this._gCodeInit.push(
-          `G01${x}${y} Z${config.safeZ}; With new deep step`
-        );
+        let x = e.axes.x ? " X" + ((config.invest.x && "-") || "") + e.axes.x.toFixed(4) : "";
+        let y = e.axes.y ? " Y" + ((config.invest.y && "-") || "") + e.axes.y.toFixed(4) : "";
+        if (config.laser) {
+          this._gCodeInit.push(`G01${x}${y} ${config.laser.commandPowerOn}; With laser on`);
+        } else {
+          this._gCodeInit.push(`G01${x}${y} Z${config.safeZ}; With new deep step`);
+        }
       }
-      this._gCodeInit.push(`G01 Z${config.safeZ}; With Z max`);
-      this._gCodeInit.push(
-        `;Generated in ${(+new Date() - config.time) / 1000} sec.`
-      );
+      if (config.laser) {
+        this._gCodeInit.push(`G01 ${config.laser.commandPowerOff}; With laser off`);
+      } else {
+        this._gCodeInit.push(`G01 Z${config.safeZ}; With Z max`);
+      }
+      this._gCodeInit.push(`;Generated in ${(+new Date() - config.time) / 1000} sec.`);
       return this._gCodeInit;
     } catch (error) {
       throw new Error("Something went wrong. :(");
@@ -62,19 +59,25 @@ class File {
           `; Img Size: ${config.imgSize}`,
           `; Process Error: ${config.errBlackPixel}%`,
           `; Tool Diameter: ${config.toolDiameter}`,
-          `; Scale Axes: ${config.scaleAxes}`,
-          `; Deep Step: ${config.deepStep}`,
-          `; Z Save: ${config.safeZ}`,
-          `; Z White: ${config.whiteZ}`,
-          `; Z Black: ${config.blackZ}`,
-          "G21 ; Set units to mm",
-          "G90 ; Absolute positioning"
+          `; Scale Axes: ${config.scaleAxes}`
         );
-        self
-          .writeFile(dirgcode, self.concat(gcode, config).join("\n"))
-          .then(dirGCode => {
-            fulfill(dirGCode);
-          });
+        if (config.laser && config.laser.commandPowerOn && config.laser.commandPowerOff) {
+          self._gCodeInit.push(
+            `; laser command power Off ${config.laser.commandPowerOff}`,
+            `; laser command power ON ${config.laser.commandPowerOn}`
+          );
+        } else {
+          self._gCodeInit.push(
+            `; Deep Step: ${config.deepStep}`,
+            `; Z Save: ${config.safeZ}`,
+            `; Z White: ${config.whiteZ}`,
+            `; Z Black: ${config.blackZ}`
+          );
+        }
+        self._gCodeInit.push("G21 ; Set units to mm", "G90 ; Absolute positioning");
+        self.writeFile(dirgcode, self.concat(gcode, config).join("\n")).then(dirGCode => {
+          fulfill(dirGCode);
+        });
       } catch (error) {
         reject(new Error("Something went wrong. :(.\n" + error));
       }
