@@ -85,6 +85,8 @@ img2gcode
   .then((data) => {
     console.log(data.dirgcode);
   });
+
+![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 ```
 __Config for laser options__
 ```Javascript
@@ -106,8 +108,6 @@ const options = {
   dirImg: path.normalize(__dirname + imgFile)
 };
 ```
-
-![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 
 ### License.
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
