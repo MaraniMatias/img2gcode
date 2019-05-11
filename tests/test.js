@@ -26,6 +26,10 @@ const options = {
   feedrate: { work: 1200, idle: 3000 }, // Only the corresponding line is added.
   deepStep: -1, // default: -1
   // invest: {x:true, y: false},
+  laser: {
+    commandPowerOn:"M04",
+    commandPowerOff: "M05"
+  },
   whiteZ: 0, // default: 0
   blackZ: -3,
   safeZ: 1,
@@ -58,11 +62,11 @@ imgToGCode(options).then(() => {
   console.timeEnd("img2gcode");
 });
 
-console.time("img2gcode");
-options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.jpeg");
-imgToGCode(options).then(() => {
-  options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
-  imgToGCode(options).then(() => {
-    console.timeEnd("img2gcode");
-  });
-});
+// console.time("img2gcode");
+// options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.jpeg");
+// imgToGCode(options).then(() => {
+//   options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
+//   imgToGCode(options).then(() => {
+//     console.timeEnd("img2gcode");
+//   });
+// });

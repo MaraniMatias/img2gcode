@@ -80,19 +80,19 @@ export class Main extends EventEmitter {
         this.error("Safe distance z undefined or is't number.");
       (config.dirImg && typeof config.dirImg === "string") ||
         this.error("Address undefined Image or is't string.");
+      if (config.laser) {
+        (typeof config.laser.commandPowerOn === "string" &&
+          typeof config.laser.commandPowerOff === "string") ||
+          this.error("Laser options are not string.");
+      }
       config.sensitivity =
-        config.sensitivity <= 1 && config.sensitivity >= 0
-          ? config.sensitivity
-          : 0.95;
-      config.deepStep =
-        (typeof config.deepStep === "number" && config.deepStep) || -1;
+        config.sensitivity <= 1 && config.sensitivity >= 0 ? config.sensitivity : 0.95;
+      config.deepStep = (typeof config.deepStep === "number" && config.deepStep) || -1;
       config.whiteZ = (typeof config.whiteZ === "number" && config.whiteZ) || 0;
       config.time = +new Date();
       if (config.invest) {
-        config.invest.x =
-          typeof config.invest.x === "boolean" ? config.invest.x : true;
-        config.invest.y =
-          typeof config.invest.y === "boolean" ? config.invest.y : true;
+        config.invest.x = typeof config.invest.x === "boolean" ? config.invest.x : true;
+        config.invest.y = typeof config.invest.y === "boolean" ? config.invest.y : true;
       } else {
         config.invest = {
           x: false,
@@ -101,19 +101,16 @@ export class Main extends EventEmitter {
       }
       if (config.feedrate) {
         config.feedrate.work =
-          (typeof config.feedrate.work === "number" && config.feedrate.work) ||
-          0;
+          (typeof config.feedrate.work === "number" && config.feedrate.work) || 0;
         config.feedrate.idle =
-          (typeof config.feedrate.idle === "number" && config.feedrate.idle) ||
-          0;
+          (typeof config.feedrate.idle === "number" && config.feedrate.idle) || 0;
       } else {
         config.feedrate = {
           work: NaN,
           idle: NaN
         };
       }
-      this._typeInfo =
-        (typeof config.info === "string" && config.info) || "none";
+      this._typeInfo = (typeof config.info === "string" && config.info) || "none";
       this.log("-> Image: " + config.dirImg);
 
       const self = this;
@@ -147,16 +144,10 @@ export class Main extends EventEmitter {
     });
   }
 
-  private analyze(
-    config: ImgToGCode.Config,
-    fulfill: (dirGCode: string) => void
-  ) {
+  private analyze(config: ImgToGCode.Config, fulfill: (dirGCode: string) => void) {
     try {
       this.tick(0);
-      let firstPixel: ImgToGCode.Pixel[][] = Analyze.getFirstPixel(
-        this._img,
-        this._pixel
-      );
+      let firstPixel: ImgToGCode.Pixel[][] = Analyze.getFirstPixel(this._img, this._pixel);
       this.addPixel(
         {
           x: firstPixel[0][0].x,
@@ -169,19 +160,13 @@ export class Main extends EventEmitter {
       let w = 0;
       while (w <= config.errBlackPixel) {
         this.tick(this._progress / config.errBlackPixel);
-        let nexPixels = Analyze.nextBlackToMove(
-          firstPixel,
-          this._img,
-          this._pixel
-        );
+        let nexPixels = Analyze.nextBlackToMove(firstPixel, this._img, this._pixel);
         if (!nexPixels) {
           this.tick(1);
           config.errBlackPixel = Utilities.round(
             (Utilities.size(this._img.pixels) * 100) / config.errBlackPixel
           );
-          this.log(
-            "-> " + config.errBlackPixel + "% of black pixels unprocessed."
-          );
+          this.log("-> " + config.errBlackPixel + "% of black pixels unprocessed.");
           this.log("-> Accommodating gcode...");
           File.save(this._gCode, config).then((dirGCode: string) => {
             this.log("-> Sava As: " + dirGCode);
@@ -208,15 +193,10 @@ export class Main extends EventEmitter {
           self._img.width = image.bitmap.width;
 
           self._pixel.toMm =
-            config.scaleAxes !== undefined &&
-            config.scaleAxes !== self._img.height
-              ? (self._pixel.toMm = Utilities.round(
-                  config.scaleAxes / self._img.height
-                ))
+            config.scaleAxes !== undefined && config.scaleAxes !== self._img.height
+              ? (self._pixel.toMm = Utilities.round(config.scaleAxes / self._img.height))
               : 1;
-          self._pixel.diameter = Utilities.round(
-            config.toolDiameter / self._pixel.toMm
-          );
+          self._pixel.diameter = Utilities.round(config.toolDiameter / self._pixel.toMm);
           let squareImg = self.getAllPixel(image, config);
           self._img.pixels = squareImg;
           self._img.height = squareImg.length;
@@ -257,7 +237,8 @@ export class Main extends EventEmitter {
             z: {
               val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ),
               safe: false
-            }
+            },
+            m:config.laser ? config.laser.commandPowerOn : void 0
           },
           config
         );
@@ -268,6 +249,7 @@ export class Main extends EventEmitter {
               val: config.safeZ,
               safe: true
             },
+            m: config.laser ? config.laser.commandPowerOff : void 0,
             f: config.feedrate.idle
           },
           config
@@ -280,6 +262,7 @@ export class Main extends EventEmitter {
               val: config.safeZ,
               safe: true
             },
+            m: config.laser ? config.laser.commandPowerOff : void 0,
             f: config.feedrate.idle
           },
           config
@@ -290,6 +273,7 @@ export class Main extends EventEmitter {
               val: Utilities.resolveZ(newPixel, config.whiteZ, config.blackZ),
               safe: false
             },
+            m:config.laser ? config.laser.commandPowerOn : void 0,
             f: config.feedrate.work
           },
           config
@@ -312,70 +296,63 @@ export class Main extends EventEmitter {
       let X = axes.x && (axes.x + sum) * this._pixel.toMm;
       let Y = axes.y && (axes.y + sum) * this._pixel.toMm;
       if (this._gCode.length === 0) {
+        const comment = config.laser
+          ? `X0 Y0 ${config.laser.commandPowerOff} Line Init`
+          : `X0 Y0 Z${config.safeZ} Line Init`;
+        let line: ImgToGCode.Axes = {
+          x: 0,
+          y: 0,
+          z: {
+            val: config.safeZ,
+            safe: true
+          }
+        };
+        if (config.laser) {
+          line.m = config.laser.commandPowerOff;
+        }
+        this._gCode.push(new Line(line, config.invest, comment));
+        line = {
+          x: X,
+          y: Y,
+          z: {
+            val: config.safeZ,
+            safe: true
+          }
+        };
+        if (config.laser) {
+          line.m = config.laser.commandPowerOff;
+        }
         this._gCode.push(
-          new Line(
-            {
-              x: 0,
-              y: 0,
-              z: {
-                val: config.safeZ,
-                safe: true
-              }
-            },
-            config.invest,
-            `X0 Y0 Z${config.safeZ} Line Init`
-          )
-        );
-        this._gCode.push(
-          new Line(
-            {
-              x: X,
-              y: Y,
-              z: {
-                val: config.safeZ,
-                safe: true
-              }
-            },
-            config.invest,
-            "With Z max "
-          )
+          new Line(line, config.invest, config.laser ? "Laser off" : "With Z max ")
         );
       }
-      this._gCode.push(
-        new Line(
-          {
-            x: X,
-            y: Y,
-            z: axes.z,
-            f: axes.f
-          },
-          config.invest
-        )
-      );
+      let line: ImgToGCode.Axes = {
+        x: X,
+        y: Y,
+        z: axes.z,
+        f: axes.f
+      };
+      if (config.laser) {
+        line.m = config.laser.commandPowerOn;
+      }
+      this._gCode.push(new Line(line, config.invest));
     } catch (error) {
       this.error("Failed to build a line.");
     }
   }
 
-  private getAllPixel(
-    image: any,
-    config: ImgToGCode.Config
-  ): ImgToGCode.Pixel[][] {
+  private getAllPixel(image: any, config: ImgToGCode.Config): ImgToGCode.Pixel[][] {
     try {
       let self = this;
 
       function intensityFix(colour) {
-        return (
-          (colour.r + colour.g + colour.b) * (colour.a > 1 ? colour.a / 100 : 1)
-        );
+        return (colour.r + colour.g + colour.b) * (colour.a > 1 ? colour.a / 100 : 1);
       }
       let newArray: ImgToGCode.Pixel[][] = [];
       for (let x = 0, xl = this._img.width; x < xl; x++) {
         let row: ImgToGCode.Pixel[] = [];
         for (let y = 0, yl = this._img.height; y < yl; y++) {
-          let intensity = intensityFix(
-            Jimp.intToRGBA(image.getPixelColour(x, y))
-          );
+          let intensity = intensityFix(Jimp.intToRGBA(image.getPixelColour(x, y)));
           row.push({
             x,
             y,
