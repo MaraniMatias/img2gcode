@@ -17,17 +17,19 @@ var bar = new ProgressBar("Analyze: [:bar] :percent :etas", {
 // const imgFile = "/img-and-gcode/qutap.png";
 const imgFile = "/img-and-gcode/test.jpeg";
 // const imgFile = "/img-and-gcode/test.png";
+// const imgFile = "/img-and-gcode/cuadrado.jpeg";
+//  const imgFile = "/img-and-gcode/hello.jpeg";
 
 const options = {
   // It is mm
-  toolDiameter: 3,
+  toolDiameter: 1,
   sensitivity: 0.9, // intensity sensitivity
-  scaleAxes: 128, // default: image.height equal mm
+  // scaleAxes: 128, // default: image.height equal mm
   feedrate: { work: 1200, idle: 3000 }, // Only the corresponding line is added.
   deepStep: -1, // default: -1
   // invest: {x:true, y: false},
   laser: {
-    commandPowerOn:"M04",
+    commandPowerOn: "M04",
     commandPowerOff: "M05"
   },
   whiteZ: 0, // default: 0
@@ -51,13 +53,13 @@ function imgToGCode(options) {
       })
       .then(data => {
         // console.log(data.config);
-        // console.log(data.dirgcode);
+        console.log(data.dirgcode);
         resolve(data);
       });
   });
 }
 console.time("img2gcode");
-options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
+// options.dirImg = path.normalize(__dirname + "/img-and-gcode/test.png");
 imgToGCode(options).then(() => {
   console.timeEnd("img2gcode");
 });
