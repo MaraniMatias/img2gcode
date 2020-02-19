@@ -116,10 +116,17 @@ Author: Marani Matias Ezequiel.
 
 ----
 
-_Donate_
+### Buy Me A Coffee ☕️
 
-**Bitcoin** 3GonBQ8XibkL9d5SDu5j7MccavV1VKXXet
-
-**Ethereum** 0xf3ca8c0630ceee045f715b5c596e70887a903d38
-
-**Monero** 86sR1arBcYW918Bf8NhN3bCynwGfbzMna48KfsffHi8L1UEKqwu6FVRR3canexk3jfByB99gWB5bSFxvAt2ZneigLmSNxJB
+<p><img src="https://simpleicons.org/icons/bitcoin.svg" height="12" /> <b>Bitcoin</b></p>
+<p>
+  3GonBQ8XibkL9d5SDu5j7MccavV1VKXXet
+</p>
+<p><img src="https://simpleicons.org/icons/ethereum.svg" height="12" /> <b>Ethereum</b></p>
+<p>
+  0xf3ca8c0630ceee045f715b5c596e70887a903d38
+</p>
+<p><img src="https://simpleicons.org/icons/monero.svg" height="12" /> <b>Monero</b></p>
+<p>
+  86sR1arBcYW918Bf8NhN3bCynwGfbzMna48KfsffHi8L1UEKqwu6FVRR3canexk3jfByB99gWB5bSFxvAt2ZneigLmSNxJB
+</p>
