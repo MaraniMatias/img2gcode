@@ -120,13 +120,9 @@ Author: Marani Matias Ezequiel.
 
 <p><img src="https://simpleicons.org/icons/bitcoin.svg" height="12" /> <b>Bitcoin</b></p>
 <p>
-  3GonBQ8XibkL9d5SDu5j7MccavV1VKXXet
+  1CrXKtEkmg71ur6BFSNAqhV2P7mB9dY9qr
 </p>
 <p><img src="https://simpleicons.org/icons/ethereum.svg" height="12" /> <b>Ethereum</b></p>
 <p>
-  0xf3ca8c0630ceee045f715b5c596e70887a903d38
-</p>
-<p><img src="https://simpleicons.org/icons/monero.svg" height="12" /> <b>Monero</b></p>
-<p>
-  86sR1arBcYW918Bf8NhN3bCynwGfbzMna48KfsffHi8L1UEKqwu6FVRR3canexk3jfByB99gWB5bSFxvAt2ZneigLmSNxJB
+  0xE835D7eB739D598E72aDfDFf3D7C319cd4ee7E0D
 </p>
