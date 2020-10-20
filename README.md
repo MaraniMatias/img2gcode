@@ -17,7 +17,7 @@ Depending on the configuration between tool and image height generates better co
 var img2gcode = require("img2gcode");
 
 img2gcode
-  .start(({  // It is mm
+  .start({  // It is mm
     toolDiameter: 2,
     scaleAxes: 700,
     deepStep: -1,
