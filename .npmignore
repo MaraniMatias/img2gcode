@@ -5,3 +5,6 @@ typings/
 *.png
 *.jpeg
 *.gif
+*.gcode
+/test/**/*
+*.ts

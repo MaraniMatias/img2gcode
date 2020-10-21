@@ -1,12 +1,12 @@
 {
   "name": "img2gcode",
-  "version": "1.0.7",
+  "version": "1.2.0",
   "description": "convert jpg, png, gif to gcode with nodejs and jimp.",
   "main": "./src/index.js",
   "typess": "./src/img2gcode.d.ts",
   "scripts": {
     "build": "tsc --project ./src",
-    "start": "npm run-script build; npm run-script test",
+    "start": "npm run build; npm runtest",
     "test": "node ./tests/test.js"
   },
   "repository": {
@@ -17,13 +17,13 @@
   "email": "maranimatias@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "jimp": "^0.6.4"
+    "jimp": "^0.16.1"
   },
   "devDependencies": {
-    "@jimp/types": "^0.6.4",
-    "@types/node": "^12.0.0",
+    "@jimp/types": "^0.16.1",
+    "@types/node": "^14.14.1",
     "progress": "^2.0.3",
-    "typescript": "^3.4.5"
+    "typescript": "^4.0.3"
   },
   "keywords": [
     "img",
@@ -41,6 +41,6 @@
     "image to cnc"
   ],
   "engines": {
-    "node": "^10.15.3"
+    "node": ">=10.15.3"
   }
 }
