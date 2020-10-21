@@ -22,14 +22,15 @@ Depending on the configuration between tool and image height generates better co
 var img2gcode = require("img2gcode");
 
 img2gcode
-  .start({  // It is mm
+  .start({
+    // It is mm
     toolDiameter: 2,
     scaleAxes: 700,
     deepStep: -1,
     whiteZ: 0,
     blackZ: -2,
     safeZ: 2,
-    dirImg:__dirname+'/img-and-gcode/test.jpeg'
+    dirImg: __dirname + '/img-and-gcode/test.jpeg'
   }).then((data) => {
     console.log(data.config);
     console.log(data.dirgcode);
@@ -62,19 +63,18 @@ Only if Options.info it is "emitter"
 
 ### Method
 
-- `then`
-  This function is called to finish saving the file GCode.
-  Receives as parameters an object: { config , dirgcode }
+- `then` This function is called to finish saving the file GCode and receives an object: { config , dirgcode }
 
 ### Examples
 
 ```javascript
 var img2gcode = require("img2gcode");
 var ProgressBar = require("progress"); // npm install progress
-var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { total: 100 });
+var bar = new ProgressBar("Analyze: [:bar] :percent :etas", { total: 100 });
 
 img2gcode
-  .start({  // It is mm
+  .start({
+    // It is mm
     toolDiameter: 1,
     scaleAxes: 700,
     deepStep: -1,
@@ -83,19 +83,17 @@ img2gcode
     blackZ: -2,
     safeZ: 1,
     info: "emitter", // "none" or "console" or "emitter"
-    dirImg: __dirname + '/img-and-gcode/test.png'
+    dirImg: __dirname + "/img-and-gcode/test.png",
   })
-  .on('log', (str) => {
+  .on("log", (str) => {
     console.log(str);
   })
-  .on('tick', (perc) => {
-    bar.update(perc)
+  .on("tick", (perc) => {
+    bar.update(perc);
   })
   .then((data) => {
     console.log(data.dirgcode);
   });
-
-![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 ```
 
 **Config for laser options**
