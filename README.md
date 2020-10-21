@@ -1,16 +1,21 @@
 # Image to GCode
+
 Convert jpg, jpeg, png, gif to gcode with NodeJS.
 
 - Generate GCode with absolute coordinates, finds a black pixel if you follow the trail.
 - This version is faster previous versions.
 - Find the shortest path to the next black pixel.
 
+![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
+
 ### Installation
+
 ```bash
 $ npm install img2gcode
 ```
 
 ## Quick Start
+
 Depending on the configuration between tool and image height generates better code.
 
 ```Javascript
@@ -32,9 +37,10 @@ img2gcode
 ```
 
 ### Options
+
 - `toolDiameter` (number) Tool diameter. **default:** 1
 - `sensitivity` (number) Intensity sensitivity. 0 to 1. **default:** 0.95
-- `scaleAxes` (number)  Image height in mm. **default:** image.height equal mm
+- `scaleAxes` (number) Image height in mm. **default:** image.height equal mm
 - `deepStep` (number) Depth per pass. **default:** -1
 - `invest` { x: (boolean), y: (boolean) } **default:** {x: false, y: true}.
 - `dirImg` (string) Image path, accepts JPEG JPG PNG GIF formats.
@@ -46,20 +52,23 @@ img2gcode
 - `laser` { commandPowerOn: (string), commandPowerOff: (string) } Is you set this options, Z command is will be ignore
 
 ### Events
-  Only if Options.info it is "emitter"
+
+Only if Options.info it is "emitter"
+
 - `log` Displays information.
 - `tick` Percentage of black pixels processed. 0 (0%) to 1 (100%).
 - `error` Displays error.
 - `complete` Emits at the end with "then".
 
 ### Method
+
 - `then`
   This function is called to finish saving the file GCode.
   Receives as parameters an object: { config , dirgcode }
 
 ### Examples
 
-```Javascript
+```javascript
 var img2gcode = require("img2gcode");
 var ProgressBar = require("progress"); // npm install progress
 var bar = new ProgressBar('Analyze: [:bar] :percent :etas', { total: 100 });
@@ -88,8 +97,10 @@ img2gcode
 
 ![img2gcode with CNC-ino](https://github.com/MaraniMatias/img2gcode/blob/master/ej-img2gcode.png)
 ```
-__Config for laser options__
-```Javascript
+
+**Config for laser options**
+
+```javascript
 const options = {
   // It is mm
   toolDiameter: 3,
@@ -98,23 +109,24 @@ const options = {
   feedrate: { work: 1200, idle: 3000 },
   deepStep: -1,
   laser: {
-    commandPowerOn:"M04",
-    commandPowerOff: "M05"
+    commandPowerOn: "M04",
+    commandPowerOff: "M05",
   },
   whiteZ: 0,
   blackZ: -3,
   safeZ: 1,
   info: "emitter",
-  dirImg: path.normalize(__dirname + imgFile)
+  dirImg: path.normalize(__dirname + imgFile),
 };
 ```
 
 ### License.
+
 I hope someone else will serve ([MIT](http://opensource.org/licenses/mit-license.php)).
 
 Author: Marani Matias Ezequiel.
 
-----
+---
 
 ### Buy Me A Coffee ☕️
 
